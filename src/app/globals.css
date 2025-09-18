@@ -10,7 +10,7 @@
 
 /* Text highlighting */
 ::selection {
-  background: #e5b3c3;
+  background: #a1224b;
 }
 
 /* `Globe` components */
@@ -26,6 +26,7 @@
     pointer-events: none;
     z-index: -10;
     animation: fadeIn 5s ease-in-out;
+    background-color: rgb(0, 0, 0);
   }
 }
 .content-container {
@@ -118,4 +119,85 @@
 /* Lightbox */
 .photoswipe--custom {
   --pswp-bg: white !important;
+}
+
+/* HDR Image Support */
+.hdr-image {
+  /* Smooth transitions for HDR adjustments */
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.hdr-enhanced {
+  /* Enhanced contrast and brightness for HDR displays */
+  filter: contrast(1.1) brightness(1.05);
+}
+
+/* HDR display optimizations */
+@media (dynamic-range: high) {
+  .hdr-enhanced {
+    /* More aggressive enhancements for true HDR displays */
+    filter: contrast(1.15) brightness(1.1) saturate(1.05);
+  }
+  
+  /* Optimize masonry layout for HDR */
+  .masonry-item {
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* P3 color gamut support */
+@media (color-gamut: p3) {
+  .hdr-image[data-color-space="P3"] {
+    /* Use P3 color space when available */
+    color-space: display-p3;
+  }
+}
+
+/* Rec2020 color gamut support */
+@media (color-gamut: rec2020) {
+  .hdr-image[data-color-space="Rec2020"] {
+    /* Use Rec2020 color space when available */
+    color-space: rec2020;
+  }
+}
+
+/* High luminance displays */
+@media (min-luminance: 100) {
+  .hdr-enhanced {
+    /* Adjust for very bright displays */
+    filter: contrast(1.2) brightness(1.15) saturate(1.1);
+  }
+}
+
+/* Dark mode HDR adjustments */
+@media (prefers-color-scheme: dark) and (dynamic-range: high) {
+  .hdr-enhanced {
+    /* Reduce brightness for dark mode HDR */
+    filter: contrast(1.1) brightness(0.95) saturate(1.05);
+  }
+}
+
+/* Loading states for HDR images */
+.hdr-image[data-loading="true"] {
+  opacity: 0.7;
+  filter: blur(1px);
+}
+
+/* HDR metadata tooltips */
+.hdr-image[data-max-luminance]:hover::after {
+  content: "HDR: " attr(data-max-luminance) " nits";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1000;
 }
