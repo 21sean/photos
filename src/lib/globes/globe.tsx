@@ -12,6 +12,7 @@ import { Album, AlbumTitle, types } from '@/types/albums';
 import { titleToSlug } from '@/lib/api/slug';
 import Link from 'next/link';
 import { AlbumCard } from './card';
+import useHDRSetup from '@/hooks/use-hdr-setup';
 
 type Ref = CustomGlobeMethods | undefined; // Reference to globe instance
 type GlobeEl = React.MutableRefObject<Ref>; // React `ref` passed to globe element
@@ -384,9 +385,12 @@ function useScene(globeElRef: Ref) {
   }, [globeElRef]);
 }
 
-const DEFAULT_AUTOROTATE_SPEED = 1.00; // Reduced by 30% from 1.75
+const DEFAULT_AUTOROTATE_SPEED = .32; // Reduced by 30% from 1.75
 
 function Globe({ albums }: { albums: Array<Album> }) {
+  // Initialize HDR capabilities
+  useHDRSetup();
+  
   // object config
   const globeEl = useRef<Ref>();
   const globeElRef: Ref = globeEl.current;

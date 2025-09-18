@@ -5,23 +5,24 @@ import { Masonry as MasonicMasonry } from 'masonic';
 import { type RenderComponentProps } from 'masonic';
 import { useLightbox } from '../../hooks/use-lightbox';
 import { Photo } from '@/types';
+import HDRImage from './hdr-image';
 
 const MasonryItem = ({
   width: itemWidth,
-  data: { url, width, height }
+  data: photo
 }: RenderComponentProps<Photo>) => (
   <a
-    href={url}
-    data-pswp-width={width}
-    data-pswp-height={height}
+    href={photo.url}
+    data-pswp-width={photo.width}
+    data-pswp-height={photo.height}
     target="_blank"
     rel="noreferrer"
   >
-    <img
-      src={url}
-      width={(width / itemWidth) * width}
-      height={(width / itemWidth) * height}
-      alt=""
+    <HDRImage
+      photo={photo}
+      width={(photo.width / itemWidth) * photo.width}
+      height={(photo.width / itemWidth) * photo.height}
+      className="masonry-item"
     />
   </a>
 );
