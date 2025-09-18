@@ -76,30 +76,16 @@ export const mockAlbums = [
     order: 2,
     photos: [
       {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=3",
-        title: "Tram 28",
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=4",
-        title: "Azulejo Tiles",
-        width: 800,
-        height: 600
-      },
-      {
-        size: 2073600,
-        url: "https://picsum.photos/1920/1080?random=102&hdr=p3",
-        title: "Golden Hour Tram",
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/68084daf-56fb-444a-bcd0-919213b71d49.jpeg?h=922b6616516c19b2db62f77772909c18",
+        title: "Lisbon Streets",
         width: 1920,
-        height: 1080,
+        height: 1280,
         isHDR: true,
         colorSpace: "P3" as const,
         hdrMetadata: {
-          maxLuminance: 800,
-          minLuminance: 0.02,
+          maxLuminance: 1000,
+          minLuminance: 0.01,
           colorGamut: "P3"
         }
       }
