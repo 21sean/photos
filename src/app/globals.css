@@ -45,6 +45,99 @@
 .fade-in {
   animation: fadeIn 2.5s ease-in-out;
 }
+
+/* Album list slide animation */
+.album-list {
+  will-change: transform;
+  transition: transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              text-align 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  text-align: center;
+}
+
+.album-list-sliding {
+  transform: translateX(-25vw);
+  text-align: left;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  .album-list-sliding {
+    transform: translateX(-31vw);
+  }
+  
+  /* Album card positioning for mobile - aligned with bottom of album list */
+  aside.absolute.z-50 {
+    left: 40vw !important;
+    top: 16vh !important;
+    bottom: 70vh !important;
+    transform: none !important;
+    max-width: 50vw !important;
+    width: 50vw !important;
+    font-size: 0.8em !important; /* 20% smaller text */
+    padding: 0.75rem !important; /* Reduce padding for mobile */
+  }
+  
+  /* Album card text adjustments for mobile */
+  aside.absolute.z-50 .marquee {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    margin-bottom: 0.5rem !important; /* Add margin between marquee and click text */
+  }
+  
+  /* Ensure click to enter text is visible and not clipped */
+  aside.absolute.z-50 > span:last-child {
+    margin-top: auto !important; /* Push to bottom of card */
+    padding-top: 0.5rem !important;
+    flex-shrink: 0 !important; /* Prevent shrinking */
+    font-size: 0.75rem !important; /* Smaller "Click to enter" text on mobile */
+  }
+}
+
+/* Album card background */
+aside.absolute.z-50 {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: blur(1px);
+  /* Fade-in animation - 30% slower */
+  animation: fadeInCard 0.65s ease-out forwards;
+}
+
+/* Album card fade-out when disappearing */
+aside.absolute.z-50.fade-out {
+  animation: fadeOutCard 0.65s ease-in forwards;
+}
+
+/* Album card fade-in animation */
+@keyframes fadeInCard {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Album card fade-out animation */
+@keyframes fadeOutCard {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* Desktop positioning - only apply on larger screens */
+@media (min-width: 769px) {
+  aside.absolute.z-50 {
+    left: 60% !important;
+    top: 40% !important;
+  }
+}
+
 @keyframes fadeInDelayed {
   0% {
     opacity: 0;
