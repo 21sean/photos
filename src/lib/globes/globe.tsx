@@ -70,8 +70,9 @@ function usePoints(albums: Array<Album>) {
   const locations = albums.filter(album => album.type === types.LOCATION);
   for (const album of locations) {
     points.push(
-      { lat: album.lat, lng: album.lng, radius: 0.19 },
+      { ...album, radius: 0.19 },
       ...album.locations.map(location => ({
+        ...album,
         lat: location.lat,
         lng: location.lng,
         radius: 0.135
@@ -86,7 +87,7 @@ function usePoints(albums: Array<Album>) {
 }
 
 function useRings(
-  globeElRef: CustomGlobeMethods,
+  globeEl: GlobeEl,
   setPointAltitude: React.Dispatch<React.SetStateAction<number>>
 ) {
   const [activeAlbumTitle, setActiveAlbumTitle] = useState<AlbumTitle>();
@@ -97,13 +98,27 @@ function useRings(
 
   const [enterTimeoutId, setEnterTimeoutId] = useState<NodeJS.Timeout>();
   function handleMouseEnter({ lat, lng, title, type }: Album) {
+    console.log('Mouse enter:', { title, type, lat, lng });
+    console.log('globeEl current:', globeEl.current);
+
     setActiveAlbumTitle(title);
 
     clearTimeout(enterTimeoutId);
 
+    // Stop auto-rotation when hovering over any location
+    if (globeEl.current && globeEl.current.controls) {
+      console.log('Stopping rotation...');
+      const controls = globeEl.current.controls();
+      controls.autoRotate = false;
+      controls.autoRotateForced = true; // Force the auto-rotation to stop
+      console.log('AutoRotate set to:', controls.autoRotate);
+    } else {
+      console.log('globeEl.current or controls not available');
+    }
+
     const id = setTimeout(() => {
       if (type === types.LOCATION) {
-        globeElRef.pointOfView(
+        globeEl.current?.pointOfView(
           {
             lat,
             lng,
@@ -112,17 +127,11 @@ function useRings(
           1000
         );
 
-        globeElRef.controls().autoRotateForced = true;
-        globeElRef.controls().autoRotateSpeed = 0.69;
-
         setRings([
           { lat, lng, maxR: 9, propagationSpeed: 0.88, repeatPeriod: 1777 }
         ]);
       } else if (type === types.CUSTOM) {
         setPointAltitude(2);
-
-        globeElRef.controls().autoRotateForced = true;
-        globeElRef.controls().autoRotateSpeed = 3.7 * DEFAULT_AUTOROTATE_SPEED;
 
         setRings([
           {
@@ -139,10 +148,9 @@ function useRings(
   }
   function handleMouseLeave() {
     setPointAltitude(0.002);
-
     setActiveAlbumTitle(undefined);
 
-    globeElRef.pointOfView(
+    globeEl.current?.pointOfView(
       {
         lat: 30,
         altitude: 2
@@ -150,8 +158,15 @@ function useRings(
       1000
     );
 
-    globeElRef.controls().autoRotateForced = false;
-    globeElRef.controls().autoRotateSpeed = 1.5;
+    // Restore auto-rotation after the view transition
+    setTimeout(() => {
+      if (globeEl.current?.controls) {
+        const controls = globeEl.current.controls();
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
+        controls.autoRotateForced = false; // Allow auto-rotation to resume
+      }
+    }, 1100); // Wait for the view transition to complete
 
     setRings([]);
   }
@@ -191,7 +206,7 @@ function useArcs(albums: Array<Album>) {
 }
 
 function useCustomLayer(globeEl: GlobeEl) {
-  const numbers = Array.from(Array(500), (_, index) => index);
+  const numbers = Array.from(Array(200), (_, index) => index); // Reduced from 500 to 200 for better performance
   const customLayerData = numbers.map(() => ({
     lat: (Math.random() - 0.5) * 180,
     lng: (Math.random() - 0.5) * 360,
@@ -199,10 +214,10 @@ function useCustomLayer(globeEl: GlobeEl) {
   }));
   const customThreeObject = () =>
     new THREE.Mesh(
-      new THREE.SphereGeometry(0.22),
+      new THREE.SphereGeometry(0.18), // Slightly smaller spheres
       new THREE.MeshBasicMaterial({
         color: '#777777',
-        opacity: 0.25,
+        opacity: 0.2, // Slightly more transparent
         transparent: true
       })
     );
@@ -273,11 +288,13 @@ function useGlobeReady(globeEl: GlobeEl) {
           break;
         }
       }
+      const controls = globeEl.current.controls();
       if (
-        !globeEl.current.controls().autoRotateForced &&
-        newSpeed !== DEFAULT_AUTOROTATE_SPEED
+        !controls.autoRotateForced &&
+        newSpeed !== DEFAULT_AUTOROTATE_SPEED &&
+        controls.autoRotate
       ) {
-        globeEl.current.controls().autoRotateSpeed = newSpeed;
+        controls.autoRotateSpeed = newSpeed;
       }
     }
     requestAnimationFrame(autoRotateSpeed);
@@ -285,16 +302,37 @@ function useGlobeReady(globeEl: GlobeEl) {
 
   useEffect(() => {
     if (globeReady && globeEl.current) {
-      globeEl.current.controls().enabled = false;
-
-      globeEl.current.controls().enableZoom = false;
-
-      globeEl.current.controls().autoRotate = true;
-      globeEl.current.controls().autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
+      const controls = globeEl.current.controls();
+      
+      // Only disable user interaction, but keep controls enabled for auto-rotation
+      controls.enableZoom = false;
+      controls.enablePan = false;
+      controls.enableRotate = false;
+      
+      // Force enable auto-rotation
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
+      controls.autoRotateForced = false; // Initialize the forced flag
 
       globeEl.current.pointOfView({ lat: 30, lng: -30, altitude: 2 });
 
+      // Start the dynamic rotation speed
       autoRotateSpeed();
+      
+      // Multiple attempts to ensure auto-rotation starts
+      const forceRotation = () => {
+        if (globeEl.current) {
+          const controls = globeEl.current.controls();
+          controls.autoRotate = true;
+          controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
+          controls.autoRotateForced = false;
+        }
+      };
+      
+      setTimeout(forceRotation, 100);
+      setTimeout(forceRotation, 500);
+      setTimeout(forceRotation, 1000);
+      setTimeout(forceRotation, 2000);
     }
   }, [globeEl, globeReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -339,7 +377,7 @@ function useScene(globeElRef: Ref) {
   }, [globeElRef]);
 }
 
-const DEFAULT_AUTOROTATE_SPEED = 1.75;
+const DEFAULT_AUTOROTATE_SPEED = 1.00; // Reduced by 30% from 1.75
 
 function Globe({ albums }: { albums: Array<Album> }) {
   // object config
@@ -364,7 +402,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
     handleMouseEnter,
     handleMouseLeave,
     activeAlbumTitle
-  } = useRings(globeElRef as CustomGlobeMethods, setPointAltitude);
+  } = useRings(globeEl, setPointAltitude);
   const activeAlbum = albums.find(album => album.title === activeAlbumTitle);
 
   // arcs animation
@@ -396,7 +434,10 @@ function Globe({ albums }: { albums: Array<Album> }) {
         ref={globeEl}
         width={width}
         height={height}
-        rendererConfig={{ antialias: true }} // `false` yields much better performance
+        rendererConfig={{ 
+          antialias: false, // Better performance
+          powerPreference: "high-performance"
+        }}
         onGlobeReady={handleGlobeReady}
         animateIn={false}
         backgroundColor="rgba(0,0,0,0)"
@@ -415,6 +456,19 @@ function Globe({ albums }: { albums: Array<Album> }) {
         pointAltitude={pointAltitude}
         pointRadius={point => (point as { radius: number }).radius}
         pointsMerge={true}
+        onPointHover={(point) => {
+          if (point) {
+            handleMouseEnter(point as Album);
+          } else {
+            handleMouseLeave();
+          }
+        }}
+        onPointClick={(point) => {
+          if (point) {
+            const album = point as Album;
+            window.location.href = `/${titleToSlug(album.title)}`;
+          }
+        }}
         ringsData={rings}
         ringColor={() => colorInterpolator}
         ringMaxRadius="maxR"
@@ -431,8 +485,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
       />
 
       <section className="content-container grow text-3xl">
-        <h1 className="font-bold mb-12 sm:mb-20 text-center md:text-left">
-          Aaron Agarunov
+        <h1 className="font-bold mb-6 sm:mb-12 text-center md:text-left">
+          sean.photo
         </h1>
 
         <ul
