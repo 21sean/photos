@@ -91,7 +91,7 @@ function AlbumPage({ params: { slug } }: { params: { slug: string } }) {
               ? 'max-h-0 opacity-0 translate-y-[-10px]' 
               : 'max-h-96 opacity-100 translate-y-0'
           }`}>
-            <ul className="mt-4 pt-4 border-t border-gray-300 space-y-2">
+            <ul className="mt-2 pt-4 pb-6 border-t border-gray-300 space-y-2">
               {albums.map((albumItem, index) => {
                 const isActive = title.toLowerCase() === albumItem.title.toLowerCase();
                 return (

@@ -391,6 +391,9 @@ function Globe({ albums }: { albums: Array<Album> }) {
   // Initialize HDR capabilities
   useHDRSetup();
   
+  // State for mobile slide animation
+  const [isSliding, setIsSliding] = useState(false);
+  
   // object config
   const globeEl = useRef<Ref>();
   const globeElRef: Ref = globeEl.current;
@@ -430,9 +433,29 @@ function Globe({ albums }: { albums: Array<Album> }) {
     navigator.platform.toLowerCase().includes('mac') ||
     navigator.userAgent.toLowerCase().includes('mac');
 
+  // Handle mobile album navigation with slide animation
+  const handleMobileAlbumClick = (albumTitle: string) => {
+    console.log('Starting slide animation, isSliding before:', isSliding); // Debug log
+    setIsSliding(true);
+    console.log('setIsSliding(true) called'); // Debug log
+    // Don't navigate here - only show the album card
+  };
+
+  // Handle navigation when clicking "Click to enter" on album card
+  const handleAlbumCardClick = (albumTitle: string) => {
+    // Navigate to the album
+    window.location.href = `/${titleToSlug(albumTitle)}`;
+  };
+
+  // Reset the album list to center when going back to overview
+  const resetAlbumListPosition = () => {
+    console.log('Resetting album list position');
+    setIsSliding(false);
+  };
+
   return (
     <section
-      className={`globe-container
+      className={`globe-container relative
         py-36
         sm:py-36
         md:py-32 md:px-24
@@ -441,6 +464,14 @@ function Globe({ albums }: { albums: Array<Album> }) {
         2xl:px-64
         3xl:py-56`}
     >
+      {/* Mobile-only header at the top */}
+      <h1 
+        className="md:hidden font-bold text-3xl text-center mb-8 absolute top-4 left-0 right-0 cursor-pointer"
+        onClick={resetAlbumListPosition}
+      >
+        sean.photo
+      </h1>
+
       <GlobeGL
         ref={globeEl}
         width={width}
@@ -496,13 +527,16 @@ function Globe({ albums }: { albums: Array<Album> }) {
       />
 
       <section className="content-container grow text-3xl">
-        <h1 className="font-bold mb-6 sm:mb-12 text-center md:text-left">
+        <h1 className="hidden md:block font-bold mb-6 sm:mb-12 text-center md:text-left">
           sean.photo
         </h1>
 
         <ul
-          className={`flex flex-col items-center
-            md:items-start tracking-tight`}
+          className={`flex flex-col 
+            items-center
+            md:items-start tracking-tight 
+            album-list
+            ${isSliding ? 'album-list-sliding' : ''}`}
         >
           {albums.map(album => {
             return (
@@ -516,19 +550,31 @@ function Globe({ albums }: { albums: Array<Album> }) {
                   handleMouseLeave();
                 }}
               >
+                {/* Desktop: clickable link, Mobile: non-clickable text */}
                 <Link
                   href={`/${titleToSlug(album.title)}`}
-                  className="hover:text-gray-500"
+                  className="hidden md:block hover:text-gray-500"
                 >
                   {album.title}
                 </Link>
+                <span 
+                  className="md:hidden cursor-pointer"
+                  onClick={() => handleMobileAlbumClick(album.title)}
+                >
+                  {album.title}
+                </span>
               </li>
             );
           })}
         </ul>
       </section>
 
-      {activeAlbum && <AlbumCard album={activeAlbum} />}
+      {activeAlbum && (
+        <AlbumCard 
+          album={activeAlbum} 
+          onMobileClick={() => handleAlbumCardClick(activeAlbum.title)}
+        />
+      )}
 
       <footer className={`tracking-tight content`}>
         <div className="text-3xl text-center md:text-right">
