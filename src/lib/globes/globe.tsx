@@ -109,8 +109,8 @@ function useRings(
     if (globeEl.current && globeEl.current.controls) {
       console.log('Stopping rotation...');
       const controls = globeEl.current.controls();
-      controls.autoRotate = false;
-      controls.autoRotateForced = true; // Force the auto-rotation to stop
+      controls.autoRotateForced = true; // Set forced flag first
+      controls.autoRotate = false; // Then disable rotation
       console.log('AutoRotate set to:', controls.autoRotate);
     } else {
       console.log('globeEl.current or controls not available');
@@ -162,9 +162,9 @@ function useRings(
     setTimeout(() => {
       if (globeEl.current?.controls) {
         const controls = globeEl.current.controls();
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
-        controls.autoRotateForced = false; // Allow auto-rotation to resume
+        controls.autoRotateForced = false; // Allow auto-rotation to resume first
+        controls.autoRotate = true; // Then enable rotation
+        controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED; // Reset to default speed
       }
     }, 1100); // Wait for the view transition to complete
 
@@ -253,6 +253,14 @@ function useGlobeReady(globeEl: GlobeEl) {
   // faster autoRotate speed over the ocean
   const autoRotateSpeed = () => {
     if (globeEl.current) {
+      const controls = globeEl.current.controls();
+      
+      // Don't modify anything if rotation is forced to stop
+      if (controls.autoRotateForced) {
+        requestAnimationFrame(autoRotateSpeed);
+        return;
+      }
+
       const { lng } = globeEl.current.pointOfView();
       let newSpeed = DEFAULT_AUTOROTATE_SPEED;
 
@@ -288,9 +296,8 @@ function useGlobeReady(globeEl: GlobeEl) {
           break;
         }
       }
-      const controls = globeEl.current.controls();
+      
       if (
-        !controls.autoRotateForced &&
         newSpeed !== DEFAULT_AUTOROTATE_SPEED &&
         controls.autoRotate
       ) {
