@@ -59,6 +59,19 @@
 .fade-in-delayed {
   animation: fadeInDelayed 2.33s ease-in-out;
 }
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeInUp {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
 @keyframes blink {
   50% {
     opacity: 0;
