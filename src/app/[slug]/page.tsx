@@ -15,9 +15,14 @@ export async function generateStaticParams() {
 }
 
 async function AlbumPage({ params: { slug } }: { params: { slug: string } }) {
+  // Guard against non-album routes like favicon.ico
+  if (slug.includes('.') || slug.startsWith('_')) {
+    throw new Error('Not found');
+  }
+  
   const albums = await getAlbums();
   const title = slugToAlbumTitle(slug);
-  const { album, photos } = await getAlbum(title);
+  const { album, photos } = await getAlbum(slug);
   const tags = useTags(album);
 
   return (
