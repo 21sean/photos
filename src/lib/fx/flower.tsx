@@ -11,7 +11,7 @@ function randomInRange(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
 
-const background = '#fff';
+const background = '#00fc3bff';
 const foreground = '#de2c6d';
 
 type Config = {

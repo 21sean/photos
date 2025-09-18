@@ -4,6 +4,7 @@ import { useLightbox } from '@/hooks/use-lightbox';
 import { useWindowSize } from '@/hooks/use-window-size';
 import { Photo } from '@/types';
 import { useEffect } from 'react';
+import { isLikelyHDR, getHDRImageStyles } from '../hdr-utils';
 
 function PigGrid({ items }: { items: Array<Photo> }) {
   useLightbox(items);
@@ -29,9 +30,28 @@ function PigGrid({ items }: { items: Array<Photo> }) {
       anchor.setAttribute('data-pswp-height', item.height.toString());
       anchor.target = '_blank';
       anchor.rel = 'noreferrer';
+      
       const img = document.createElement('img');
       img.src = url;
-      img.alt = '';
+      img.alt = item.title || '';
+      
+      // Apply HDR styles if image is HDR
+      const isHDR = item.isHDR || isLikelyHDR(item.url);
+      if (isHDR) {
+        const hdrStyles = getHDRImageStyles(isHDR, item.colorSpace);
+        Object.assign(img.style, hdrStyles);
+        img.className = 'hdr-image hdr-enhanced';
+        
+        // Add HDR data attributes
+        if (item.colorSpace) {
+          img.setAttribute('data-color-space', item.colorSpace);
+        }
+        if (item.hdrMetadata?.maxLuminance) {
+          img.setAttribute('data-max-luminance', item.hdrMetadata.maxLuminance.toString());
+        }
+      }
+      
+      anchor.appendChild(img);
       return anchor;
     },
     getMinAspectRatio: function (lastWindowWidth: number) {

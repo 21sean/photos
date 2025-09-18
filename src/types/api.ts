@@ -24,7 +24,15 @@ export const PhotoSchema = z.object({
   size: z.number(),
   url: z.string(),
   width: z.number(),
-  height: z.number()
+  height: z.number(),
+  title: z.string().optional(),
+  isHDR: z.boolean().optional(),
+  colorSpace: z.enum(['sRGB', 'P3', 'Rec2020']).optional(),
+  hdrMetadata: z.object({
+    maxLuminance: z.number().optional(),
+    minLuminance: z.number().optional(),
+    colorGamut: z.string().optional()
+  }).optional()
 });
 
 export type Photo = z.infer<typeof PhotoSchema>;

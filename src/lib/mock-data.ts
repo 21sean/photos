@@ -20,16 +20,44 @@ export const mockAlbums = [
       {
         size: 480000,
         url: "https://picsum.photos/800/600?random=1",
-        title: "Mexican Architecture" as AlbumTitle,
+        title: "Mexican Architecture",
         width: 800,
         height: 600
       },
       {
         size: 480000,
         url: "https://picsum.photos/800/600?random=2", 
-        title: "Ancient Ruins" as AlbumTitle,
+        title: "Ancient Ruins",
         width: 800,
         height: 600
+      },
+      {
+        size: 1920000,
+        url: "https://picsum.photos/1920/1080?random=100&hdr=true",
+        title: "Sunset over Chichen Itza",
+        width: 1920,
+        height: 1080,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 2073600,
+        url: "https://picsum.photos/1920/1080?random=101&rec2020=true",
+        title: "Vibrant Market Scene",
+        width: 1920,
+        height: 1080,
+        isHDR: true,
+        colorSpace: "Rec2020" as const,
+        hdrMetadata: {
+          maxLuminance: 4000,
+          minLuminance: 0.005,
+          colorGamut: "Rec2020"
+        }
       }
     ]
   },
@@ -50,16 +78,30 @@ export const mockAlbums = [
       {
         size: 480000,
         url: "https://picsum.photos/800/600?random=3",
-        title: "Tram 28" as AlbumTitle,
+        title: "Tram 28",
         width: 800,
         height: 600
       },
       {
         size: 480000,
         url: "https://picsum.photos/800/600?random=4",
-        title: "Azulejo Tiles" as AlbumTitle,
+        title: "Azulejo Tiles",
         width: 800,
         height: 600
+      },
+      {
+        size: 2073600,
+        url: "https://picsum.photos/1920/1080?random=102&hdr=p3",
+        title: "Golden Hour Tram",
+        width: 1920,
+        height: 1080,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 800,
+          minLuminance: 0.02,
+          colorGamut: "P3"
+        }
       }
     ]
   },
