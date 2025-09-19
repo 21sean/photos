@@ -1,3 +1,5 @@
+'use client';
+
 import { getAlbums, getAlbum } from '@/lib/api';
 import { titleToSlug, slugToAlbumTitle } from '@/lib/api/slug';
 
@@ -7,8 +9,6 @@ export async function generateStaticParams() {
     slug: titleToSlug(album.title)
   }));
 }
-
-'use client';
 
 import dynamic from 'next/dynamic';
 import Nav from '@/lib/nav';
