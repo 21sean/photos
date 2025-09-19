@@ -27,6 +27,7 @@
     "masonic": "^4.0.0",
     "next": "14.2.3",
     "photoswipe": "^5.4.3",
+    "point-in-polygon-hao": "^1.2.4",
     "prettier": "^3.2.5",
     "react": "^18",
     "react-dom": "^18",
