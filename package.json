@@ -13,7 +13,9 @@
     "knip:fix": "knip --fix",
     "check": "tsc --noEmit",
     "check:all": "pnpm check && pnpm knip && pnpm lint && pnpm format",
-    "test": "npx playwright test"
+    "test": "npx playwright test",
+    "build:static": "cp next.config.static.mjs next.config.mjs && next build",
+    "deploy:static": "pnpm build:static && next export"
   },
   "dependencies": {
     "@react-three/fiber": "^8.16.3",
