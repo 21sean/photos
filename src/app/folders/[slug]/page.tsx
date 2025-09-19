@@ -9,8 +9,7 @@ export async function generateStaticParams() {
 }
 
 async function Folder({ params: { slug } }: { params: { slug: string } }) {
-  const name = slugToFolderName(slug);
-  const { folder, photos } = await getFolder(name);
+  const { folder, photos } = await getFolder(slug);
 
   return (
     <section className="flex flex-col justify-center sm:flex-row sm:my-20 sm:mt-48">

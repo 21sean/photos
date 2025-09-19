@@ -46,42 +46,35 @@ The project is written in TypeScript, using Zod, Tailwind, and [Next.js](https:/
 
 ## Hosting
 
-The Next site is statically exported and hosted on a GitHub Pages site using GitHub Actions.
+The Next.js site can be deployed as a static export or as a server-side application.
 
-All assets are stored on [Contentful](https://www.contentful.com/) and fetched from their GraphQL endpoint.
+All photo data is currently stored as mock data in the application for demonstration purposes.
 
-### Schema
+## Data Structure
 
-#### Photo Albums
+The application uses TypeScript interfaces to define the photo album and folder structures. See the [album types](https://github.com/agarun/photos/blob/main/src/types/albums.ts#L14) for more information.
 
-This model refers to the albums featured on the front page, titled by their region.
+### Photo Albums
 
-Special albums on the front page like `Music` can exist without coordinate data if using `type: custom`.
+Albums featured on the front page with globe coordinates:
 
-| Field       | Contentful Type                        |
-| ----------- | -------------------------------------- |
-| title       | Short text                             |
-| photos      | Media                                  |
-| color       | Short text                             |
-| type        | Short text: Enum<[location, custom]>   |
-| description | Long text                              |
-| date        | Short text                             |
-| lat         | Decimal                                |
-| lng         | Decimal                                |
-| locations   | JSON: Array<{ lat, lng, description }> |
-| order       | Decimal                                |
+- title: Album name
+- photos: Array of photo objects
+- color: Display color for the album
+- type: "location" or "custom"
+- description: Album description
+- date: Date string
+- lat/lng: Geographic coordinates
+- locations: Array of specific locations within the album
+- order: Display order
 
-For more information, see the [album types](https://github.com/agarun/photos/blob/main/src/types/albums.ts#L14). Note this field originally had ID `photoGallery`.
+### Photo Folders
 
-#### Photo Folders
+Optional folders feature available at the `/folders` route:
 
-This model refers to the _optional_ folders feature available at the `/folders` route.
-
-| Field        | Contentful Type |
-| ------------ | --------------- |
-| title        | Short text      |
-| parent_title | Short text      |
-| photos       | Media           |
-| description  | Long text       |
-| date         | Short text      |
-| order        | Decimal         |
+- title: Folder name
+- parent_title: Parent folder (if nested)
+- photos: Array of photo objects
+- description: Folder description
+- date: Date string
+- order: Display order

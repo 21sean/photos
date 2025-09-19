@@ -2,7 +2,7 @@ import { mockAlbums, mockFolders } from '../mock-data';
 import { titleToSlug } from './slug';
 
 export async function getAlbums() {
-  // Using mock data instead of Contentful
+  // Using mock data for photo portfolio
   await new Promise(resolve => setTimeout(resolve, 100)); // Simulate API delay
   return mockAlbums.sort((a, b) => a.order - b.order);
 }
