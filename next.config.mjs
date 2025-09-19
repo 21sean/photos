@@ -1,13 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: [
-    'react-globe.gl',
-    'globe.gl',
-    'three-globe',
-    'three-conic-polygon-geometry',
-    '@turf/boolean-point-in-polygon'
-  ],
+  output: 'export',
+  trailingSlash: true,
   images: {
+    unoptimized: true,
     domains: ['picsum.photos', 'cdn.myportfolio.com']
   }
 };

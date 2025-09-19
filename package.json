@@ -25,7 +25,7 @@
     "d3-geo": "^3.1.1",
     "justifiedGallery": "^3.8.1",
     "masonic": "^4.0.0",
-    "next": "14.2.3",
+    "next": "^14.2.32",
     "photoswipe": "^5.4.3",
     "point-in-polygon-hao": "^1.2.4",
     "prettier": "^3.2.5",
@@ -47,6 +47,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
+    "serve": "^14.2.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
