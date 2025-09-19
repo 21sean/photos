@@ -1,9 +1,17 @@
+import { getAlbums, getAlbum } from '@/lib/api';
+import { titleToSlug, slugToAlbumTitle } from '@/lib/api/slug';
+
+export async function generateStaticParams() {
+  const albums = await getAlbums();
+  return albums.map(album => ({
+    slug: titleToSlug(album.title)
+  }));
+}
+
 'use client';
 
 import dynamic from 'next/dynamic';
-import { getAlbum, getAlbums } from '@/lib/api';
 import Nav from '@/lib/nav';
-import { titleToSlug, slugToAlbumTitle } from '@/lib/api/slug';
 import { GlobeIcon } from '@/lib/icons/globe-icon';
 import { useState, useEffect } from 'react';
 import { Album, AlbumList } from '@/types/albums';
