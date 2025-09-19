@@ -8,6 +8,36 @@
   }
 }
 
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Target iOS Safari specifically */
+  .globe-container {
+    height: -webkit-fill-available !important;
+  }
+  
+  /* Fix for iOS address bar hiding/showing */
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  html {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Improve touch handling for iOS */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Smooth scrolling for iOS */
+body {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none; /* Prevent rubber band scrolling */
+}
+
 /* Text highlighting */
 ::selection {
   background: #a1224b;
@@ -17,7 +47,8 @@
 .globe-container {
   display: flex;
   flex-direction: column;
-  height: 100lvh;
+  height: 100vh; /* Fallback for older browsers */
+  height: 100dvh; /* Use dynamic viewport height instead of logical */
 
   & > div {
     position: absolute;
@@ -51,11 +82,14 @@
   will-change: transform;
   transition: transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
               text-align 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  -webkit-transition: -webkit-transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                      text-align 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-align: center;
 }
 
 .album-list-sliding {
   transform: translateX(-25vw);
+  -webkit-transform: translateX(-25vw); /* iOS Safari fallback */
   text-align: left;
 }
 
@@ -63,6 +97,7 @@
 @media (max-width: 768px) {
   .album-list-sliding {
     transform: translateX(-31vw);
+    -webkit-transform: translateX(-31vw); /* iOS Safari fallback */
   }
   
   /* Album card positioning for mobile - aligned with bottom of album list */
@@ -71,6 +106,7 @@
     top: 16vh !important;
     bottom: 70vh !important;
     transform: none !important;
+    -webkit-transform: none !important;
     max-width: 50vw !important;
     width: 50vw !important;
     font-size: 0.8em !important; /* 20% smaller text */
@@ -111,10 +147,12 @@ aside.absolute.z-50.fade-out {
   0% {
     opacity: 0;
     transform: scale(0.95);
+    -webkit-transform: scale(0.95);
   }
   100% {
     opacity: 1;
     transform: scale(1);
+    -webkit-transform: scale(1);
   }
 }
 
@@ -123,10 +161,12 @@ aside.absolute.z-50.fade-out {
   0% {
     opacity: 1;
     transform: scale(1);
+    -webkit-transform: scale(1);
   }
   100% {
     opacity: 0;
     transform: scale(0.95);
+    -webkit-transform: scale(0.95);
   }
 }
 
@@ -201,9 +241,11 @@ aside.absolute.z-50.fade-out {
 @keyframes marquee {
   from {
     transform: translateX(0);
+    -webkit-transform: translateX(0);
   }
   to {
     transform: translateX(calc(-100% - 1rem));
+    -webkit-transform: translateX(calc(-100% - 1rem));
   }
 }
 .marquee {
@@ -211,6 +253,7 @@ aside.absolute.z-50.fade-out {
   display: flex;
   overflow: hidden;
   user-select: none;
+  -webkit-user-select: none; /* iOS Safari fallback */
   gap: 1rem;
 }
 .marquee-content {
@@ -220,6 +263,7 @@ aside.absolute.z-50.fade-out {
   gap: 1rem;
   min-width: 100%;
   animation: marquee 10s linear infinite;
+  -webkit-animation: marquee 10s linear infinite;
 }
 
 /* Lightbox */
@@ -298,6 +342,7 @@ aside.absolute.z-50.fade-out {
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
+  -webkit-transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 4px 8px;
@@ -306,4 +351,33 @@ aside.absolute.z-50.fade-out {
   white-space: nowrap;
   pointer-events: none;
   z-index: 1000;
+}
+
+/* Additional iOS Safari improvements */
+@media screen and (-webkit-min-device-pixel-ratio: 2) {
+  /* Target high DPI displays (Retina) */
+  .hdr-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* iOS Safari scroll fix */
+@supports (-webkit-appearance: none) {
+  body {
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  /* Prevent zoom on input focus for iOS */
+  input, textarea, select {
+    font-size: 16px;
+  }
+  
+  /* Fix for iOS Safari viewport units */
+  @media screen and (max-height: 900px) {
+    .globe-container {
+      height: 100vh !important;
+    }
+  }
 }
