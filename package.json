@@ -12,10 +12,10 @@
     "knip": "knip",
     "knip:fix": "knip --fix",
     "check": "tsc --noEmit",
-    "check:all": "pnpm check && pnpm knip && pnpm lint && pnpm format",
+    "check:all": "npm run check && npm run knip && npm run lint && npm run format",
     "test": "npx playwright test",
     "build:static": "cp next.config.static.mjs next.config.mjs && next build",
-    "deploy:static": "pnpm build:static && next export"
+    "deploy:static": "npm run build:static && next export"
   },
   "dependencies": {
     "@react-three/fiber": "^8.16.3",

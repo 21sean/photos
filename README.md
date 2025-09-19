@@ -4,18 +4,18 @@ My photography portfolio with galleries, tags, folders, and a globe 🌎
 
 # Setup
 
-The prerequisites are Node >= 20 and pnpm >= 8.
+The prerequisites are Node >= 20 and npm (comes with Node.js).
 
 First, install the dependencies:
 
 ```sh
-pnpm install
+npm install
 ```
 
 Run the development server:
 
 ```sh
-pnpm dev
+npm run dev
 ```
 
 Open http://localhost:3000 to see the app!
