@@ -2,6 +2,7 @@
 const nextConfig = {
   output: 'export',
   trailingSlash: true,
+  distDir: 'out',
   // Remove basePath if deploying to root domain
   // basePath: '/photos',
   // assetPrefix: '/photos',
