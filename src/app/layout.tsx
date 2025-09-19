@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'sean.photo',
     description: 'HDR Photography Portfolio',
-    url: 'https://photos.sean.photo',
+    url: 'https://sean.ventures', // Updated to match current deployment
     siteName: "sean.photo",
     images: [
       {
