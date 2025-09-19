@@ -16,6 +16,11 @@ const config: Config = {
         '2.5': '0.875rem'
       },
       screens: {
+        'xs': '475px',
+        'mobile': {'raw': '(hover: none) and (pointer: coarse) and (orientation: portrait)'},
+        'touch': {'raw': '(hover: none) and (orientation: portrait)'},
+        'ios': {'raw': '(-webkit-touch-callout: none) and (orientation: portrait)'},
+        'portrait': {'raw': '(orientation: portrait)'},
         '3xl': '2000px'
       }
     }
