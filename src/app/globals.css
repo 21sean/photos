@@ -8,21 +8,41 @@
   }
 }
 
-/* iOS Safari specific fixes */
+/* iOS Safari specific fixes - PORTRAIT MODE ONLY */
 @supports (-webkit-touch-callout: none) {
-  /* Target iOS Safari specifically */
-  .globe-container {
-    height: -webkit-fill-available !important;
-  }
-  
-  /* Fix for iOS address bar hiding/showing */
-  body {
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-  }
-  
-  html {
-    height: -webkit-fill-available;
+  @media (orientation: portrait) {
+    /* Target iOS Safari specifically in portrait */
+    .globe-container {
+      height: -webkit-fill-available !important;
+    }
+    
+    /* Fix for iOS address bar hiding/showing */
+    body {
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+    }
+    
+    html {
+      height: -webkit-fill-available;
+    }
+    
+    /* Force mobile styles on iOS regardless of viewport width */
+    .album-list-sliding {
+      transform: translateX(-31vw) !important;
+      -webkit-transform: translateX(-31vw) !important;
+    }
+    
+    aside.absolute.z-50 {
+      left: 40vw !important;
+      top: 16vh !important;
+      bottom: 70vh !important;
+      transform: none !important;
+      -webkit-transform: none !important;
+      max-width: 50vw !important;
+      width: 50vw !important;
+      font-size: 0.8em !important;
+      padding: 0.75rem !important;
+    }
   }
 }
 
@@ -36,6 +56,48 @@
 body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: none; /* Prevent rubber band scrolling */
+}
+
+/* Portrait-only orientation lock */
+@media screen and (orientation: landscape) and (max-height: 768px) {
+  body::before {
+    content: "Please rotate your device to portrait mode for the best viewing experience";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.2rem;
+    z-index: 9999;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+  }
+  
+  /* Hide main content in landscape */
+  main {
+    display: none;
+  }
+}
+
+/* Alternative: Completely disable landscape functionality */
+@media screen and (orientation: landscape) and (hover: none) and (pointer: coarse) {
+  .globe-container {
+    transform: rotate(90deg);
+    transform-origin: center center;
+    width: 100vh;
+    height: 100vw;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -50vw;
+    margin-left: -50vh;
+  }
 }
 
 /* Text highlighting */
@@ -93,8 +155,11 @@ body {
   text-align: left;
 }
 
-/* Mobile-specific adjustments */
-@media (max-width: 768px) {
+/* Mobile-specific adjustments - Updated for iOS Safari */
+/* Use multiple strategies to detect mobile devices - PORTRAIT MODE ONLY */
+@media (max-width: 768px) and (orientation: portrait), 
+       (hover: none) and (pointer: coarse) and (orientation: portrait),
+       (max-device-width: 1024px) and (orientation: portrait) {
   .album-list-sliding {
     transform: translateX(-31vw);
     -webkit-transform: translateX(-31vw); /* iOS Safari fallback */
@@ -126,6 +191,36 @@ body {
     padding-top: 0.5rem !important;
     flex-shrink: 0 !important; /* Prevent shrinking */
     font-size: 0.75rem !important; /* Smaller "Click to enter" text on mobile */
+  }
+}
+
+/* iOS-specific mobile detection using touch capability - PORTRAIT ONLY */
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  .album-list-sliding {
+    transform: translateX(-31vw) !important;
+    -webkit-transform: translateX(-31vw) !important;
+  }
+}
+
+/* Force mobile behavior for iOS Safari regardless of reported viewport width - PORTRAIT ONLY */
+@supports (-webkit-touch-callout: none) {
+  @media (max-device-width: 1024px) and (orientation: portrait) {
+    .album-list-sliding {
+      transform: translateX(-31vw) !important;
+      -webkit-transform: translateX(-31vw) !important;
+    }
+    
+    aside.absolute.z-50 {
+      left: 40vw !important;
+      top: 16vh !important;
+      bottom: 70vh !important;
+      transform: none !important;
+      -webkit-transform: none !important;
+      max-width: 50vw !important;
+      width: 50vw !important;
+      font-size: 0.8em !important;
+      padding: 0.75rem !important;
+    }
   }
 }
 
