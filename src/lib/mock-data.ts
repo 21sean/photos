@@ -1,4 +1,4 @@
-// Mock data to replace Contentful
+// Mock data for photography portfolio
 import { AlbumTitle } from '../types/albums';
 
 export const mockAlbums = [
