@@ -28,7 +28,7 @@ export const Nav: React.FC<{
       )}
 
       <ul className={`flex flex-col max-sm:items-center max-sm:mb-8 content-start tracking-tight ${
-        isInAlbum ? 'max-sm:hidden' : ''
+        isInAlbum ? 'hidden sm:flex sm:flex-col' : ''
       }`}>
         {albums.map((album, index) => {
           const isActive = title.toLowerCase() === album.title.toLowerCase();
