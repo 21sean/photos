@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import Nav from '@/lib/nav';
 import { GlobeIcon } from '@/lib/icons/globe-icon';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Album, AlbumList } from '@/types/albums';
 import { Photo } from '@/types';
 import { titleToSlug } from '@/lib/api/slug';
@@ -26,6 +26,16 @@ export default function AlbumPageClient({
   slug
 }: AlbumPageClientProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Throttled toggle to prevent rapid clicks causing performance issues
+  const handleToggle = useCallback(() => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setIsCollapsed(!isCollapsed);
+    // Reset animation lock after animation completes
+    setTimeout(() => setIsAnimating(false), 500);
+  }, [isCollapsed, isAnimating]);
 
   return (
     <section className="flex flex-col sm:flex-row sm:my-20" id="top">
@@ -60,8 +70,9 @@ export default function AlbumPageClient({
           
           {/* Mobile destinations toggle */}
           <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={handleToggle}
             className="sm:hidden mt-4 text-gray-600 hover:text-gray-800 text-sm font-medium flex items-center gap-2 transition-colors duration-200"
+            disabled={isAnimating}
           >
             <span className={`transform transition-transform duration-300 ${
               isCollapsed ? 'rotate-0' : 'rotate-90'
@@ -72,10 +83,10 @@ export default function AlbumPageClient({
           </button>
           
           {/* Mobile destinations list inside the white box */}
-          <div className={`sm:hidden overflow-hidden transition-all duration-500 ease-in-out ${
+          <div className={`sm:hidden overflow-hidden will-change-transform transition-all duration-500 ease-in-out ${
             isCollapsed 
-              ? 'max-h-0 opacity-0 translate-y-[-10px]' 
-              : 'max-h-96 opacity-100 translate-y-0'
+              ? 'max-h-0 opacity-0 transform translate3d(0, -10px, 0)' 
+              : 'max-h-96 opacity-100 transform translate3d(0, 0, 0)'
           }`}>
             <ul className="mt-2 pt-4 pb-6 border-t border-gray-300 space-y-2">
               {albums.map((albumItem, index) => {
@@ -83,7 +94,7 @@ export default function AlbumPageClient({
                 return (
                   <li 
                     key={albumItem.title} 
-                    className={`transition-all duration-300 ease-out ${
+                    className={`will-change-transform transition-all duration-300 ease-out ${
                       !isCollapsed 
                         ? 'animate-fadeInUp opacity-100' 
                         : ''
