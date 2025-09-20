@@ -438,6 +438,12 @@ function Globe({ albums }: { albums: Array<Album> }) {
     console.log('Starting slide animation, isSliding before:', isSliding); // Debug log
     setIsSliding(true);
     console.log('setIsSliding(true) called'); // Debug log
+    
+    // Find and set the active album to show the album card
+    const album = albums.find(a => a.title === albumTitle);
+    if (album) {
+      handleMouseEnter(album);
+    }
     // Don't navigate here - only show the album card
   };
 
@@ -508,7 +514,16 @@ function Globe({ albums }: { albums: Array<Album> }) {
         onPointClick={(point) => {
           if (point) {
             const album = point as Album;
-            window.location.href = `/${titleToSlug(album.title)}`;
+            // Check if we're on mobile (screen width < 768px)
+            const isMobile = window.innerWidth < 768;
+            
+            if (isMobile) {
+              // On mobile, show the album card instead of navigating directly
+              handleMobileAlbumClick(album.title);
+            } else {
+              // On desktop, navigate directly
+              window.location.href = `/${titleToSlug(album.title)}`;
+            }
           }
         }}
         ringsData={rings}
