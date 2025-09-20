@@ -433,7 +433,13 @@ function Globe({ albums }: { albums: Array<Album> }) {
     navigator.userAgent.toLowerCase().includes('mac');
 
   // Handle mobile album navigation with slide animation
-  const handleMobileAlbumClick = (albumTitle: string) => {
+  const handleMobileAlbumClick = (albumTitle: string, event?: React.MouseEvent) => {
+    // Prevent any default behavior and stop propagation
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
     console.log('Starting slide animation, isSliding before:', isSliding); // Debug log
     setIsSliding(true);
     console.log('setIsSliding(true) called'); // Debug log
@@ -520,8 +526,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
               // On mobile, show the album card instead of navigating directly
               handleMobileAlbumClick(album.title);
             } else {
-              // On desktop, navigate directly
-              window.location.href = `/${titleToSlug(album.title)}`;
+              // On desktop, also show album card instead of direct navigation
+              handleMobileAlbumClick(album.title);
             }
           }
         }}
@@ -563,11 +569,16 @@ function Globe({ albums }: { albums: Array<Album> }) {
                 onMouseLeave={() => {
                   handleMouseLeave();
                 }}
+                onClick={(e) => {
+                  // Prevent any default li behavior that might cause navigation
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
               >
                 {/* Both Desktop and Mobile: non-clickable text that shows album card */}
                 <span 
                   className="cursor-pointer hover:text-gray-500"
-                  onClick={() => handleMobileAlbumClick(album.title)}
+                  onClick={(e) => handleMobileAlbumClick(album.title, e)}
                 >
                   {album.title}
                 </span>
