@@ -27,14 +27,13 @@ export function AlbumCard({
         absolute z-50
         rounded-lg bg-black-100 w-60 text-2xl opacity-100 flex flex-col
         border border-gray-200
-        overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors duration-200
+        overflow-hidden hover:bg-gray-50 transition-colors duration-200
         touch-manipulation`} /* Add touch-manipulation for better mobile interaction */
       style={{
         left: `calc(33% + ${randomLeft}px)`,
         top: `calc(33% + ${randomTop}px)`,
         minHeight: '138px' /* Ensure minimum height to prevent clipping */
       }}
-      onClick={onMobileClick}
     >
       <span className="blink rounded-lg flex-shrink-0 text-lg md:text-2xl">{album.title}</span>
       <span className="text-sm md:text-base flex-shrink-0">{album.date}</span>
@@ -51,7 +50,18 @@ export function AlbumCard({
         </div>
       </div>
 
-      <span className="flex-shrink-0 text-sm md:text-base py-2 -mx-2 px-2 rounded touch-manipulation select-none">&rarr;Click to enter&rarr;</span>
+      <span 
+        className="flex-shrink-0 text-sm md:text-base py-2 -mx-2 px-2 rounded touch-manipulation select-none cursor-pointer hover:bg-gray-200 transition-colors duration-200"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (onMobileClick) {
+            onMobileClick();
+          }
+        }}
+      >
+        &rarr;Click to enter&rarr;
+      </span>
     </aside>
   );
 }
