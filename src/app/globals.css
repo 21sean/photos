@@ -224,6 +224,32 @@ body {
   }
 }
 
+/* iOS Performance Optimizations for Dropdown */
+@supports (-webkit-touch-callout: none) {
+  /* Hardware acceleration for dropdown on iOS */
+  .sm\\:hidden.overflow-hidden.will-change-transform {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+  }
+  
+  /* Optimize transforms for iOS */
+  .sm\\:hidden.overflow-hidden.will-change-transform * {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Hide album navigation on mobile when in album page */
+@media (max-width: 640px) {
+  .album-nav-mobile-hidden {
+    display: none !important;
+  }
+}
+
 /* Album card background */
 aside.absolute.z-50 {
   background-color: rgba(0, 0, 0, 0.1) !important;
@@ -290,15 +316,19 @@ aside.absolute.z-50.fade-out {
 @keyframes fadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translate3d(0, 10px, 0);
+    -webkit-transform: translate3d(0, 10px, 0);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
   }
 }
 .animate-fadeInUp {
   animation: fadeInUp 0.4s ease-out forwards;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 @keyframes blink {
   50% {
