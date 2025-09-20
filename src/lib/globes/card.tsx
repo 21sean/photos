@@ -25,7 +25,7 @@ export function AlbumCard({
     <aside
       className={`p-4
         absolute z-50
-        rounded-lg bg-black-100 w-60 text-2xl opacity-100 flex flex-col
+        rounded-lg bg-black-100 w-60 text-2xl flex flex-col
         border border-gray-200
         overflow-hidden hover:bg-gray-50 transition-colors duration-200
         touch-manipulation`} /* Add touch-manipulation for better mobile interaction */
@@ -51,7 +51,7 @@ export function AlbumCard({
       </div>
 
       <span 
-        className="flex-shrink-0 text-sm md:text-base py-2 -mx-2 px-2 rounded touch-manipulation select-none cursor-pointer hover:bg-gray-200 transition-colors duration-200"
+        className="flex-shrink-0 text-sm md:text-base py-1 px-2 rounded touch-manipulation select-none cursor-pointer hover:bg-gray-200 transition-colors duration-200"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -68,11 +68,12 @@ export function AlbumCard({
           }
         }}
         style={{
-          // Ensure adequate touch target size (44px minimum recommended)
-          minHeight: '44px',
-          display: 'flex',
+          // Ensure adequate touch target size but don't expand beyond content
+          minHeight: '32px',
+          display: 'inline-flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          alignSelf: 'flex-start' // Don't stretch to full width
         }}
       >
         &rarr;Click to enter&rarr;

@@ -393,6 +393,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
   // State for mobile slide animation
   const [isSliding, setIsSliding] = useState(false);
   
+  
   // object config
   const globeEl = useRef<Ref>();
   const globeElRef: Ref = globeEl.current;
@@ -463,6 +464,13 @@ function Globe({ albums }: { albums: Array<Album> }) {
     setIsSliding(false);
   };
 
+  // Hide album card when double-clicking sean.photo text or globe background
+  const hideAlbumCard = () => {
+    console.log('Hiding album card');
+    handleMouseLeave(); // This will clear the active album and hide the card
+  };
+
+
   return (
     <section
       className={`globe-container relative
@@ -473,11 +481,18 @@ function Globe({ albums }: { albums: Array<Album> }) {
         xl:py-48 xl:px-48
         2xl:px-64
         3xl:py-56`}
+      onDoubleClick={(e) => {
+        // Only hide if clicking on the background, not on interactive elements
+        if (e.target === e.currentTarget) {
+          hideAlbumCard();
+        }
+      }}
     >
       {/* Mobile-only header at the top */}
       <h1 
         className="md:hidden font-bold text-3xl text-center mb-8 absolute top-4 left-0 right-0 cursor-pointer"
         onClick={resetAlbumListPosition}
+        onDoubleClick={hideAlbumCard}
       >
         sean.photo
       </h1>
@@ -538,7 +553,10 @@ function Globe({ albums }: { albums: Array<Album> }) {
       />
 
       <section className="content-container grow text-3xl">
-        <h1 className="hidden md:block font-bold mb-6 sm:mb-12 text-center md:text-left">
+        <h1 
+          className="hidden md:block font-bold mb-6 sm:mb-12 text-center md:text-left cursor-pointer"
+          onDoubleClick={hideAlbumCard}
+        >
           sean.photo
         </h1>
 
@@ -568,7 +586,9 @@ function Globe({ albums }: { albums: Array<Album> }) {
               >
                 {/* Both Desktop and Mobile: album title shows card only, no navigation */}
                 <span 
-                  className="cursor-pointer hover:text-gray-500 touch-manipulation select-none"
+                  className={`cursor-pointer hover:text-gray-500 touch-manipulation select-none ${
+                    activeAlbumTitle === album.title ? 'italic' : ''
+                  }`}
                   onClick={(e) => handleAlbumTitleClick(album.title, e)}
                   onTouchEnd={(e) => {
                     // Handle touch events on mobile devices for better responsiveness

@@ -64,12 +64,12 @@
       left: 40vw !important;
       top: 12vh !important; /* Moved up from 16vh */
       bottom: 74vh !important; /* Adjusted to maintain size */
-      transform: none !important;
-      -webkit-transform: none !important;
       max-width: 50vw !important;
       width: 50vw !important;
       font-size: 0.8em !important;
       padding: 0.75rem !important;
+      /* Preserve the fade-in animation on mobile */
+      animation: fadeInCard 0.65s ease-out forwards !important;
     }
     
     /* Improve tap target for click to enter text - ONLY for globe page */
@@ -207,12 +207,12 @@ body {
     left: 40vw !important;
     top: 12vh !important; /* Moved up from 16vh */
     bottom: 74vh !important; /* Adjusted to maintain size */
-    transform: none !important;
-    -webkit-transform: none !important;
     max-width: 50vw !important;
     width: 50vw !important;
     font-size: 0.8em !important; /* 20% smaller text */
     padding: 0.75rem !important; /* Reduce padding for mobile */
+    /* Preserve the fade-in animation on mobile */
+    animation: fadeInCard 0.65s ease-out forwards !important;
   }
   
   /* Album card text adjustments for mobile */
@@ -251,12 +251,12 @@ body {
       left: 40vw !important;
       top: 12vh !important; /* Moved up from 16vh */
       bottom: 74vh !important; /* Adjusted to maintain size */
-      transform: none !important;
-      -webkit-transform: none !important;
       max-width: 50vw !important;
       width: 50vw !important;
       font-size: 0.8em !important;
       padding: 0.75rem !important;
+      /* Preserve the fade-in animation on mobile */
+      animation: fadeInCard 0.65s ease-out forwards !important;
     }
   }
 }
@@ -293,6 +293,8 @@ aside.absolute.z-50 {
   backdrop-filter: blur(1px);
   /* Fade-in animation - 30% slower */
   animation: fadeInCard 0.65s ease-out forwards;
+  /* Start with opacity 0 for proper fade-in */
+  opacity: 0;
 }
 
 /* Album card fade-out when disappearing */
