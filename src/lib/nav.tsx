@@ -49,7 +49,7 @@ export const Nav: React.FC<{
         })}
         {title && (
           <>
-            <li className="sm:mt-10 flex gap-1">
+            <li className="sm:mt-10 flex gap-1 max-sm:hidden">
               <Link
                 href="/about"
                 prefetch={false}
