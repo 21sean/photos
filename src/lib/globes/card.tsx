@@ -59,6 +59,21 @@ export function AlbumCard({
             onMobileClick();
           }
         }}
+        onTouchEnd={(e) => {
+          // Handle touch events for better mobile responsiveness
+          e.preventDefault();
+          e.stopPropagation();
+          if (onMobileClick) {
+            onMobileClick();
+          }
+        }}
+        style={{
+          // Ensure adequate touch target size (44px minimum recommended)
+          minHeight: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
       >
         &rarr;Click to enter&rarr;
       </span>
