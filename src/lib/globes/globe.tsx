@@ -10,7 +10,6 @@ import * as topojson from 'topojson-client';
 import { useWindowSize } from '@/hooks/use-window-size';
 import { Album, AlbumTitle, types } from '@/types/albums';
 import { titleToSlug } from '@/lib/api/slug';
-import Link from 'next/link';
 import { AlbumCard } from './card';
 import useHDRSetup from '@/hooks/use-hdr-setup';
 
@@ -565,15 +564,9 @@ function Globe({ albums }: { albums: Array<Album> }) {
                   handleMouseLeave();
                 }}
               >
-                {/* Desktop: clickable link, Mobile: non-clickable text */}
-                <Link
-                  href={`/${titleToSlug(album.title)}`}
-                  className="hidden md:block hover:text-gray-500"
-                >
-                  {album.title}
-                </Link>
+                {/* Both Desktop and Mobile: non-clickable text that shows album card */}
                 <span 
-                  className="md:hidden cursor-pointer"
+                  className="cursor-pointer hover:text-gray-500"
                   onClick={() => handleMobileAlbumClick(album.title)}
                 >
                   {album.title}
