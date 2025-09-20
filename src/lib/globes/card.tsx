@@ -51,7 +51,7 @@ export function AlbumCard({
         </div>
       </div>
 
-      <span className="flex-shrink-0 text-sm md:text-base">&rarr;Click to enter&rarr;</span>
+      <span className="flex-shrink-0 text-sm md:text-base py-2 -mx-2 px-2 rounded touch-manipulation select-none">&rarr;Click to enter&rarr;</span>
     </aside>
   );
 }
