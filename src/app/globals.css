@@ -22,10 +22,19 @@
       left: 0 !important;
     }
     
-    /* Move album list up by 18% to prevent bottom clipping */
+    /* Move album list down by 7% and adjust positioning */
     .content-container {
-      transform: translateY(-18%) !important;
-      -webkit-transform: translateY(-18%) !important;
+      transform: translateY(-11%) !important; /* Changed from -18% to -11% (net 7% down) */
+      -webkit-transform: translateY(-11%) !important;
+    }
+    
+    /* Move copyright up to prevent clipping */
+    footer {
+      position: fixed !important;
+      bottom: 2vh !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 20 !important;
     }
     
     /* Fix for iOS address bar hiding/showing */
@@ -549,6 +558,22 @@ aside.absolute.z-50.fade-out {
       /* Smooth HDR transitions on device rotation */
       transition: all 0.3s ease;
     }
+  }
+  
+  /* Safari-specific fixes for album navigation */
+  .album-list li {
+    /* Prevent any Safari-specific navigation behavior */
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+  
+  .album-list li span {
+    /* Ensure spans don't trigger navigation in Safari */
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    pointer-events: auto !important;
   }
 }
 
