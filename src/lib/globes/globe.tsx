@@ -432,24 +432,23 @@ function Globe({ albums }: { albums: Array<Album> }) {
     navigator.platform.toLowerCase().includes('mac') ||
     navigator.userAgent.toLowerCase().includes('mac');
 
-  // Handle mobile album navigation with slide animation
-  const handleMobileAlbumClick = (albumTitle: string, event?: React.MouseEvent) => {
+  // Handle album title click - show card only, no navigation
+  const handleAlbumTitleClick = (albumTitle: string, event?: React.MouseEvent | React.TouchEvent) => {
     // Prevent any default behavior and stop propagation
     if (event) {
       event.preventDefault();
       event.stopPropagation();
     }
     
-    console.log('Starting slide animation, isSliding before:', isSliding); // Debug log
+    console.log('Album title clicked, showing card for:', albumTitle);
     setIsSliding(true);
-    console.log('setIsSliding(true) called'); // Debug log
     
     // Find and set the active album to show the album card
     const album = albums.find(a => a.title === albumTitle);
     if (album) {
       handleMouseEnter(album);
     }
-    // Don't navigate here - only show the album card
+    // IMPORTANT: Don't navigate here - only show the album card
   };
 
   // Handle navigation when clicking "Click to enter" on album card
@@ -519,16 +518,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
         onPointClick={(point) => {
           if (point) {
             const album = point as Album;
-            // Check if we're on mobile (screen width < 768px)
-            const isMobile = window.innerWidth < 768;
-            
-            if (isMobile) {
-              // On mobile, show the album card instead of navigating directly
-              handleMobileAlbumClick(album.title);
-            } else {
-              // On desktop, also show album card instead of direct navigation
-              handleMobileAlbumClick(album.title);
-            }
+            // Show album card instead of navigating directly (both mobile and desktop)
+            handleAlbumTitleClick(album.title);
           }
         }}
         ringsData={rings}
@@ -575,10 +566,22 @@ function Globe({ albums }: { albums: Array<Album> }) {
                   e.stopPropagation();
                 }}
               >
-                {/* Both Desktop and Mobile: non-clickable text that shows album card */}
+                {/* Both Desktop and Mobile: album title shows card only, no navigation */}
                 <span 
-                  className="cursor-pointer hover:text-gray-500"
-                  onClick={(e) => handleMobileAlbumClick(album.title, e)}
+                  className="cursor-pointer hover:text-gray-500 touch-manipulation select-none"
+                  onClick={(e) => handleAlbumTitleClick(album.title, e)}
+                  onTouchEnd={(e) => {
+                    // Handle touch events on mobile devices for better responsiveness
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleAlbumTitleClick(album.title, e);
+                  }}
+                  style={{
+                    // Improve touch target size on mobile
+                    minHeight: '44px',
+                    display: 'inline-block',
+                    lineHeight: '44px'
+                  }}
                 >
                   {album.title}
                 </span>

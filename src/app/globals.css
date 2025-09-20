@@ -8,11 +8,11 @@
   }
 }
 
-/* iOS Safari specific fixes - PORTRAIT MODE ONLY */
+/* iOS Safari specific fixes - PORTRAIT MODE ONLY - GLOBE PAGE ONLY */
 @supports (-webkit-touch-callout: none) {
   @media (orientation: portrait) {
-    /* Target iOS Safari specifically in portrait */
-    .globe-container {
+    /* Target iOS Safari specifically in portrait - ONLY for globe page */
+    body:has(.globe-container) .globe-container {
       height: -webkit-fill-available !important;
       /* Disable scrolling on iOS Safari */
       overflow: hidden !important;
@@ -22,14 +22,14 @@
       left: 0 !important;
     }
     
-    /* Move album list down by 7% and adjust positioning */
-    .content-container {
+    /* Move album list down by 7% and adjust positioning - ONLY for globe page */
+    body:has(.globe-container) .content-container {
       transform: translateY(-11%) !important; /* Changed from -18% to -11% (net 7% down) */
       -webkit-transform: translateY(-11%) !important;
     }
     
-    /* Move copyright up to prevent clipping */
-    footer {
+    /* Move copyright up to prevent clipping - ONLY for globe page */
+    body:has(.globe-container) footer {
       position: fixed !important;
       bottom: 2vh !important;
       left: 0 !important;
@@ -37,8 +37,8 @@
       z-index: 20 !important;
     }
     
-    /* Fix for iOS address bar hiding/showing */
-    body {
+    /* Fix for iOS address bar hiding/showing - ONLY for globe page */
+    body:has(.globe-container) {
       min-height: 100vh;
       min-height: -webkit-fill-available;
       /* Disable scrolling on iOS Safari */
@@ -47,20 +47,20 @@
       width: 100% !important;
     }
     
-    html {
+    html:has(.globe-container) {
       height: -webkit-fill-available;
       /* Disable scrolling on iOS Safari */
       overflow: hidden !important;
     }
     
-    /* Force mobile styles on iOS regardless of viewport width */
-    .album-list-sliding {
+    /* Force mobile styles on iOS regardless of viewport width - ONLY for globe page */
+    body:has(.globe-container) .album-list-sliding {
       transform: translateX(-31vw) !important;
       -webkit-transform: translateX(-31vw) !important;
     }
     
-    /* Move album card up and improve positioning */
-    aside.absolute.z-50 {
+    /* Move album card up and improve positioning - ONLY for globe page */
+    body:has(.globe-container) aside.absolute.z-50 {
       left: 40vw !important;
       top: 12vh !important; /* Moved up from 16vh */
       bottom: 74vh !important; /* Adjusted to maintain size */
@@ -72,8 +72,8 @@
       padding: 0.75rem !important;
     }
     
-    /* Improve tap target for click to enter text */
-    aside.absolute.z-50 > span:last-child {
+    /* Improve tap target for click to enter text - ONLY for globe page */
+    body:has(.globe-container) aside.absolute.z-50 > span:last-child {
       padding: 0.75rem 0.5rem !important; /* Increase touch area */
       margin: -0.25rem -0.5rem 0 -0.5rem !important; /* Negative margins to maintain visual size */
       border-radius: 4px !important;
@@ -231,23 +231,23 @@ body {
   }
 }
 
-/* iOS-specific mobile detection using touch capability - PORTRAIT ONLY */
+/* iOS-specific mobile detection using touch capability - PORTRAIT ONLY - GLOBE PAGE ONLY */
 @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
-  .album-list-sliding {
+  body:has(.globe-container) .album-list-sliding {
     transform: translateX(-31vw) !important;
     -webkit-transform: translateX(-31vw) !important;
   }
 }
 
-/* Force mobile behavior for iOS Safari regardless of reported viewport width - PORTRAIT ONLY */
+/* Force mobile behavior for iOS Safari regardless of reported viewport width - PORTRAIT ONLY - GLOBE PAGE ONLY */
 @supports (-webkit-touch-callout: none) {
   @media (max-device-width: 1024px) and (orientation: portrait) {
-    .album-list-sliding {
+    body:has(.globe-container) .album-list-sliding {
       transform: translateX(-31vw) !important;
       -webkit-transform: translateX(-31vw) !important;
     }
     
-    aside.absolute.z-50 {
+    body:has(.globe-container) aside.absolute.z-50 {
       left: 40vw !important;
       top: 12vh !important; /* Moved up from 16vh */
       bottom: 74vh !important; /* Adjusted to maintain size */
@@ -560,16 +560,27 @@ aside.absolute.z-50.fade-out {
     }
   }
   
-  /* Safari-specific fixes for album navigation */
-  .album-list li {
+  /* Safari-specific fixes for album navigation - GLOBE PAGE ONLY */
+  body:has(.globe-container) .album-list li {
     /* Prevent any Safari-specific navigation behavior */
     -webkit-touch-callout: none !important;
     -webkit-user-select: none !important;
     user-select: none !important;
   }
   
-  .album-list li span {
+  body:has(.globe-container) .album-list li span {
     /* Ensure spans don't trigger navigation in Safari */
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    pointer-events: auto !important;
+    /* Improve touch responsiveness */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Improve album card touch handling on mobile */
+  body:has(.globe-container) aside.absolute.z-50 {
+    /* Ensure touch events work properly */
     -webkit-touch-callout: none !important;
     -webkit-user-select: none !important;
     user-select: none !important;
@@ -586,9 +597,9 @@ aside.absolute.z-50.fade-out {
   }
 }
 
-/* iOS Safari scroll fix */
+/* iOS Safari scroll fix - GLOBE PAGE ONLY */
 @supports (-webkit-appearance: none) {
-  body {
+  body:has(.globe-container) {
     position: relative;
     overflow-x: hidden;
   }
@@ -598,9 +609,9 @@ aside.absolute.z-50.fade-out {
     font-size: 16px;
   }
   
-  /* Fix for iOS Safari viewport units */
+  /* Fix for iOS Safari viewport units - GLOBE PAGE ONLY */
   @media screen and (max-height: 900px) {
-    .globe-container {
+    body:has(.globe-container) .globe-container {
       height: 100vh !important;
     }
   }
