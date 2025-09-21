@@ -51,18 +51,24 @@ export function detectHDRCapabilities(): HDRCapabilities {
     const ctx = canvas.getContext('2d', { 
       colorSpace: 'display-p3',
       willReadFrequently: false // Performance optimization
-    });
-    if (ctx && 'colorSpace' in ctx.getContextAttributes()) {
-      capabilities.supportsP3 = true;
+    }) as CanvasRenderingContext2D | null;
+    if (ctx && typeof (ctx as any).getContextAttributes === 'function') {
+      const attrs = (ctx as any).getContextAttributes();
+      if (attrs && 'colorSpace' in attrs) {
+        capabilities.supportsP3 = true;
+      }
     }
     
     // Test for HDR canvas support
     const hdrCtx = canvas.getContext('2d', { 
       colorSpace: 'rec2020',
       willReadFrequently: false
-    });
-    if (hdrCtx && 'colorSpace' in hdrCtx.getContextAttributes()) {
-      capabilities.supportsRec2020 = true;
+    }) as CanvasRenderingContext2D | null;
+    if (hdrCtx && typeof (hdrCtx as any).getContextAttributes === 'function') {
+      const attrs = (hdrCtx as any).getContextAttributes();
+      if (attrs && 'colorSpace' in attrs) {
+        capabilities.supportsRec2020 = true;
+      }
     }
   } catch (e) {
     console.warn('HDR canvas detection failed:', e);
