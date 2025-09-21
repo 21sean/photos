@@ -13,7 +13,7 @@
   @media (orientation: portrait) {
     /* Target iOS Safari specifically in portrait - ONLY for globe page */
     body:has(.globe-container) .globe-container {
-      height: -webkit-fill-available !important;
+      height: calc(-webkit-fill-available + 10vh) !important;
       /* Disable scrolling on iOS Safari */
       overflow: hidden !important;
       position: fixed !important;
@@ -40,7 +40,7 @@
     /* Fix for iOS address bar hiding/showing - ONLY for globe page */
     body:has(.globe-container) {
       min-height: 100vh;
-      min-height: -webkit-fill-available;
+      min-height: calc(-webkit-fill-available + 10vh);
       /* Disable scrolling on iOS Safari */
       overflow: hidden !important;
       position: fixed !important;
@@ -48,7 +48,7 @@
     }
     
     html:has(.globe-container) {
-      height: -webkit-fill-available;
+      height: calc(-webkit-fill-available + 10vh);
       /* Disable scrolling on iOS Safari */
       overflow: hidden !important;
     }
@@ -79,6 +79,12 @@
       border-radius: 4px !important;
       /* Add subtle background on touch for better feedback */
       -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Reduce album list text spacing by 50% (override inline 44px line-height) */
+    body:has(.globe-container) .album-list li span {
+      line-height: 22px !important;
+      min-height: 22px !important;
     }
   }
 }
@@ -746,7 +752,7 @@ body:has(.globe-container) aside.absolute.z-50 {
     left: -50%;
     top: 50%;
     width: 50%;
-    border-bottom: 4px solid #ff0000; /* effect color only */
+    border-bottom: 2px solid #ffffff; /* effect color only */
     transform: translateX(0);
     transition: transform 0.5s cubic-bezier(1, -0.04, 0, 1.16);
     pointer-events: none;
