@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Nav from '@/lib/nav';
-import { GlobeIcon } from '@/lib/icons/globe-icon';
+import { GlobeIcon } from '@/lib/icons';
 import { useState, useCallback } from 'react';
 import { Album, AlbumList } from '@/types/albums';
 import { Photo } from '@/types';
@@ -38,8 +38,8 @@ export default function AlbumPageClient({
   }, [isCollapsed, isAnimating]);
 
   return (
-    <section className="flex flex-col sm:flex-row sm:my-20" id="top">
-      <div className="pt-10 sm:pl-10 sm:pr-20 lg:pl-20 lg:pr-40 space-y-1">
+    <section className="flex flex-col sm:flex-row sm:my-4" id="top">
+      <div className="pt-3 sm:pt-6 sm:pl-10 sm:pr-20 lg:pl-20 lg:pr-40 space-y-1">
         <Nav albums={albums} title={album.title} isCollapsed={isCollapsed} />
       </div>
 
@@ -120,17 +120,7 @@ export default function AlbumPageClient({
           </div>
         </div>
 
-        <Masonry className="my-12" items={photos} />
-
-        <a
-          href="#top"
-          className={`pt-6 max-sm:px-2 max-sm:pb-6
-            max-sm:text-center max-sm:w-full
-            text-gray-400 hover:text-gray-600
-            fade-in-delayed`}
-        >
-          Go to top ↑
-        </a>
+        <Masonry className="mt-4 mb-6" items={photos} />
       </div>
     </section>
   );
