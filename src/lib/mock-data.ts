@@ -7,7 +7,7 @@ export const mockAlbums = [
     color: "#FF6B6B",
     type: "location" as const,
     description: "Vibrant culture, ancient ruins, and stunning beaches",
-    date: "2024",
+    date: "2025",
     lat: 23.6345,
     lng: -102.5528,
     locations: [
@@ -66,7 +66,7 @@ export const mockAlbums = [
     color: "#4ECDC4",
     type: "location" as const, 
     description: "Charming streets, historic trams, and beautiful tiles",
-    date: "2024",
+    date: "2025",
     lat: 38.7223,
     lng: -9.1393,
     locations: [
@@ -96,7 +96,7 @@ export const mockAlbums = [
     color: "#45B7D1",
     type: "location" as const,
     description: "Port wine, azulejo tiles, and medieval charm",
-    date: "2024", 
+    date: "2025", 
     lat: 41.1579,
     lng: -8.6291,
     locations: [
@@ -126,7 +126,7 @@ export const mockAlbums = [
     color: "#96CEB4",
     type: "location" as const,
     description: "Gothic architecture and medieval atmosphere",
-    date: "2024", 
+    date: "2025", 
     lat: 50.0755,
     lng: 14.4378,
     locations: [
@@ -156,7 +156,7 @@ export const mockAlbums = [
     color: "#FFEAA7",
     type: "location" as const,
     description: "Gaudí's masterpieces and Mediterranean vibes",
-    date: "2024", 
+    date: "2025", 
     lat: 41.3851,
     lng: 2.1734,
     locations: [
@@ -218,7 +218,7 @@ export const mockAlbums = [
     color: "#74B9FF",
     type: "location" as const,
     description: "Alpine peaks, pristine lakes, and charming villages",
-    date: "2024", 
+    date: "2025", 
     lat: 46.8182,
     lng: 8.2275,
     locations: [
@@ -342,7 +342,7 @@ export const mockAlbums = [
     color: "#A29BFE",
     type: "location" as const,
     description: "Royal palaces, historic landmarks, and modern culture",
-    date: "2024", 
+    date: "2021", 
     lat: 51.5074,
     lng: -0.1278,
     locations: [
@@ -373,7 +373,7 @@ export const mockAlbums = [
     color: "#00CEC9",
     type: "location" as const,
     description: "Perfect weather, beautiful beaches, and laid-back vibes",
-    date: "2024", 
+    date: "2018", 
     lat: 32.7157,
     lng: -117.1611,
     locations: [
@@ -404,7 +404,7 @@ export const mockAlbums = [
     color: "#FD79A8",
     type: "location" as const,
     description: "Hollywood glamour, beaches, and endless sunshine",
-    date: "2024", 
+    date: "2021", 
     lat: 34.0522,
     lng: -118.2437,
     locations: [
@@ -435,7 +435,7 @@ export const mockAlbums = [
     color: "#6C5CE7",
     type: "location" as const,
     description: "Music heritage, southern charm, and natural beauty",
-    date: "2024", 
+    date: "2019", 
     lat: 35.7478,
     lng: -86.7945,
     locations: [
