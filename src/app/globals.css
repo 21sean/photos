@@ -104,7 +104,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(0, 0, 0, 1);
     color: white;
     display: flex;
     align-items: center;
@@ -284,6 +284,76 @@ body {
 @media (max-width: 640px) {
   .album-nav-mobile-hidden {
     display: none !important;
+  }
+}
+
+/* Mobile page length optimizations */
+@media (max-width: 768px) {
+  /* Reduce excessive margins on mobile for all pages */
+  section {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* Ensure pig container doesn't create height on mobile */
+  #pig {
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+  }
+  
+  /* Optimize spacing for folder and album pages */
+  section.flex.flex-col.justify-center {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  /* Reduce heading margins on mobile */
+  h1.text-4xl {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Optimize masonry container spacing */
+  .masonry-item {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Prevent masonry items from having excessive heights on mobile */
+  .masonry-item,
+  .masonry-item > div,
+  .masonry-item img {
+    max-height: 100vh !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+  
+  /* Ensure masonry containers don't create excessive space */
+  [data-masonic-container] {
+    min-height: auto !important;
+  }
+  
+  /* Reduce album page white box spacing */
+  .bg-gray-100 {
+    margin-bottom: 1rem;
+  }
+  
+  /* Fix viewport height issues on mobile browsers */
+  html, body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Prevent excessive height on mobile pages */
+  main {
+    min-height: auto !important;
+  }
+  
+  /* Optimize mobile viewport for non-globe pages */
+  body:not(:has(.globe-container)) {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-y: auto !important;
   }
 }
 

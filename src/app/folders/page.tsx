@@ -6,13 +6,13 @@ async function Folders() {
   const folders = await getFolders();
 
   return (
-    <section className="flex flex-col justify-center sm:flex-row sm:my-20 sm:mt-48">
-      <div className="max-sm:px-2 px-4 w-full max-w-6xl">
-        <h1 className="font-semibold tracking-tight text-4xl mb-16 w-full text-gray-800">
+    <section className="flex flex-col justify-center sm:flex-row sm:my-4 sm:mt-8">
+      <div className="px-2 sm:px-4 w-full max-w-6xl">
+        <h1 className="font-semibold tracking-tight text-4xl mb-8 w-full text-gray-800">
           Album Folders
         </h1>
 
-        <ul className="flex flex-col justify-center items-start gap-5 mb-32">
+        <ul className="flex flex-col justify-center items-start gap-5 mb-8">
           {folders.map(folder => (
             <li
               key={folder.title}
