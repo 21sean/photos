@@ -86,6 +86,19 @@
       line-height: 22px !important;
       min-height: 22px !important;
     }
+
+    /* Selected/active album title: make gray off-white on iOS Safari */
+    body:has(.globe-container) .album-list li span.album-title-active {
+      color: #f1f1f1 !important;
+    }
+    
+    /* Make AlbumCard "Click to enter" 25% smaller on iOS Safari */
+    body:has(.globe-container) aside.absolute.z-50 > span:last-child {
+      transform: scale(0.75);
+      -webkit-transform: scale(0.75);
+      transform-origin: left center;
+      -webkit-transform-origin: left center;
+    }
   }
 }
 
