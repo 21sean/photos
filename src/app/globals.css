@@ -599,39 +599,36 @@ aside.absolute.z-50.fade-out {
     color-space: display-p3;
     /* Optimize for gain map processing */
     image-rendering: -webkit-optimize-contrast;
+    /* Smooth HDR transitions on device rotation */
+    transition: all 0.3s ease;
   }
 }
-      /* Smooth HDR transitions on device rotation */
-      transition: all 0.3s ease;
-    }
-  }
-  
-  /* Safari-specific fixes for album navigation - GLOBE PAGE ONLY */
-  body:has(.globe-container) .album-list li {
-    /* Prevent any Safari-specific navigation behavior */
-    -webkit-touch-callout: none !important;
-    -webkit-user-select: none !important;
-    user-select: none !important;
-  }
-  
-  body:has(.globe-container) .album-list li span {
-    /* Ensure spans don't trigger navigation in Safari */
-    -webkit-touch-callout: none !important;
-    -webkit-user-select: none !important;
-    user-select: none !important;
-    pointer-events: auto !important;
-    /* Improve touch responsiveness */
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
-  }
-  
-  /* Improve album card touch handling on mobile */
-  body:has(.globe-container) aside.absolute.z-50 {
-    /* Ensure touch events work properly */
-    -webkit-touch-callout: none !important;
-    -webkit-user-select: none !important;
-    user-select: none !important;
-    pointer-events: auto !important;
-  }
+
+/* Safari-specific fixes for album navigation - GLOBE PAGE ONLY */
+body:has(.globe-container) .album-list li {
+  /* Prevent any Safari-specific navigation behavior */
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+body:has(.globe-container) .album-list li span {
+  /* Ensure spans don't trigger navigation in Safari */
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  pointer-events: auto !important;
+  /* Improve touch responsiveness */
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Improve album card touch handling on mobile */
+body:has(.globe-container) aside.absolute.z-50 {
+  /* Ensure touch events work properly */
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  pointer-events: auto !important;
 }
 
 /* Additional iOS Safari improvements */
