@@ -59,16 +59,14 @@ export function detectHDRCapabilities(): HDRCapabilities {
       }
     }
     
-    // Test for HDR canvas support
-    const hdrCtx = canvas.getContext('2d', { 
-      colorSpace: 'rec2020',
-      willReadFrequently: false
-    }) as CanvasRenderingContext2D | null;
-    if (hdrCtx && typeof (hdrCtx as any).getContextAttributes === 'function') {
-      const attrs = (hdrCtx as any).getContextAttributes();
-      if (attrs && 'colorSpace' in attrs) {
-        capabilities.supportsRec2020 = true;
+    // Test for Rec2020 support via CSS media queries instead
+    try {
+      if (typeof window !== 'undefined' && window.matchMedia) {
+        const rec2020Query = window.matchMedia('(color-gamut: rec2020)');
+        capabilities.supportsRec2020 = rec2020Query.matches;
       }
+    } catch (e) {
+      console.warn('Rec2020 detection failed:', e);
     }
   } catch (e) {
     console.warn('HDR canvas detection failed:', e);

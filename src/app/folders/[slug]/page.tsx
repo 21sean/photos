@@ -12,20 +12,19 @@ async function Folder({ params: { slug } }: { params: { slug: string } }) {
   const { folder, photos } = await getFolder(slug);
 
   return (
-    <section className="flex flex-col justify-center sm:flex-row sm:my-20 sm:mt-48">
-      <div className="max-sm:px-2 px-4 w-full max-w-6xl">
+    <section className="flex flex-col justify-center sm:flex-row sm:my-4 sm:mt-8">
+      <div className="px-2 sm:px-4 w-full max-w-6xl">
         <h1
           id="top"
-          className="font-semibold tracking-tight text-4xl mb-16 w-full"
+          className="font-semibold tracking-tight text-4xl mb-8 w-full"
         >
           {folder.title}
         </h1>
 
         <Grid items={photos} />
 
-        <div className="flex justify-between items-center text-gray-400 hover:text-gray-600">
-          <a href="#top">↑ Go to top</a>
-          <Link href="/folders">← Back to all folders</Link>
+        <div className="flex justify-end items-center mt-6">
+          <Link href="/folders" className="text-gray-400 hover:text-gray-600">← Back to all folders</Link>
         </div>
       </div>
     </section>

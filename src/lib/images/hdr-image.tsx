@@ -27,26 +27,42 @@ export function HDRImage({
     supportsRec2020: false
   });
   
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Detect HDR capabilities on client side - cached for performance
-    const capabilities = detectHDRCapabilities();
-    setHdrCapabilities(capabilities);
+    try {
+      const capabilities = detectHDRCapabilities();
+      setHdrCapabilities(capabilities);
+    } catch (error) {
+      console.warn('HDR detection failed, using fallback:', error);
+      // Use safe fallback values
+      setHdrCapabilities({
+        supportsHDR: false,
+        supportsP3: false,
+        supportsRec2020: false
+      });
+    }
   }, []);
 
   // Determine if this image should be treated as HDR
   const isHDR = photo.isHDR || isLikelyHDR(photo.url);
   
-  // Get HDR-aware styles - memoized for performance
-  const hdrStyles = useMemo(() => 
-    getHDRImageStyles(isHDR, photo.colorSpace), 
-    [isHDR, photo.colorSpace]
-  );
+  // Get HDR-aware styles - memoized for performance with error handling
+  const hdrStyles = useMemo(() => {
+    try {
+      return getHDRImageStyles(isHDR, photo.colorSpace);
+    } catch (error) {
+      console.warn('HDR styles failed, using fallback:', error);
+      return {}; // Return empty styles as fallback
+    }
+  }, [isHDR, photo.colorSpace]);
   
-  // Enhanced loading with HDR considerations
   const handleImageLoad = useCallback(() => {
-    setImageLoaded(true);
+    // Ensure loading animation is visible for at least 500ms
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
   }, []);
 
   // Determine optimal image attributes
@@ -60,7 +76,7 @@ export function HDRImage({
     onLoad: handleImageLoad,
     style: {
       ...hdrStyles,
-      opacity: imageLoaded ? 1 : 0.8,
+      opacity: isLoading ? 0 : 1,
       transition: 'opacity 0.3s ease, filter 0.3s ease',
     },
     className: `hdr-image ${isHDR ? 'hdr-enhanced' : ''} ${className}`,
@@ -81,27 +97,27 @@ export function HDRImage({
   }
 
   return (
-    <picture>
-      {/* Provide fallbacks for different formats */}
-      {isHDR && hdrCapabilities.supportsHDR && (
-        <>
-          {/* AVIF HDR support for modern browsers */}
-          <source 
-            srcSet={photo.url.replace(/\.(jpg|jpeg|png)$/i, '.avif')} 
-            type="image/avif"
-            media="(dynamic-range: high)"
-          />
-          {/* HEIF HDR support for Safari */}
-          <source 
-            srcSet={photo.url.replace(/\.(jpg|jpeg|png)$/i, '.heic')} 
-            type="image/heic"
-            media="(dynamic-range: high)"
-          />
-        </>
-      )}
-      
-      <img {...imageProps} />
-    </picture>
+      <picture>
+        {/* Provide fallbacks for different formats */}
+        {isHDR && hdrCapabilities.supportsHDR && (
+          <>
+            {/* AVIF HDR support for modern browsers */}
+            <source 
+              srcSet={photo.url.replace(/\.(jpg|jpeg|png)$/i, '.avif')} 
+              type="image/avif"
+              media="(dynamic-range: high)"
+            />
+            {/* HEIF HDR support for Safari */}
+            <source 
+              srcSet={photo.url.replace(/\.(jpg|jpeg|png)$/i, '.heic')} 
+              type="image/heic"
+              media="(dynamic-range: high)"
+            />
+          </>
+        )}
+        
+        <img {...imageProps} />
+      </picture>
   );
 }
 

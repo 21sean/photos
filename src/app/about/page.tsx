@@ -34,8 +34,8 @@ async function AboutPage() {
   return (
     <section
       className={`flex flex-col sm:flex-row
-        pt-10 sm:pt-5 sm:pb-5
-        h-lvh max-sm:h-full max-sm:overflow-y-auto`}
+        pt-4 sm:pt-5 sm:pb-5
+        min-h-screen max-sm:h-auto max-sm:overflow-y-auto`}
     >
       <div
         className={`
@@ -47,7 +47,7 @@ async function AboutPage() {
 
       <div
         className={`rounded-tl-xl rounded-bl-xl bg-black
-          px-9 py-8 pt-20
+          px-4 sm:px-9 py-4 sm:py-8 pt-8 sm:pt-20
           w-full relative overflow-hidden`}
       >
         <section className="z-20 relative max-w-96">

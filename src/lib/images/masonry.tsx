@@ -10,22 +10,25 @@ import HDRImage from './hdr-image';
 const MasonryItem = ({
   width: itemWidth,
   data: photo
-}: RenderComponentProps<Photo>) => (
-  <a
-    href={photo.url}
-    data-pswp-width={photo.width}
-    data-pswp-height={photo.height}
-    target="_blank"
-    rel="noreferrer"
-  >
-    <HDRImage
-      photo={photo}
-      width={(photo.width / itemWidth) * photo.width}
-      height={(photo.width / itemWidth) * photo.height}
-      className="masonry-item"
-    />
-  </a>
-);
+}: RenderComponentProps<Photo>) => {
+  // Calculate proper scaled dimensions for the masonry item
+  const aspectRatio = photo.width / photo.height;
+  const scaledHeight = itemWidth / aspectRatio;
+  
+  return (
+    <div
+      className="cursor-pointer masonry-item"
+      onClick={() => window.open(photo.url, '_blank', 'noopener,noreferrer')}
+    >
+      <HDRImage
+        photo={photo}
+        width={itemWidth}
+        height={scaledHeight}
+        className="masonry-item"
+      />
+    </div>
+  );
+};
 
 function currentColumnWidth() {
   if (window.innerWidth > 2000) {
@@ -73,9 +76,9 @@ export const Masonry = ({
   return (
     <section
       id="gallery"
-      className={`h-full w-full min-h-screen
+      className={`h-auto w-full
       md:w-[500px] lg:w-[720px] xl:w-[1000px] 2xl:w-[1200px] 3xl:w-[1250px]
-      px-2 sm:p-0 sm:pb-48
+      px-2 sm:p-0
       fade-in-delayed`}
     >
       <MasonicMasonry
