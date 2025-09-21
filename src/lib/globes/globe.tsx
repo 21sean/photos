@@ -591,7 +591,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
               >
                 {/* Both Desktop and Mobile: album title shows card only, no navigation */}
                 <span 
-                  className={`album-title-split ${animatingTitle === album.title ? 'album-title-split-animating' : ''} cursor-pointer hover:text-gray-500 touch-manipulation select-none`}
+                  className={`album-title-split ${animatingTitle === album.title ? 'album-title-split-animating' : ''} ${activeAlbumTitle === album.title ? 'album-title-active' : ''} cursor-pointer hover:text-gray-500 touch-manipulation select-none`}
                   onClick={(e) => handleAlbumTitleClick(album.title, e)}
                   onTouchEnd={(e) => {
                     // Handle touch events on mobile devices for better responsiveness
