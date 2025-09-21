@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Photo } from '@/types';
 import { detectHDRCapabilities, getHDRImageStyles, isLikelyHDR } from '../hdr-utils';
 
@@ -30,20 +30,24 @@ export function HDRImage({
   const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
-    // Detect HDR capabilities on client side
-    setHdrCapabilities(detectHDRCapabilities());
+    // Detect HDR capabilities on client side - cached for performance
+    const capabilities = detectHDRCapabilities();
+    setHdrCapabilities(capabilities);
   }, []);
 
   // Determine if this image should be treated as HDR
   const isHDR = photo.isHDR || isLikelyHDR(photo.url);
   
-  // Get HDR-aware styles
-  const hdrStyles = getHDRImageStyles(isHDR, photo.colorSpace);
+  // Get HDR-aware styles - memoized for performance
+  const hdrStyles = useMemo(() => 
+    getHDRImageStyles(isHDR, photo.colorSpace), 
+    [isHDR, photo.colorSpace]
+  );
   
   // Enhanced loading with HDR considerations
-  const handleImageLoad = () => {
+  const handleImageLoad = useCallback(() => {
     setImageLoaded(true);
-  };
+  }, []);
 
   // Determine optimal image attributes
   const imageProps: React.ImgHTMLAttributes<HTMLImageElement> = {

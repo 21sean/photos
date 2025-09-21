@@ -22,12 +22,22 @@ export function useLightbox(data: Array<LightboxData>) {
       gallery: '#gallery',
       dataSource: selectDataSource(data),
       children: 'a',
-      showHideAnimationType: 'zoom',
+      showHideAnimationType: 'fade', // Changed from 'zoom' to 'fade' to reduce lag
       pswpModule: () => import('photoswipe'),
       mainClass: 'photoswipe--custom',
       bgOpacity: 0.84,
       tapAction: 'close',
-      counter: false
+      counter: false,
+      // Disable zoom functionality to improve performance
+      zoomAnimationDuration: 0,
+      showAnimationDuration: 200,
+      hideAnimationDuration: 200,
+      // Disable pinch-to-zoom and double-tap zoom
+      pinchToClose: false,
+      clickToCloseNonZoomable: true,
+      // Performance optimizations
+      preload: [1, 1], // Reduced preloading
+      loop: false
     });
 
     if (data.length === 0) {
