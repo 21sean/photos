@@ -392,6 +392,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
   
   // State for mobile slide animation
   const [isSliding, setIsSliding] = useState(false);
+  // Temporary state to trigger click/tap split animation
+  const [animatingTitle, setAnimatingTitle] = useState<string | null>(null);
   
   
   // object config
@@ -442,6 +444,9 @@ function Globe({ albums }: { albums: Array<Album> }) {
     }
     
     console.log('Album title clicked, showing card for:', albumTitle);
+    // Trigger split-text animation on click/tap
+    setAnimatingTitle(albumTitle);
+    window.setTimeout(() => setAnimatingTitle(null), 900);
     setIsSliding(true);
     
     // Find and set the active album to show the album card
@@ -586,9 +591,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
               >
                 {/* Both Desktop and Mobile: album title shows card only, no navigation */}
                 <span 
-                  className={`cursor-pointer hover:text-gray-500 touch-manipulation select-none ${
-                    activeAlbumTitle === album.title ? 'italic' : ''
-                  }`}
+                  className={`album-title-split ${animatingTitle === album.title ? 'album-title-split-animating' : ''} cursor-pointer hover:text-gray-500 touch-manipulation select-none`}
                   onClick={(e) => handleAlbumTitleClick(album.title, e)}
                   onTouchEnd={(e) => {
                     // Handle touch events on mobile devices for better responsiveness
@@ -603,7 +606,11 @@ function Globe({ albums }: { albums: Array<Album> }) {
                     lineHeight: '44px'
                   }}
                 >
-                  {album.title}
+                  {/* Split-effect layers (mobile-only CSS will animate). Duplicate text via data-text. */}
+                  <span className="album-title-split-top" data-text={album.title} aria-hidden="true" />
+                  <span className="album-title-split-bottom" data-text={album.title} aria-hidden="true" />
+                  {/* Visually hidden original to preserve layout; color hidden via CSS only on mobile */}
+                  <span className="album-title-text">{album.title}</span>
                 </span>
               </li>
             );
