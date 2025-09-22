@@ -32,10 +32,13 @@ export function useHDRSetup() {
     function setOuterHeightVar() {
       try {
         const outerH = Math.max(window.outerHeight || 0, window.innerHeight || 0);
-        document.documentElement.style.setProperty('--outer-h', outerH + 'px');
+        const px = outerH + 'px';
+        document.documentElement.style.setProperty('--outer-h', px);
+        document.documentElement.style.setProperty('--screen-h', px);
       } catch {}
     }
     setOuterHeightVar();
+    window.addEventListener('resize', setOuterHeightVar, { passive: true } as any);
     window.addEventListener('orientationchange', setOuterHeightVar, { passive: true } as any);
     window.addEventListener('pageshow', setOuterHeightVar, { passive: true } as any);
     // Visual viewport changes can also affect layout; update var then too
@@ -43,6 +46,7 @@ export function useHDRSetup() {
       window.visualViewport.addEventListener('resize', setOuterHeightVar);
     }
     return () => {
+      window.removeEventListener('resize', setOuterHeightVar as any);
       window.removeEventListener('orientationchange', setOuterHeightVar as any);
       window.removeEventListener('pageshow', setOuterHeightVar as any);
       if (window.visualViewport) {
