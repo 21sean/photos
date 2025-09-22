@@ -32,15 +32,16 @@ export function useHDRSetup() {
     function setOuterHeightVar() {
       try {
         const visualViewportHeight = window.visualViewport?.height ?? 0;
-        const innerHeight = window.innerHeight || 0;
-        const viewportHeight = Math.max(visualViewportHeight, innerHeight);
+        const innerHeight = window.innerHeight ?? 0;
+        const clientHeight = document.documentElement?.clientHeight ?? 0;
+        const viewportHeight = Math.max(visualViewportHeight, innerHeight, clientHeight);
 
         if (viewportHeight > 0) {
           const viewportPx = `${viewportHeight}px`;
           document.documentElement.style.setProperty('--screen-h', viewportPx);
         }
 
-        const outerHeight = window.outerHeight || viewportHeight;
+        const outerHeight = window.outerHeight ?? viewportHeight;
         if (outerHeight > 0) {
           const outerPx = `${outerHeight}px`;
           document.documentElement.style.setProperty('--outer-h', outerPx);
