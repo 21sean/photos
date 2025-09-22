@@ -483,13 +483,10 @@ function Globe({ albums }: { albums: Array<Album> }) {
   return (
     <section
       className={`globe-container relative
-        py-36
-        sm:py-36
-        md:py-32 md:px-24
-        lg:py-40 lg:px-36
-        xl:py-48 xl:px-48
-        2xl:px-64
-        3xl:py-56`}
+        md:px-24
+        lg:px-36
+        xl:px-48
+        2xl:px-64`}
       onDoubleClick={(e) => {
         // Only hide if clicking on the background, not on interactive elements
         if (e.target === e.currentTarget) {
