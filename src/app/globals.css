@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --screen-h: 100lvh;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body:has(.app-fullscreen) {
+  background: #000;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.app-fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: -webkit-fill-available;
+  height: var(--screen-h, 100lvh);
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
