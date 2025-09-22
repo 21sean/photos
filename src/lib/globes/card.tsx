@@ -27,7 +27,7 @@ export function AlbumCard({
         absolute z-50
         rounded-lg bg-black-100 w-60 text-2xl flex flex-col
         border border-gray-200
-        overflow-hidden hover:bg-gray-50 transition-colors duration-200
+        overflow-x-hidden overflow-y-visible hover:bg-gray-50 transition-colors duration-200
         touch-manipulation`} /* Add touch-manipulation for better mobile interaction */
       style={{
         left: `calc(33% + ${randomLeft}px)`,
@@ -37,7 +37,7 @@ export function AlbumCard({
     >
       <span className="blink rounded-lg flex-shrink-0 text-lg md:text-2xl">{album.title}</span>
       <span className="text-sm md:text-base flex-shrink-0">{album.date}</span>
-      <div className="marquee py-4 text-sm md:text-base flex-grow overflow-hidden">
+      <div className="marquee py-4 pb-2 text-sm md:text-base flex-grow overflow-x-hidden">
         <div className="marquee-content">
           {tags.map(tag => (
             <span key={`${tag}-1`}>{tag}</span>
