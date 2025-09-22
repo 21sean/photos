@@ -39,8 +39,12 @@
     
     /* Fix for iOS address bar hiding/showing - ONLY for globe page */
     body:has(.globe-container) {
-      min-height: 100vh;
-      min-height: calc(-webkit-fill-available + 10vh);
+      /* Prefer dynamic viewport height and fill available to avoid black bars */
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+      /* Extend into safe areas and avoid gaps */
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
       /* Disable scrolling on iOS Safari */
       overflow: hidden !important;
       position: fixed !important;
@@ -48,7 +52,7 @@
     }
     
     html:has(.globe-container) {
-      height: calc(-webkit-fill-available + 10vh);
+      height: -webkit-fill-available;
       /* Disable scrolling on iOS Safari */
       overflow: hidden !important;
     }
@@ -164,15 +168,17 @@ body {
 
 /* Text highlighting */
 ::selection {
-  background: #a1224b;
+  background: #04e635;
 }
 
 /* `Globe` components */
 .globe-container {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Fallback for older browsers */
   height: 100dvh; /* Use dynamic viewport height instead of logical */
+  min-height: -webkit-fill-available; /* iOS Safari */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 
   & > div {
     position: absolute;

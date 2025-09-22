@@ -35,7 +35,7 @@ async function AboutPage() {
     <section
       className={`flex flex-col sm:flex-row
         pt-4 sm:pt-5 sm:pb-5
-        min-h-screen max-sm:h-auto max-sm:overflow-y-auto`}
+        min-h-[100dvh] max-sm:h-auto max-sm:overflow-y-auto`}
     >
       <div
         className={`

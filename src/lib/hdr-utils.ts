@@ -194,6 +194,7 @@ export function addHDRMetaTags() {
     'initial-scale=1',
     'maximum-scale=1', // Prevent zoom lag
     'user-scalable=no', // Disable zoom for performance
+    'viewport-fit=cover', // Ensure content extends into iOS safe areas
     capabilities.supportsHDR ? 'color-scheme=light dark' : ''
   ].filter(Boolean).join(', ');
   

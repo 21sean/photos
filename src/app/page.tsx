@@ -10,7 +10,7 @@ export default async function Page() {
   const albums = await getAlbums();
 
   return (
-    <main role="main">
+    <main role="main" className="min-h-[100dvh]">
       <Globe albums={albums} />
     </main>
   );
