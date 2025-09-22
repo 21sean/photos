@@ -530,10 +530,10 @@ function Globe({ albums }: { albums: Array<Album> }) {
         ref={globeEl}
         width={containerWidth ?? width}
         height={(stableOuterHeight && stableOuterHeight > 0)
-          ? Math.round(stableOuterHeight * 1.1) // fill last ~10%
+          ? stableOuterHeight // exact stable height to avoid overshoot
           : ((containerHeight && containerHeight > 0) ? containerHeight : (height && height > 0 ? height : undefined))}
         rendererConfig={{ 
-          antialias: false, // Better performance
+          antialias: true, // Better performance
           powerPreference: "high-performance"
         }}
         onGlobeReady={handleGlobeReady}
