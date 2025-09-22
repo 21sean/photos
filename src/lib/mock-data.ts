@@ -276,10 +276,7 @@ export const mockAlbums = [
     lat: 43.7711,
     lng: 11.2486,
     locations: [
-      { lat: 43.7696, lng: 11.2558, description: "Florence" },
-      { lat: 43.3188, lng: 11.3307, description: "Siena" },
-      { lat: 43.4643, lng: 11.8814, description: "Val d'Orcia" }
-    ],
+     ],
     order: 9,
     photos: [
       {
@@ -431,10 +428,7 @@ export const mockAlbums = [
     lat: 35.7478,
     lng: -86.7945,
     locations: [
-      { lat: 36.1627, lng: -86.7816, description: "Nashville" },
-      { lat: 35.9606, lng: -83.9207, description: "Great Smoky Mountains" },
-      { lat: 35.0456, lng: -85.3097, description: "Chattanooga" }
-    ],
+  ],
     order: 14,
     photos: [
       {

@@ -6,6 +6,35 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Full-height section utility for modern browsers with safe-area support */
+  .fullpage {
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Prefer dvh when supported */
+@supports (height: 100dvh) {
+  .fullpage { min-height: 100dvh; }
+}
+
+/* Fixed overlay that must cover behind iOS address bar */
+.overlay-fixed {
+  position: fixed;
+  inset: 0;
+  height: var(--outer-h, 100vh);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  overflow: hidden;
+}
+.overlay-fixed .panel {
+  height: 100dvh;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* iOS Safari specific fixes - PORTRAIT MODE ONLY - GLOBE PAGE ONLY */
@@ -195,6 +224,14 @@ body {
   z-index: 10;
 }
 
+/* Ensure mobile header stacks above globe layers */
+@media (max-width: 768px) {
+  .album-list-wrapper {
+    position: relative;
+    z-index: 30;
+  }
+}
+
 /* Animations */
 @keyframes fadeIn {
   0% {
@@ -229,6 +266,13 @@ body {
 @media (max-width: 768px) and (orientation: portrait), 
        (hover: none) and (pointer: coarse) and (orientation: portrait),
        (max-device-width: 1024px) and (orientation: portrait) {
+  /* Album list/container vertical positioning for all mobile browsers */
+  body:has(.globe-container) .content-container {
+    transform: translateY(-5%) !important;
+    -webkit-transform: translateY(-5%) !important;
+    padding-top: max(env(safe-area-inset-top), 8px) !important;
+  }
+
   .album-list-sliding {
     transform: translateX(-31vw);
     -webkit-transform: translateX(-31vw); /* iOS Safari fallback */
