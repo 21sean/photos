@@ -42,8 +42,8 @@
   @media (orientation: portrait) {
     /* Target iOS Safari specifically in portrait - ONLY for globe page */
     body:has(.globe-container) .globe-container {
-      /* Use stable full height for iOS fixed canvas */
-      height: var(--outer-h, 100svh) !important;
+      /* Use stable full height for iOS fixed canvas, include safe areas */
+      height: calc(var(--outer-h, 100svh) + env(safe-area-inset-top) + env(safe-area-inset-bottom)) !important;
       min-height: -webkit-fill-available !important;
       width: 100% !important;
       position: relative !important;
@@ -267,6 +267,12 @@ body {
   /* Album list/container safe area for all mobile browsers */
   body:has(.globe-container) .content-container {
     padding-top: max(env(safe-area-inset-top), 8px) !important;
+  }
+
+  /* Push album list down on Safari/iOS and other mobile browsers */
+  .album-list-wrapper {
+    transform: translateY(30svh);
+    -webkit-transform: translateY(30svh);
   }
 
   .album-list-sliding {
