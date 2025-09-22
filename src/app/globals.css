@@ -74,7 +74,7 @@ body:has(.app-fullscreen) {
       height: 100vh !important;
       height: 100svh !important;
       height: 100dvh !important;
-      height: var(--screen-h, 100dvh) !important;
+      height: var(--screen-h, 100lvh) !important;
       width: 100% !important;
       position: relative !important;
       top: 0 !important;
@@ -95,22 +95,25 @@ body:has(.app-fullscreen) {
       z-index: 20 !important;
     }
     
-    /* Fix for iOS address bar hiding/showing - ONLY for globe page */
-    body:has(.globe-container) {
-      /* Prefer stable viewport height and fill available */
-      min-height: 100vh;
-      min-height: 100svh;
-      min-height: 100dvh;
-      min-height: -webkit-fill-available;
-      height: -webkit-fill-available;
-      /* Avoid pushing canvas down; manage safe-area within content */
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-      /* Disable scrolling on iOS Safari */
-      overflow: hidden !important;
-      position: relative !important;
-      width: 100% !important;
-    }
+      /* Fix for iOS address bar hiding/showing - ONLY for globe page */
+      body:has(.globe-container) {
+        /* Prefer stable viewport height and fill available */
+        min-height: 100vh;
+        min-height: 100svh;
+        min-height: 100lvh;
+        min-height: 100dvh;
+        min-height: -webkit-fill-available;
+        min-height: var(--screen-h, 100lvh);
+        height: -webkit-fill-available;
+        height: var(--screen-h, 100lvh);
+        /* Avoid pushing canvas down; manage safe-area within content */
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        /* Disable scrolling on iOS Safari */
+        overflow: hidden !important;
+        position: relative !important;
+        width: 100% !important;
+      }
     
     html:has(.globe-container) {
       height: -webkit-fill-available;
@@ -243,9 +246,15 @@ body {
   flex-direction: column;
   height: 100vh; /* Base fallback */
   height: 100svh; /* Small viewport (with UI visible) */
+  height: 100lvh; /* Large viewport (behind iOS Safari UI) */
   height: 100dvh; /* Dynamic viewport height */
-  height: var(--screen-h, 100dvh); /* Visual viewport synced from JS */
+  height: var(--screen-h, 100lvh); /* Visual viewport synced from JS */
   height: -webkit-fill-available; /* iOS Safari fill behind UI */
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100lvh;
+  min-height: 100dvh;
+  min-height: var(--screen-h, 100lvh);
   min-height: -webkit-fill-available; /* iOS Safari */
   overflow: hidden;
 

@@ -55,14 +55,35 @@ export default function RootLayout({
         <meta name="x5-page-mode" content="app" />
         <Script id="set-screen-height" strategy="beforeInteractive">
           {`
-            function setScreenH() {
-              const h = window.outerHeight || window.innerHeight;
-              document.documentElement.style.setProperty('--screen-h', h + 'px');
+            function setScreenMetrics() {
+              const docEl = document.documentElement;
+              const visualViewportHeight = window.visualViewport?.height ?? 0;
+              const innerHeight = window.innerHeight ?? 0;
+              const outerHeight = window.outerHeight ?? 0;
+              const clientHeight = docEl?.clientHeight ?? 0;
+              const screenHeight = window.screen?.height ?? 0;
+              const viewportHeight = Math.max(
+                visualViewportHeight,
+                innerHeight,
+                outerHeight,
+                clientHeight,
+                screenHeight
+              );
+
+              if (viewportHeight > 0) {
+                docEl.style.setProperty('--screen-h', viewportHeight + 'px');
+              }
+
+              if (screenHeight > 0) {
+                docEl.style.setProperty('--outer-h', screenHeight + 'px');
+              } else if (outerHeight > 0) {
+                docEl.style.setProperty('--outer-h', outerHeight + 'px');
+              }
             }
-            setScreenH();
-            addEventListener('orientationchange', setScreenH, { passive: true });
-            addEventListener('pageshow', setScreenH, { passive: true });
-            addEventListener('resize', setScreenH, { passive: true });
+            setScreenMetrics();
+            addEventListener('orientationchange', setScreenMetrics, { passive: true });
+            addEventListener('pageshow', setScreenMetrics, { passive: true });
+            addEventListener('resize', setScreenMetrics, { passive: true });
           `}
         </Script>
       </head>

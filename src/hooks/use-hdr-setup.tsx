@@ -33,17 +33,25 @@ export function useHDRSetup() {
       try {
         const visualViewportHeight = window.visualViewport?.height ?? 0;
         const innerHeight = window.innerHeight ?? 0;
+        const outerHeight = window.outerHeight ?? 0;
         const clientHeight = document.documentElement?.clientHeight ?? 0;
-        const viewportHeight = Math.max(visualViewportHeight, innerHeight, clientHeight);
+        const screenHeight = window.screen?.height ?? 0;
+        const viewportHeight = Math.max(
+          visualViewportHeight,
+          innerHeight,
+          outerHeight,
+          clientHeight,
+          screenHeight
+        );
 
         if (viewportHeight > 0) {
           const viewportPx = `${viewportHeight}px`;
           document.documentElement.style.setProperty('--screen-h', viewportPx);
         }
 
-        const outerHeight = window.outerHeight ?? viewportHeight;
-        if (outerHeight > 0) {
-          const outerPx = `${outerHeight}px`;
+        const outerViewportHeight = Math.max(screenHeight, outerHeight, viewportHeight);
+        if (outerViewportHeight > 0) {
+          const outerPx = `${outerViewportHeight}px`;
           document.documentElement.style.setProperty('--outer-h', outerPx);
         }
       } catch {}
