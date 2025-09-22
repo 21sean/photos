@@ -10,7 +10,7 @@ export default async function Page() {
   const albums = await getAlbums();
 
   return (
-    <main role="main" className="fullpage">
+    <main role="main" className="app-fullscreen fullpage">
       <Globe albums={albums} />
     </main>
   );
