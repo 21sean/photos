@@ -480,8 +480,37 @@ function Globe({ albums }: { albums: Array<Album> }) {
   };
 
 
+  // Measure container size to ensure correct canvas fit on iOS Safari
+  const containerRef = useRef<HTMLElement | null>(null);
+  const [containerWidth, setContainerWidth] = useState<number | undefined>(undefined);
+  const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => {
+      setContainerWidth(el.clientWidth);
+      setContainerHeight(el.clientHeight);
+    };
+    update();
+    const RO = (window as any).ResizeObserver;
+    const ro = RO ? new RO(update) : undefined;
+    if (ro) {
+      ro.observe(el);
+    } else {
+      window.addEventListener('resize', update);
+    }
+    return () => {
+      if (ro) {
+        ro.disconnect();
+      } else {
+        window.removeEventListener('resize', update);
+      }
+    };
+  }, []);
+
   return (
     <section
+      ref={containerRef as any}
       className={`globe-container relative
         md:px-24
         lg:px-36
@@ -496,8 +525,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
     >
       <GlobeGL
         ref={globeEl}
-        width={width}
-        height={height && height > 0 ? height : undefined}
+        width={containerWidth ?? width}
+        height={(containerHeight && containerHeight > 0) ? containerHeight : (height && height > 0 ? height : undefined)}
         rendererConfig={{ 
           antialias: false, // Better performance
           powerPreference: "high-performance"
