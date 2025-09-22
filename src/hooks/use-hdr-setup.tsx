@@ -31,10 +31,20 @@ export function useHDRSetup() {
     // Stable full-screen CSS var for iOS 26 fixed overlays
     function setOuterHeightVar() {
       try {
-        const outerH = Math.max(window.outerHeight || 0, window.innerHeight || 0);
-        const px = outerH + 'px';
-        document.documentElement.style.setProperty('--outer-h', px);
-        document.documentElement.style.setProperty('--screen-h', px);
+        const visualViewportHeight = window.visualViewport?.height ?? 0;
+        const innerHeight = window.innerHeight || 0;
+        const viewportHeight = Math.max(visualViewportHeight, innerHeight);
+
+        if (viewportHeight > 0) {
+          const viewportPx = `${viewportHeight}px`;
+          document.documentElement.style.setProperty('--screen-h', viewportPx);
+        }
+
+        const outerHeight = window.outerHeight || viewportHeight;
+        if (outerHeight > 0) {
+          const outerPx = `${outerHeight}px`;
+          document.documentElement.style.setProperty('--outer-h', outerPx);
+        }
       } catch {}
     }
     setOuterHeightVar();
