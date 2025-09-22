@@ -34,14 +34,17 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onHide
     <>
       {/* Mobile-only header at the top */}
       <h1 
-        className="md:hidden font-bold text-3xl text-center mb-8 absolute left-0 right-0 cursor-pointer"
-        style={{ top: 'calc(env(safe-area-inset-top) + 1rem)' }}
+        className="md:hidden font-bold text-3xl text-center mb-8 sticky left-0 right-0 z-[60] text-white cursor-pointer px-4"
+        style={{ top: 'calc(env(safe-area-inset-top) + 1rem)', textShadow: '0 1px 8px rgba(0,0,0,0.55)' }}
         onClick={resetAlbumListPosition}
         onDoubleClick={onHideCard}
       >
         sean.photo
       </h1>
+      {/* Spacer to offset header height on mobile */}
+      <div className="md:hidden" style={{ height: 'calc(env(safe-area-inset-top) + 4rem)' }} />
 
+      <div className="album-list-wrapper">
       <h1 
         className="hidden md:block font-bold mb-6 sm:mb-12 text-center md:text-left cursor-pointer"
         onDoubleClick={onHideCard}
@@ -88,6 +91,7 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onHide
           </li>
         ))}
       </ul>
+      </div>
     </>
   );
 }
