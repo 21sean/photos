@@ -95,7 +95,7 @@
     body:has(.globe-container) aside.absolute.z-50 {
       left: 40vw !important;
       top: 12vh !important; /* Moved up from 16vh */
-      bottom: 72.6vh !important; /* Adjusted for 10% longer card (was 74vh) */
+      bottom: 71.6vh !important; /* Slightly taller to prevent bottom clipping */
       max-width: 50vw !important;
       width: 50vw !important;
       font-size: 0.8em !important;
@@ -278,7 +278,7 @@ body {
   aside.absolute.z-50 {
     left: 40vw !important;
     top: 12vh !important; /* Moved up from 16vh */
-    bottom: 72.6vh !important; /* Adjusted for 10% longer card (was 74vh) */
+    bottom: 71.6vh !important; /* Slightly taller to prevent bottom clipping */
     max-width: 50vw !important;
     width: 50vw !important;
     font-size: 0.8em !important; /* 20% smaller text */
@@ -557,7 +557,8 @@ aside.absolute.z-50.fade-out {
 .marquee {
   position: relative;
   display: flex;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible; /* prevent clipping on iOS */
   user-select: none;
   -webkit-user-select: none; /* iOS Safari fallback */
   gap: 1rem;
