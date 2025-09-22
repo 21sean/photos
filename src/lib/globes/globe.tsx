@@ -509,7 +509,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
   }, []);
 
   // Prefer stable height on iOS using --outer-h when available
-  const stableOuterHeight = (typeof window !== 'undefined') ? parseInt(getComputedStyle(document.documentElement).getPropertyValue('--outer-h')) || undefined : undefined;
+  const stableOuterHeight = (typeof window !== 'undefined') ? (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--screen-h')) || parseInt(getComputedStyle(document.documentElement).getPropertyValue('--outer-h')) || undefined) : undefined;
 
   return (
     <section
