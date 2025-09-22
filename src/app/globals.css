@@ -42,8 +42,8 @@
   @media (orientation: portrait) {
     /* Target iOS Safari specifically in portrait - ONLY for globe page */
     body:has(.globe-container) .globe-container {
-      /* Prefer stable viewport height to avoid URL bar jumps */
-      height: 100svh !important;
+      /* Use stable full height for iOS fixed canvas */
+      height: var(--outer-h, 100svh) !important;
       min-height: -webkit-fill-available !important;
       width: 100% !important;
       position: relative !important;
@@ -70,8 +70,8 @@
       /* Prefer stable viewport height and fill available */
       min-height: 100svh;
       min-height: -webkit-fill-available;
-      /* Extend into safe areas and avoid gaps */
-      padding-top: env(safe-area-inset-top);
+      /* Only bottom safe area to avoid pushing canvas down */
+      padding-top: 0 !important;
       padding-bottom: env(safe-area-inset-bottom);
       /* Disable scrolling on iOS Safari */
       overflow: hidden !important;
@@ -569,14 +569,12 @@ aside.absolute.z-50.fade-out {
   flex-shrink: 0;
   gap: 1rem;
   min-width: 100%;
+  line-height: 1.2; /* reduce vertical clipping */
   animation: marquee 10s linear infinite;
   -webkit-animation: marquee 10s linear infinite;
 }
 
-/* Lightbox */
-.photoswipe--custom {
-  --pswp-bg: white !important;
-}
+
 
 /* HDR Image Support with Gain Maps */
 .hdr-image {
