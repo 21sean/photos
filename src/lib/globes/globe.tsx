@@ -43,29 +43,6 @@ function randomInRange(min: number, max: number): number {
   return Math.random() * (max - min) + min;
 }
 
-function readCssPxVariable(varName: string): number | undefined {
-  if (typeof window === 'undefined') {
-    return undefined;
-  }
-
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(varName);
-  if (!raw) {
-    return undefined;
-  }
-
-  const trimmed = raw.trim();
-  if (!trimmed) {
-    return undefined;
-  }
-
-  const parsed = Number.parseFloat(trimmed);
-  if (!Number.isFinite(parsed)) {
-    return undefined;
-  }
-
-  return Math.ceil(parsed);
-}
-
 function useLandPolygons() {
   const [landPolygons, setLandPolygons] = useState([]);
   useEffect(() => {
@@ -532,21 +509,6 @@ function Globe({ albums }: { albums: Array<Album> }) {
     };
   }, []);
 
-  // Prefer stable height on iOS using --outer-h when available
-  const stableOuterHeight = (() => {
-    const screenHeight = readCssPxVariable('--screen-h');
-    if (screenHeight && screenHeight > 0) {
-      return screenHeight;
-    }
-
-    const outerHeight = readCssPxVariable('--outer-h');
-    if (outerHeight && outerHeight > 0) {
-      return outerHeight;
-    }
-
-    return undefined;
-  })();
-
   return (
     <section
       ref={containerRef as any}
@@ -567,11 +529,9 @@ function Globe({ albums }: { albums: Array<Album> }) {
         width={(containerWidth && containerWidth > 0)
           ? Math.ceil(containerWidth)
           : width}
-        height={(stableOuterHeight && stableOuterHeight > 0)
-          ? stableOuterHeight // exact stable height to avoid overshoot
-          : ((containerHeight && containerHeight > 0)
-            ? Math.ceil(containerHeight)
-            : (height && height > 0 ? Math.ceil(height) : undefined))}
+        height={(containerHeight && containerHeight > 0)
+          ? Math.ceil(containerHeight)
+          : (height && height > 0 ? Math.ceil(height) : undefined)}
         rendererConfig={{ 
           antialias: true, // Better performance
           powerPreference: "high-performance"
