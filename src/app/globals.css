@@ -26,7 +26,7 @@
 .overlay-fixed {
   position: fixed;
   inset: 0;
-  height: var(--outer-h, 100vh);
+  height: var(--outer-h, 100dvh);
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   overflow: hidden;
@@ -43,8 +43,11 @@
     /* Target iOS Safari specifically in portrait - ONLY for globe page */
     body:has(.globe-container) .globe-container {
       /* Stable full physical screen height for Safari */
-      height: -webkit-fill-available !important;
-      height: var(--screen-h, 100lvh) !important;
+      min-height: -webkit-fill-available !important;
+      height: 100vh !important;
+      height: 100svh !important;
+      height: 100dvh !important;
+      height: var(--screen-h, 100dvh) !important;
       width: 100% !important;
       position: relative !important;
       top: 0 !important;
@@ -68,7 +71,9 @@
     /* Fix for iOS address bar hiding/showing - ONLY for globe page */
     body:has(.globe-container) {
       /* Prefer stable viewport height and fill available */
+      min-height: 100vh;
       min-height: 100svh;
+      min-height: 100dvh;
       min-height: -webkit-fill-available;
       /* Avoid pushing canvas down; manage safe-area within content */
       padding-top: 0 !important;
@@ -208,7 +213,9 @@ body {
 .globe-container {
   display: flex;
   flex-direction: column;
-  height: 100dvh; /* Use dynamic viewport height instead of logical */
+  height: 100vh; /* Base fallback */
+  height: 100svh; /* Small viewport (with UI visible) */
+  height: 100dvh; /* Dynamic viewport height */
   min-height: -webkit-fill-available; /* iOS Safari */
   overflow: hidden;
 
