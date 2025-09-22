@@ -13,19 +13,20 @@
   @media (orientation: portrait) {
     /* Target iOS Safari specifically in portrait - ONLY for globe page */
     body:has(.globe-container) .globe-container {
-      height: calc(-webkit-fill-available + 10vh) !important;
-      /* Disable scrolling on iOS Safari */
-      overflow: hidden !important;
-      position: fixed !important;
+      /* Prefer stable viewport height to avoid URL bar jumps */
+      height: 100svh !important;
+      min-height: -webkit-fill-available !important;
       width: 100% !important;
+      position: relative !important;
       top: 0 !important;
       left: 0 !important;
     }
     
     /* Move album list down by 7% and adjust positioning - ONLY for globe page */
     body:has(.globe-container) .content-container {
-      transform: translateY(-11%) !important; /* Changed from -18% to -11% (net 7% down) */
-      -webkit-transform: translateY(-11%) !important;
+      transform: translateY(-5%) !important;
+      -webkit-transform: translateY(-5%) !important;
+      padding-top: calc(env(safe-area-inset-top) + 8px) !important;
     }
     
     /* Move copyright up to prevent clipping - ONLY for globe page */
@@ -39,15 +40,15 @@
     
     /* Fix for iOS address bar hiding/showing - ONLY for globe page */
     body:has(.globe-container) {
-      /* Prefer dynamic viewport height and fill available to avoid black bars */
-      min-height: 100dvh;
+      /* Prefer stable viewport height and fill available */
+      min-height: 100svh;
       min-height: -webkit-fill-available;
       /* Extend into safe areas and avoid gaps */
       padding-top: env(safe-area-inset-top);
       padding-bottom: env(safe-area-inset-bottom);
       /* Disable scrolling on iOS Safari */
       overflow: hidden !important;
-      position: fixed !important;
+      position: relative !important;
       width: 100% !important;
     }
     

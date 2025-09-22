@@ -122,11 +122,17 @@ function useRings(
 
     const id = setTimeout(() => {
       if (type === types.LOCATION) {
+        // Slightly more zoomed out on mobile devices
+        const isMobile = typeof window !== 'undefined' && (
+          (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
+          window.innerWidth <= 768
+        );
+        const altitudeOnFocus = isMobile ? 1.2 : 1;
         globeEl.current?.pointOfView(
           {
             lat,
             lng,
-            altitude: 1
+            altitude: altitudeOnFocus
           },
           1000
         );

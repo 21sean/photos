@@ -34,7 +34,8 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onHide
     <>
       {/* Mobile-only header at the top */}
       <h1 
-        className="md:hidden font-bold text-3xl text-center mb-8 absolute top-4 left-0 right-0 cursor-pointer"
+        className="md:hidden font-bold text-3xl text-center mb-8 absolute left-0 right-0 cursor-pointer"
+        style={{ top: 'calc(env(safe-area-inset-top) + 1rem)' }}
         onClick={resetAlbumListPosition}
         onDoubleClick={onHideCard}
       >
