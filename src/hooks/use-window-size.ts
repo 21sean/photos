@@ -14,10 +14,18 @@ export function useWindowSize() {
   });
 
   useEffect(() => {
+    function getViewportHeight() {
+      // Prefer visualViewport height on iOS Safari to avoid top/bottom gaps
+      const vv = window.visualViewport;
+      const visualHeight = vv ? vv.height : undefined;
+      const fallback = window.innerHeight;
+      return Math.round(visualHeight || fallback);
+    }
+
     function handleResize() {
       setWindowSize({
         width: window.innerWidth,
-        height: window.innerHeight
+        height: getViewportHeight()
       });
     }
 
@@ -25,7 +33,20 @@ export function useWindowSize() {
 
     handleResize();
 
-    return () => window.removeEventListener('resize', handleResize);
+    // On iOS Safari, the visualViewport resizes when the URL bar collapses/expands
+    const vv = (window as any).visualViewport;
+    if (vv && vv.addEventListener) {
+      vv.addEventListener('resize', handleResize);
+      vv.addEventListener('scroll', handleResize); // account for viewport shifting
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (vv && vv.removeEventListener) {
+        vv.removeEventListener('resize', handleResize);
+        vv.removeEventListener('scroll', handleResize);
+      }
+    };
   }, []);
   return windowSize;
 }

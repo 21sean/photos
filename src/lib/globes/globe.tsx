@@ -12,6 +12,7 @@ import { Album, AlbumTitle, types } from '@/types/albums';
 import { titleToSlug } from '@/lib/api/slug';
 import { AlbumCard } from './card';
 import useHDRSetup from '@/hooks/use-hdr-setup';
+import AlbumList from '@/lib/globes/album-list';
 
 type Ref = CustomGlobeMethods | undefined; // Reference to globe instance
 type GlobeEl = React.MutableRefObject<Ref>; // React `ref` passed to globe element
@@ -55,30 +56,33 @@ function useLandPolygons() {
     }
     fetchLandPolygons();
   }, []);
-  const polygonMaterial = new THREE.MeshBasicMaterial({
+  const polygonMaterial = React.useMemo(() => new THREE.MeshBasicMaterial({
     color: 0xffffff,
     opacity: 0.77,
     transparent: true
-  });
+  }), []);
 
   return { landPolygons, polygonMaterial };
 }
 
 function usePoints(albums: Array<Album>) {
   const [altitude, setAltitude] = useState(0.002);
-  const points = [];
-  const locations = albums.filter(album => album.type === types.LOCATION);
-  for (const album of locations) {
-    points.push(
-      { ...album, radius: 0.19 },
-      ...album.locations.map(location => ({
-        ...album,
-        lat: location.lat,
-        lng: location.lng,
-        radius: 0.135
-      }))
-    );
-  }
+  const points = React.useMemo(() => {
+    const pts: Array<any> = [];
+    const locations = albums.filter(album => album.type === types.LOCATION);
+    for (const album of locations) {
+      pts.push(
+        { ...album, radius: 0.19 },
+        ...album.locations.map(location => ({
+          ...album,
+          lat: location.lat,
+          lng: location.lng,
+          radius: 0.135
+        }))
+      );
+    }
+    return pts;
+  }, [albums]);
   return {
     pointAltitude: altitude,
     setPointAltitude: setAltitude,
@@ -93,8 +97,8 @@ function useRings(
   const [activeAlbumTitle, setActiveAlbumTitle] = useState<AlbumTitle>();
 
   const [rings, setRings] = useState<Array<Ring>>([]);
-  const colorInterpolator = (t: number) =>
-    `rgba(255,100,50,${Math.sqrt(1 - t)})`;
+  const colorInterpolator = React.useCallback((t: number) =>
+    `rgba(255,100,50,${Math.sqrt(1 - t)})`, []);
 
   const [enterTimeoutId, setEnterTimeoutId] = useState<NodeJS.Timeout>();
   function handleMouseEnter({ lat, lng, title, type }: Album) {
@@ -206,13 +210,15 @@ function useArcs(albums: Array<Album>) {
 }
 
 function useCustomLayer(globeEl: GlobeEl) {
-  const numbers = Array.from(Array(200), (_, index) => index); // Reduced from 500 to 200 for better performance
-  const customLayerData = numbers.map(() => ({
-    lat: (Math.random() - 0.5) * 180,
-    lng: (Math.random() - 0.5) * 360,
-    alt: Math.random() * 1.4 + 0.1
-  }));
-  const customThreeObject = () =>
+  const customLayerData = React.useMemo(() => {
+    const numbers = Array.from(Array(200), (_, index) => index); // Reduced from 500 to 200 for better performance
+    return numbers.map(() => ({
+      lat: (Math.random() - 0.5) * 180,
+      lng: (Math.random() - 0.5) * 360,
+      alt: Math.random() * 1.4 + 0.1
+    }));
+  }, []);
+  const customThreeObject = React.useCallback(() =>
     new THREE.Mesh(
       new THREE.SphereGeometry(0.18), // Slightly smaller spheres
       new THREE.MeshBasicMaterial({
@@ -220,10 +226,10 @@ function useCustomLayer(globeEl: GlobeEl) {
         opacity: 0.2, // Slightly more transparent
         transparent: true
       })
-    );
-  const customThreeObjectUpdate: GlobeProps['customThreeObjectUpdate'] = (
-    object,
-    objectData
+    ), []);
+  const customThreeObjectUpdate: GlobeProps['customThreeObjectUpdate'] = React.useCallback((
+    object: any,
+    objectData: any
   ) => {
     const typedObjectData = objectData as {
       lat: number;
@@ -238,7 +244,7 @@ function useCustomLayer(globeEl: GlobeEl) {
         typedObjectData.alt
       )
     );
-  };
+  }, [globeEl]);
 
   return {
     customLayerData,
@@ -390,11 +396,6 @@ function Globe({ albums }: { albums: Array<Album> }) {
   // Initialize HDR capabilities
   useHDRSetup();
   
-  // State for mobile slide animation
-  const [isSliding, setIsSliding] = useState(false);
-  // Temporary state to trigger click/tap split animation
-  const [animatingTitle, setAnimatingTitle] = useState<string | null>(null);
-  
   
   // object config
   const globeEl = useRef<Ref>();
@@ -431,42 +432,39 @@ function Globe({ albums }: { albums: Array<Album> }) {
   const { customLayerData, customThreeObject, customThreeObjectUpdate } =
     useCustomLayer(globeEl);
 
-  const isMac =
+  const isMac = React.useMemo(() =>
     navigator.platform.toLowerCase().includes('mac') ||
-    navigator.userAgent.toLowerCase().includes('mac');
+    navigator.userAgent.toLowerCase().includes('mac')
+  , []);
 
-  // Handle album title click - show card only, no navigation
-  const handleAlbumTitleClick = (albumTitle: string, event?: React.MouseEvent | React.TouchEvent) => {
-    // Prevent any default behavior and stop propagation
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
+  const polygonAltitudeCb = React.useCallback(() => 0, []);
+  const polygonSideColorCb = React.useCallback(() => 'rgba(255, 255, 255, 0)', []);
+  const polygonStrokeColorCb = React.useCallback(() => (isMac ? 'black' : 'darkslategray'), [isMac]);
+  const pointColorCb = React.useCallback(() => 'rgba(255, 0, 0, 0.75)', []);
+  const pointRadiusCb = React.useCallback((point: any) => (point as { radius: number }).radius, []);
+  const onPointHoverCb = React.useCallback((point: any) => {
+    if (point) {
+      handleMouseEnter(point as Album);
+    } else {
+      handleMouseLeave();
     }
-    
-    console.log('Album title clicked, showing card for:', albumTitle);
-    // Trigger split-text animation on click/tap
-    setAnimatingTitle(albumTitle);
-    window.setTimeout(() => setAnimatingTitle(null), 900);
-    setIsSliding(true);
-    
-    // Find and set the active album to show the album card
-    const album = albums.find(a => a.title === albumTitle);
-    if (album) {
+  }, [handleMouseEnter, handleMouseLeave]);
+  const onPointClickCb = React.useCallback((point: any) => {
+    if (point) {
+      const album = point as Album;
+      // Show album card instead of navigating directly (both mobile and desktop)
+      // Delegate to album list interaction
       handleMouseEnter(album);
     }
-    // IMPORTANT: Don't navigate here - only show the album card
-  };
+  }, [handleMouseEnter]);
+  const arcDashLengthCb = React.useCallback(() => randomInRange(0.06, 0.7) / 1, []);
+  const arcDashGapCb = React.useCallback(() => randomInRange(0.025, 0.4) * 10, []);
+  const arcDashAnimateTimeCb = React.useCallback(() => randomInRange(0.08, 0.8) * 20000 + 500, []);
 
   // Handle navigation when clicking "Click to enter" on album card
   const handleAlbumCardClick = (albumTitle: string) => {
     // Navigate to the album
     window.location.href = `/${titleToSlug(albumTitle)}`;
-  };
-
-  // Reset the album list to center when going back to overview
-  const resetAlbumListPosition = () => {
-    console.log('Resetting album list position');
-    setIsSliding(false);
   };
 
   // Hide album card when double-clicking sean.photo text or globe background
@@ -493,19 +491,10 @@ function Globe({ albums }: { albums: Array<Album> }) {
         }
       }}
     >
-      {/* Mobile-only header at the top */}
-      <h1 
-        className="md:hidden font-bold text-3xl text-center mb-8 absolute top-4 left-0 right-0 cursor-pointer"
-        onClick={resetAlbumListPosition}
-        onDoubleClick={hideAlbumCard}
-      >
-        sean.photo
-      </h1>
-
       <GlobeGL
         ref={globeEl}
         width={width}
-        height={height}
+        height={height && height > 0 ? height : undefined}
         rendererConfig={{ 
           antialias: false, // Better performance
           powerPreference: "high-performance"
@@ -520,28 +509,16 @@ function Globe({ albums }: { albums: Array<Album> }) {
         polygonsData={landPolygons}
         polygonCapMaterial={polygonMaterial}
         polygonsTransitionDuration={0}
-        polygonAltitude={() => 0}
-        polygonSideColor={() => 'rgba(255, 255, 255, 0)'}
-        polygonStrokeColor={() => (isMac ? 'black' : 'darkslategray')} // compensate for platform's polygon rendering differences
+        polygonAltitude={polygonAltitudeCb}
+        polygonSideColor={polygonSideColorCb}
+        polygonStrokeColor={polygonStrokeColorCb} // compensate for platform's polygon rendering differences
         pointsData={points}
-        pointColor={() => 'rgba(255, 0, 0, 0.75)'}
+        pointColor={pointColorCb}
         pointAltitude={pointAltitude}
-        pointRadius={point => (point as { radius: number }).radius}
+        pointRadius={pointRadiusCb}
         pointsMerge={true}
-        onPointHover={(point) => {
-          if (point) {
-            handleMouseEnter(point as Album);
-          } else {
-            handleMouseLeave();
-          }
-        }}
-        onPointClick={(point) => {
-          if (point) {
-            const album = point as Album;
-            // Show album card instead of navigating directly (both mobile and desktop)
-            handleAlbumTitleClick(album.title);
-          }
-        }}
+        onPointHover={onPointHoverCb}
+        onPointClick={onPointClickCb}
         ringsData={rings}
         ringColor={() => colorInterpolator}
         ringMaxRadius="maxR"
@@ -549,73 +526,22 @@ function Globe({ albums }: { albums: Array<Album> }) {
         ringRepeatPeriod="repeatPeriod"
         arcsData={arcs}
         arcColor={'color'}
-        arcDashLength={() => randomInRange(0.06, 0.7) / 1} // the bigger the ranges, the calmer it looks
-        arcDashGap={() => randomInRange(0.025, 0.4) * 10}
-        arcDashAnimateTime={() => randomInRange(0.08, 0.8) * 20000 + 500}
+        arcDashLength={arcDashLengthCb} // the bigger the ranges, the calmer it looks
+        arcDashGap={arcDashGapCb}
+        arcDashAnimateTime={arcDashAnimateTimeCb}
         customLayerData={customLayerData}
         customThreeObject={customThreeObject}
         customThreeObjectUpdate={customThreeObjectUpdate}
       />
 
       <section className="content-container grow text-3xl">
-        <h1 
-          className="hidden md:block font-bold mb-6 sm:mb-12 text-center md:text-left cursor-pointer"
-          onDoubleClick={hideAlbumCard}
-        >
-          sean.photo
-        </h1>
-
-        <ul
-          className={`flex flex-col 
-            items-center
-            md:items-start tracking-tight 
-            album-list
-            ${isSliding ? 'album-list-sliding' : ''}`}
-        >
-          {albums.map(album => {
-            return (
-              <li
-                key={album.title}
-                className="max-w-fit"
-                onMouseEnter={() => {
-                  handleMouseEnter(album);
-                }}
-                onMouseLeave={() => {
-                  handleMouseLeave();
-                }}
-                onClick={(e) => {
-                  // Prevent any default li behavior that might cause navigation
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              >
-                {/* Both Desktop and Mobile: album title shows card only, no navigation */}
-                <span 
-                  className={`album-title-split ${animatingTitle === album.title ? 'album-title-split-animating' : ''} ${activeAlbumTitle === album.title ? 'album-title-active' : ''} cursor-pointer hover:text-gray-500 touch-manipulation select-none`}
-                  onClick={(e) => handleAlbumTitleClick(album.title, e)}
-                  onTouchEnd={(e) => {
-                    // Handle touch events on mobile devices for better responsiveness
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleAlbumTitleClick(album.title, e);
-                  }}
-                  style={{
-                    // Improve touch target size on mobile
-                    minHeight: '44px',
-                    display: 'inline-block',
-                    lineHeight: '44px'
-                  }}
-                >
-                  {/* Split-effect layers (mobile-only CSS will animate). Duplicate text via data-text. */}
-                  <span className="album-title-split-top" data-text={album.title} aria-hidden="true" />
-                  <span className="album-title-split-bottom" data-text={album.title} aria-hidden="true" />
-                  {/* Visually hidden original to preserve layout; color hidden via CSS only on mobile */}
-                  <span className="album-title-text">{album.title}</span>
-                </span>
-              </li>
-            );
-          })}
-        </ul>
+        <AlbumList 
+          albums={albums}
+          activeAlbumTitle={activeAlbumTitle}
+          onEnter={handleMouseEnter}
+          onLeave={handleMouseLeave}
+          onHideCard={hideAlbumCard}
+        />
       </section>
 
       {activeAlbum && (
