@@ -8,13 +8,9 @@ export const mockAlbums = [
     type: "location" as const,
     description: "Vibrant culture, ancient ruins, and stunning beaches",
     date: "2025",
-    lat: 23.6345,
-    lng: -102.5528,
-    locations: [
-      { lat: 19.4326, lng: -99.1332, description: "Mexico City" },
-      { lat: 20.6597, lng: -105.2254, description: "Puerto Vallarta" },
-      { lat: 21.1619, lng: -86.8515, description: "Cancún" }
-    ],
+    lat: 21.1619, // Cancún
+    lng: -86.8515,
+    locations: [],
     order: 1,
     photos: [
       {
@@ -219,13 +215,9 @@ export const mockAlbums = [
     type: "location" as const,
     description: "Alpine peaks, pristine lakes, and charming villages",
     date: "2025", 
-    lat: 46.8182,
-    lng: 8.2275,
-    locations: [
-      { lat: 46.5197, lng: 6.6323, description: "Lausanne" },
-      { lat: 46.9481, lng: 7.4474, description: "Interlaken" },
-      { lat: 46.0207, lng: 7.7491, description: "Zermatt" }
-    ],
+    lat: 47.3769, // Zürich
+    lng: 8.5417,
+    locations: [],
     order: 7,
     photos: [
       {
