@@ -85,19 +85,25 @@
     body:has(.globe-container) .album-list li span {
       line-height: 22px !important;
       min-height: 22px !important;
+      /* Safari/WebKit only: make font size 5% smaller */
+      font-size: 95% !important;
     }
 
     /* Selected/active album title: make gray off-white on iOS Safari */
     body:has(.globe-container) .album-list li span.album-title-active {
-      color: #f1f1f1 !important;
+      color: #ffffff !important;
     }
     
-    /* Make AlbumCard "Click to enter" 25% smaller on iOS Safari */
+    /* Revert AlbumCard "Click to enter" to normal size on iOS Safari */
     body:has(.globe-container) aside.absolute.z-50 > span:last-child {
-      transform: scale(0.75);
-      -webkit-transform: scale(0.75);
-      transform-origin: left center;
-      -webkit-transform-origin: left center;
+      transform: none;
+      -webkit-transform: none;
+    }
+
+    /* Move scrolling text (marquee) a bit higher */
+    body:has(.globe-container) aside.absolute.z-50 .marquee {
+      transform: translateY(-15%);
+      -webkit-transform: translateY(-15%);
     }
   }
 }
@@ -739,6 +745,16 @@ body:has(.globe-container) aside.absolute.z-50 {
   /* Prevent zoom on input focus for iOS */
   input, textarea, select {
     font-size: 16px;
+  }
+  
+  /* Safari/WebKit only: album list font-size 5% smaller */
+  body:has(.globe-container) .album-list li span {
+    font-size: 95% !important;
+  }
+  /* Safari/WebKit only: move marquee a bit higher */
+  body:has(.globe-container) aside.absolute.z-50 .marquee {
+    transform: translateY(-15%);
+    -webkit-transform: translateY(-15%);
   }
   
   /* Fix for iOS Safari viewport units - GLOBE PAGE ONLY */
