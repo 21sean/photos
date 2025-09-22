@@ -27,6 +27,28 @@ export function useHDRSetup() {
     if (capabilities.supportsRec2020) {
       document.documentElement.classList.add('rec2020-supported');
     }
+
+    // Stable full-screen CSS var for iOS 26 fixed overlays
+    function setOuterHeightVar() {
+      try {
+        const outerH = Math.max(window.outerHeight || 0, window.innerHeight || 0);
+        document.documentElement.style.setProperty('--outer-h', outerH + 'px');
+      } catch {}
+    }
+    setOuterHeightVar();
+    window.addEventListener('orientationchange', setOuterHeightVar, { passive: true } as any);
+    window.addEventListener('pageshow', setOuterHeightVar, { passive: true } as any);
+    // Visual viewport changes can also affect layout; update var then too
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', setOuterHeightVar);
+    }
+    return () => {
+      window.removeEventListener('orientationchange', setOuterHeightVar as any);
+      window.removeEventListener('pageshow', setOuterHeightVar as any);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', setOuterHeightVar as any);
+      }
+    };
   }, []);
 }
 
