@@ -53,8 +53,6 @@
     
     /* Move album list down by 7% and adjust positioning - ONLY for globe page */
     body:has(.globe-container) .content-container {
-      transform: translateY(-5%) !important;
-      -webkit-transform: translateY(-5%) !important;
       padding-top: calc(env(safe-area-inset-top) + 8px) !important;
     }
     
@@ -266,10 +264,8 @@ body {
 @media (max-width: 768px) and (orientation: portrait), 
        (hover: none) and (pointer: coarse) and (orientation: portrait),
        (max-device-width: 1024px) and (orientation: portrait) {
-  /* Album list/container vertical positioning for all mobile browsers */
+  /* Album list/container safe area for all mobile browsers */
   body:has(.globe-container) .content-container {
-    transform: translateY(-5%) !important;
-    -webkit-transform: translateY(-5%) !important;
     padding-top: max(env(safe-area-inset-top), 8px) !important;
   }
 
