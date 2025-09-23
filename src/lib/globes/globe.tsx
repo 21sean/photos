@@ -420,8 +420,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
 
   // rings animation
   const {
-    rings,
-    colorInterpolator,
+    // rings,
+    // colorInterpolator,
     handleMouseEnter,
     handleMouseLeave,
     activeAlbumTitle
@@ -446,7 +446,13 @@ function Globe({ albums }: { albums: Array<Album> }) {
   const polygonAltitudeCb = React.useCallback(() => 0, []);
   const polygonSideColorCb = React.useCallback(() => 'rgba(255, 255, 255, 0)', []);
   const polygonStrokeColorCb = React.useCallback(() => (isMac ? 'black' : 'darkslategray'), [isMac]);
-  const pointColorCb = React.useCallback(() => 'rgba(255, 0, 0, 0.75)', []);
+  const pointColorCb = React.useCallback((point: any) => {
+    const p = point as Partial<Album> & { radius?: number };
+    if (activeAlbumTitle && p.title === activeAlbumTitle) {
+      return 'rgba(0, 200, 0, 0.9)'; // green for selected
+    }
+    return 'rgba(255, 0, 0, 0.75)'; // default red
+  }, [activeAlbumTitle]);
   const pointRadiusCb = React.useCallback((point: any) => (point as { radius: number }).radius, []);
   const onPointHoverCb = React.useCallback((point: any) => {
     if (point) {
@@ -556,11 +562,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
         pointsMerge={true}
         onPointHover={onPointHoverCb}
         onPointClick={onPointClickCb}
-        ringsData={rings}
-        ringColor={() => colorInterpolator}
-        ringMaxRadius="maxR"
-        ringPropagationSpeed="propagationSpeed"
-        ringRepeatPeriod="repeatPeriod"
+        // rings disabled
+        ringsData={[]}
         arcsData={arcs}
         arcColor={'color'}
         arcDashLength={arcDashLengthCb} // the bigger the ranges, the calmer it looks
