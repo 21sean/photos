@@ -12,50 +12,7 @@ export const mockAlbums = [
     lng: -86.8515,
     locations: [],
     order: 1,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=1",
-        title: "Mexican Architecture",
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=2", 
-        title: "Ancient Ruins",
-        width: 800,
-        height: 600
-      },
-      {
-        size: 1920000,
-        url: "https://picsum.photos/1920/1080?random=100&hdr=true",
-        title: "Sunset over Chichen Itza",
-        width: 1920,
-        height: 1080,
-        isHDR: true,
-        colorSpace: "P3" as const,
-        hdrMetadata: {
-          maxLuminance: 1000,
-          minLuminance: 0.01,
-          colorGamut: "P3"
-        }
-      },
-      {
-        size: 2073600,
-        url: "https://picsum.photos/1920/1080?random=101&rec2020=true",
-        title: "Vibrant Market Scene",
-        width: 1920,
-        height: 1080,
-        isHDR: true,
-        colorSpace: "Rec2020" as const,
-        hdrMetadata: {
-          maxLuminance: 4000,
-          minLuminance: 0.005,
-          colorGamut: "Rec2020"
-        }
-      }
-    ]
+    photos: []
   },
   {
     title: "Lisbon" as AlbumTitle,
@@ -189,22 +146,7 @@ export const mockAlbums = [
       { lat: 41.3841, lng: 2.1770, description: "Gothic Quarter" }
     ],
     order: 5,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=9",
-        title: "Sagrada Familia" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=10",
-        title: "Park Güell" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "Venice" as AlbumTitle,
@@ -278,22 +220,7 @@ export const mockAlbums = [
       { lat: 45.4773, lng: 9.1815, description: "Brera District" }
     ],
     order: 8,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=15",
-        title: "Milan Cathedral" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=16",
-        title: "Galleria Vittorio Emanuele II" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "Tuscany" as AlbumTitle,
@@ -306,22 +233,7 @@ export const mockAlbums = [
     locations: [
      ],
     order: 9,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=17",
-        title: "Florence Skyline" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=18",
-        title: "Tuscan Countryside" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "Rome" as AlbumTitle,
@@ -337,22 +249,7 @@ export const mockAlbums = [
       { lat: 41.8986, lng: 12.4769, description: "Trevi Fountain" }
     ],
     order: 10,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=19",
-        title: "Colosseum" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=20",
-        title: "Roman Forum" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "London" as AlbumTitle,
@@ -368,22 +265,7 @@ export const mockAlbums = [
       { lat: 51.5194, lng: -0.1270, description: "Camden" }
     ],
     order: 11,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=21",
-        title: "Big Ben" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=22",
-        title: "Tower Bridge" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "San Diego" as AlbumTitle,
@@ -399,22 +281,7 @@ export const mockAlbums = [
       { lat: 32.6953, lng: -117.1564, description: "Balboa Park" }
     ],
     order: 12,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=23",
-        title: "La Jolla Cove" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=24",
-        title: "Balboa Park" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "Los Angeles" as AlbumTitle,
@@ -430,22 +297,7 @@ export const mockAlbums = [
       { lat: 34.0259, lng: -118.7798, description: "Malibu" }
     ],
     order: 13,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=25",
-        title: "Hollywood Sign" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=26",
-        title: "Santa Monica Pier" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "Tennessee" as AlbumTitle,
@@ -458,22 +310,7 @@ export const mockAlbums = [
     locations: [
   ],
     order: 14,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=27",
-        title: "Nashville Skyline" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=28",
-        title: "Great Smoky Mountains" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   }
 ];
 
@@ -484,21 +321,6 @@ export const mockFolders = [
     description: "Beautiful moments from wedding ceremonies",
     date: "2024",
     order: 1,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=9",
-        title: "Wedding Photo 1" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=10",
-        title: "Wedding Photo 2" as AlbumTitle, 
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   }
 ];
