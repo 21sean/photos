@@ -98,6 +98,160 @@ export const mockAlbums = [
           minLuminance: 0.01,
           colorGamut: "P3"
         }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/44828e18-cfea-4623-89b4-be2a9b847c14.jpeg?h=1c4f30211c71b58e03c8185c60710b3d",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/c09a5f80-ff6c-4e51-a8c8-b080fd280cbb.jpeg",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/7ead2035-84d5-49af-bbbc-5bcd66eeb087.jpeg",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/740044d9c2c7350fb26995a4a65b0df6/9085af66-a2f3-4a21-8d3f-822abe822066.jpeg",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/740044d9c2c7350fb26995a4a65b0df6/69171a12e-81d3-42d0-8545-acbced5ded86.jpeg",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/740044d9c2c7350fb26995a4a65b0df6/74424258-5911-4713-aaf2-553c3bedbba8.jpeg",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/740044d9c2c7350fb26995a4a65b0df6/25dbbb82-532c-4f87-8e52-62433f656137.jpeg",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/740044d9c2c7350fb26995a4a65b0df6/6d443b63-49e2-42e1-a319-67e901ead29.jpeg",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/740044d9c2c7350fb26995a4a65b0df6/ed4a41e7-2626-4ed2-8a38-4d12fa8833e3.jpeg",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/740044d9c2c7350fb26995a4a65b0df6/38903464-91cc-4bd1-8e7c-9e50c05878e5.jpeg",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/740044d9c2c7350fb26995a4a65b0df6/5f787495-fda7-40a8-9617-87267fe08c3b.jpeg",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 1000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
       }
     ]
   },
