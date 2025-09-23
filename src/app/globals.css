@@ -40,9 +40,6 @@ body:has(.globe-container) *:has(.globe-container) {
       padding-bottom: env(safe-area-inset-bottom) !important;
     }
     
-   
-  
-    
     /* Force mobile styles on iOS regardless of viewport width - ONLY for globe page */
     body:has(.globe-container) .album-list-sliding {
       transform: translateX(-31vw) !important;
