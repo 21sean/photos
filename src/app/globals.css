@@ -32,7 +32,7 @@ body:has(.globe-container) *:has(.globe-container) {
     /* Move copyright up to prevent clipping - ONLY for globe page */
     body:has(.globe-container) footer {
       position: relative !important;
-      bottom: 2vh !important;
+      bottom: 5vh !important;
       left: 0 !important;
       right: 0 !important;
       z-index: 20 !important;
@@ -78,10 +78,7 @@ body:has(.globe-container) *:has(.globe-container) {
       /* Safari/WebKit only: make font size 5% smaller */
     }
 
-    /* Selected/active album title: make gray off-white on iOS Safari */
-    body:has(.globe-container) .album-list li span.album-title-active {
-      color: #ffffff !important;
-    }
+    
     
     /* Revert AlbumCard "Click to enter" to normal size on iOS Safari */
     body:has(.globe-container) aside.absolute.z-50 > span:last-child {
@@ -229,6 +226,30 @@ body {
   -webkit-transition: -webkit-transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
                       text-align 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-align: center;
+}
+
+/* Album titles default to black; hover stays black; active becomes dark gray */
+.album-list li span {
+  color: #000000 !important;
+}
+.album-list li span:hover {
+  color: #000000 !important;
+}
+.album-list li span.album-title-active {
+  color: #4b5563 !important; /* gray-600 */
+}
+
+/* On text selection, use dark gray text for these elements */
+.album-list li span::selection,
+.globe-container footer *::selection,
+aside.absolute.z-50 *::selection {
+  color: #4b5563;
+}
+
+/* Footer/copyright text should always be black */
+.globe-container footer,
+.globe-container footer * {
+  color: #000000 !important;
 }
 
 .album-list-sliding {
@@ -417,6 +438,12 @@ aside.absolute.z-50 {
   animation: fadeInCard 0.65s ease-out forwards;
   /* Start with opacity 0 for proper fade-in */
   opacity: 0;
+}
+
+/* Album card text should always be black */
+aside.absolute.z-50,
+aside.absolute.z-50 * {
+  color: #000000 !important;
 }
 
 /* "Click to enter" text is the last span in the album card */
