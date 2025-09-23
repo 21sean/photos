@@ -193,6 +193,13 @@ body {
   animation: fadeIn 5s ease-in-out;
   background-color: #fff;
 }
+.album-page {
+  background-color: #000 !important;
+}
+html:has(.album-page),
+body:has(.album-page) {
+  background: #000 !important;
+}
 .content-container {
   z-index: 10;
 }
