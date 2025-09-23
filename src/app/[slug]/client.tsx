@@ -38,7 +38,7 @@ export default function AlbumPageClient({
   }, [isCollapsed, isAnimating]);
 
   return (
-    <section className="flex flex-col sm:flex-row sm:my-4" id="top">
+    <section className="album-page flex flex-col sm:flex-row sm:my-4" id="top">
       <div className="pt-3 sm:pt-6 sm:pl-10 sm:pr-20 lg:pl-20 lg:pr-40 space-y-1">
         <Nav albums={albums} title={album.title} isCollapsed={isCollapsed} />
       </div>
