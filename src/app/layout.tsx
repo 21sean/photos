@@ -16,13 +16,6 @@ export const metadata: Metadata = {
     description: 'HDR Photography Portfolio',
     url: 'https://sean.ventures', // Updated to match current deployment
     siteName: "sean.photo",
-    images: [
-      {
-        url: 'https://images.ctfassets.net/hgydmrrpr52m/51698HSeL6XwsGGkNoevym/fe4b55fbcb4431a6a75f14e6b2ebeb6b/meta_tag_1.jpg',
-        width: 1200,
-        height: 630
-      }
-    ],
     locale: 'en_US',
     type: 'website'
   }
