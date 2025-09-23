@@ -52,6 +52,8 @@ export default function RootLayout({
         <meta name="x5-fullscreen" content="true" />
         <meta name="browsermode" content="application" />
         <meta name="x5-page-mode" content="app" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
       </head>
       <body>{children}</body>
     </html>
