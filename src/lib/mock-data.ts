@@ -6,7 +6,7 @@ export const mockAlbums = [
     title: "Mexico" as AlbumTitle,
     color: "#FF6B6B",
     type: "location" as const,
-    description: "Vibrant culture, ancient ruins, and stunning beaches",
+    description: "Vibrant culture, ancient Mayanruins, and stunning beaches",
     date: "2025",
     lat: 21.1619, // Cancún
     lng: -86.8515,
@@ -24,7 +24,9 @@ export const mockAlbums = [
     lng: -9.1393,
     locations: [
       { lat: 38.7223, lng: -9.1393, description: "Alfama" },
-      { lat: 38.7071, lng: -9.1364, description: "Bairro Alto" }
+      { lat: 38.7071, lng: -9.1364, description: "Bairro Alto" },
+      { lat: 38.7071, lng: -9.1364, description: "Sintra" }
+
     ],
     order: 2,
     photos: [
