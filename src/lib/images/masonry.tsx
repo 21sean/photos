@@ -88,7 +88,7 @@ export const Masonry = ({
         columnWidth={columnWidth}
         itemHeightEstimate={averageHeight}
         maxColumnCount={4}
-        overscanBy={3}
+        overscanBy={1}
         {...props}
       />
     </section>

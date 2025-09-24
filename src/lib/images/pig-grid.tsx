@@ -50,8 +50,8 @@ function PigGrid({ items }: { items: Array<Photo> }) {
     classPrefix: 'pig',
     spaceBetweenImages: 12,
     transitionSpeed: 500,
-    primaryImageBufferHeight: 1600,
-    secondaryImageBufferHeight: 600,
+    primaryImageBufferHeight: 1000,
+    secondaryImageBufferHeight: 300,
     urlForSize: function (filename: string, size: number) {
       return filename;
     },
@@ -68,8 +68,6 @@ function PigGrid({ items }: { items: Array<Photo> }) {
       const img = document.createElement('img');
       img.src = url;
       img.alt = item.title || '';
-      img.loading = 'lazy';
-      (img as any).fetchPriority = 'low';
       
       // Apply HDR styles if image is HDR
       const isHDR = item.isHDR || isLikelyHDR(item.url);
