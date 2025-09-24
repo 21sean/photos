@@ -59,10 +59,7 @@ export function HDRImage({
   }, [isHDR, photo.colorSpace]);
   
   const handleImageLoad = useCallback(() => {
-    // Ensure loading animation is visible for at least 500ms
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
+    setIsLoading(false);
   }, []);
 
   // Determine optimal image attributes
@@ -73,11 +70,12 @@ export function HDRImage({
     alt: alt || photo.title || '',
     loading: (priority ? 'eager' : 'lazy') as 'eager' | 'lazy',
     decoding: 'async',
+    fetchPriority: priority ? 'high' : 'auto',
     onLoad: handleImageLoad,
     style: {
       ...hdrStyles,
-      opacity: isLoading ? 0 : 1,
-      transition: 'opacity 0.3s ease, filter 0.3s ease',
+      opacity: isLoading ? 0.2 : 1,
+      transition: 'opacity 0.15s ease, filter 0.15s ease',
     },
     className: `hdr-image ${isHDR ? 'hdr-enhanced' : ''} ${className}`,
   };
