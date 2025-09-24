@@ -160,10 +160,15 @@ function useRings(
     setPointAltitude(0.002);
     setActiveAlbumTitle(undefined);
 
+    const isMobile = typeof window !== 'undefined' && (
+      (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
+      window.innerWidth <= 768
+    );
+    const defaultAltitude = isMobile ? 2.8 : 2;
     globeEl.current?.pointOfView(
       {
         lat: 30,
-        altitude: 2
+        altitude: defaultAltitude
       },
       1000
     );
@@ -199,7 +204,7 @@ function generateArcs(albums: Array<Album>) {
         startLng: albums[i].lng,
         endLat: albums[j].lat,
         endLng: albums[j].lng,
-        color: ['red', 'red']
+        color: ['red', 'purple']
       });
     }
   }
@@ -229,8 +234,8 @@ function useCustomLayer(globeEl: GlobeEl) {
       new THREE.SphereGeometry(0.18), // Slightly smaller spheres
       new THREE.MeshBasicMaterial({
         color: '#777777',
-        opacity: 0.2, // Slightly more transparent
-        transparent: true
+        opacity: 0.6, // Slightly more transparent
+        transparent: false
       })
     ), []);
   const customThreeObjectUpdate: GlobeProps['customThreeObjectUpdate'] = React.useCallback((
@@ -333,7 +338,12 @@ function useGlobeReady(globeEl: GlobeEl) {
       controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
       controls.autoRotateForced = false; // Initialize the forced flag
 
-      globeEl.current.pointOfView({ lat: 30, lng: -30, altitude: 2 });
+      const isMobile = typeof window !== 'undefined' && (
+        (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
+        window.innerWidth <= 768
+      );
+      const initialAltitude = isMobile ? 2.8 : 2;
+      globeEl.current.pointOfView({ lat: 30, lng: -30, altitude: initialAltitude });
 
       // Start the dynamic rotation speed
       autoRotateSpeed();
