@@ -30,20 +30,6 @@ export const mockAlbums = [
     photos: [
       {
         size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/68084daf-56fb-444a-bcd0-919213b71d49.jpeg?h=922b6616516c19b2db62f77772909c18",
-        title: "Lisbon Streets",
-        width: 1920,
-        height: 1280,
-        isHDR: true,
-        colorSpace: "P3" as const,
-        hdrMetadata: {
-          maxLuminance: 1000,
-          minLuminance: 0.01,
-          colorGamut: "P3"
-        }
-      },
-      {
-        size: 1920000,
         url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/59953af5-125d-4722-bd7d-0d3b5d8117a7.jpeg?h=055f4fde8ffacf1685a131b248b76d28",
         title: "Lisbon Streets",
         width: 1920,

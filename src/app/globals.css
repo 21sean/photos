@@ -325,7 +325,7 @@ aside.absolute.z-50 *::selection {
     }
     
     body:has(.globe-container) aside.absolute.z-50 {
-      left: 48vw !important;
+      left: 36vw !important;
       top:5.6vh !important; /* 20% higher than 12vh */
       bottom: auto !important; /* allow free top positioning */
       max-width: 50vw !important;
