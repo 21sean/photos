@@ -30,8 +30,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${sansSerifFont.variable} font-sans`}>
       <head>
-        <link rel="preconnect" href="https://cdn.myportfolio.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://cdn.myportfolio.com" />
         <meta name="color-scheme" content="light dark" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
