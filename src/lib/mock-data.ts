@@ -10,7 +10,11 @@ export const mockAlbums = [
     date: "2025",
     lat: 21.1619, // Cancún
     lng: -86.8515,
-    locations: [],
+    locations: [
+      { lat: 21.1619, lng: -86.8515, description: "Cancún" },
+      { lat: 21.1619, lng: -86.8515, description: "Tulum" },
+      { lat: 21.1619, lng: -86.8515, description: "Playa del Carmen" }
+    ],
     order: 1,
     photos: []
   },
@@ -70,6 +74,7 @@ export const mockAlbums = [
     lng: -8.6291,
     locations: [
       { lat: 41.1579, lng: -8.6291, description: "Ribeira" },
+      { lat: 41.1579, lng: -8.6291, description: "Douro Valley" },
       { lat: 41.1496, lng: -8.6109, description: "Vila Nova de Gaia" }
     ],
     order: 3,
@@ -168,7 +173,11 @@ export const mockAlbums = [
     date: "2025", 
     lat: 47.3769, // Zürich
     lng: 8.5417,
-    locations: [],
+    locations: [
+      { lat: 47.3769, lng: 8.5417, description: "Zürich" },
+      { lat: 47.3769, lng: 8.5417, description: "Lucerne" },
+      { lat: 47.3769, lng: 8.5417, description: "Interlaken" }
+    ],
     order: 7,
     photos: [
       {
@@ -218,7 +227,10 @@ export const mockAlbums = [
     date: "2024", 
     lat: 43.7711,
     lng: 11.2486,
-    locations: [
+    locations: [  
+      { lat: 43.7711, lng: 11.2486, description: "Florence" },
+      { lat: 43.7711, lng: 11.2486, description: "Siena" },
+      { lat: 43.7711, lng: 11.2486, description: "Pisa" }
      ],
     order: 9,
     photos: []
@@ -295,7 +307,10 @@ export const mockAlbums = [
     date: "2019", 
     lat: 35.7478,
     lng: -86.7945,
-    locations: [
+    locations: [ 
+      { lat: 35.7478, lng: -86.7945, description: "Nashville" },
+      { lat: 35.7478, lng: -86.7945, description: "Memphis" },
+      { lat: 35.7478, lng: -86.7945, description: "Knoxville" }
   ],
     order: 14,
     photos: []
