@@ -18,7 +18,7 @@ export const mockAlbums = [
     title: "Lisbon" as AlbumTitle,
     color: "#4ECDC4",
     type: "location" as const, 
-    description: "Charming streets, historic trams, and beautiful tiles",
+    description: "Charming streets, historic trams, and amazing seafood",
     date: "2025",
     lat: 38.7223,
     lng: -9.1393,
@@ -37,7 +37,7 @@ export const mockAlbums = [
         isHDR: true,
         colorSpace: "P3" as const,
         hdrMetadata: {
-          maxLuminance: 1000,
+          maxLuminance: 2000,
           minLuminance: 0.01,
           colorGamut: "P3"
         }
@@ -51,7 +51,7 @@ export const mockAlbums = [
         isHDR: true,
         colorSpace: "P3" as const,
         hdrMetadata: {
-          maxLuminance: 1000,
+          maxLuminance: 2000,
           minLuminance: 0.01,
           colorGamut: "P3"
         }
@@ -62,7 +62,7 @@ export const mockAlbums = [
     title: "Porto" as AlbumTitle,
     color: "#45B7D1",
     type: "location" as const,
-    description: "Port wine, azulejo tiles, and medieval charm",
+    description: "Port wine, azulejo tiles, and rundown charm",
     date: "2025", 
     lat: 41.1579,
     lng: -8.6291,
@@ -99,7 +99,7 @@ export const mockAlbums = [
     title: "Prague" as AlbumTitle,
     color: "#96CEB4",
     type: "location" as const,
-    description: "Gothic architecture and medieval atmosphere",
+    description: "Gothic architecture, Prague Castle, and medieval atmosphere",
     date: "2025", 
     lat: 50.0755,
     lng: 14.4378,
@@ -122,7 +122,7 @@ export const mockAlbums = [
     title: "Barcelona" as AlbumTitle,
     color: "#FFEAA7",
     type: "location" as const,
-    description: "Gaudí's masterpieces and Mediterranean vibes",
+    description: "Gaudí's masterpieces, vibrant nightlife, and Tapas",
     date: "2025", 
     lat: 41.3851,
     lng: 2.1734,
@@ -241,7 +241,7 @@ export const mockAlbums = [
     title: "London" as AlbumTitle,
     color: "#A29BFE",
     type: "location" as const,
-    description: "Royal palaces, historic landmarks, and modern culture",
+    description: "Royal palaces, historic landmarks",
     date: "2021", 
     lat: 51.5074,
     lng: -0.1278,
@@ -273,7 +273,7 @@ export const mockAlbums = [
     title: "Los Angeles" as AlbumTitle,
     color: "#FD79A8",
     type: "location" as const,
-    description: "Hollywood glamour, beaches, and endless sunshine",
+    description: "Hollywood, beaches, and traffic",
     date: "2021", 
     lat: 34.0522,
     lng: -118.2437,
@@ -289,7 +289,7 @@ export const mockAlbums = [
     title: "Tennessee" as AlbumTitle,
     color: "#6C5CE7",
     type: "location" as const,
-    description: "Music heritage, southern charm, and natural beauty",
+    description: "Musical heritage, live music on Broadway, Grand Ole Opry",
     date: "2019", 
     lat: 35.7478,
     lng: -86.7945,
@@ -302,9 +302,9 @@ export const mockAlbums = [
 
 export const mockFolders = [
   {
-    title: "Wedding Photography" as AlbumTitle,
+    title: "hotography" as AlbumTitle,
     parent_title: "Events" as AlbumTitle,
-    description: "Beautiful moments from wedding ceremonies",
+    description: "",
     date: "2024",
     order: 1,
     photos: []
