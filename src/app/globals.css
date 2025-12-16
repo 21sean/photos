@@ -242,6 +242,17 @@ body:has(.album-page) {
 }
 .content-container {
   z-index: 10;
+  pointer-events: none;
+}
+
+/* Let the globe receive drag/zoom except on the actual album title text */
+.album-list-wrapper,
+.album-list {
+  pointer-events: none;
+}
+
+.album-list-item {
+  pointer-events: auto;
 }
 
 /* Ensure mobile header stacks above globe layers */
