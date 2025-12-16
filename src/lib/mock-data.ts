@@ -314,6 +314,86 @@ export const mockAlbums = [
   ],
     order: 14,
     photos: []
+  },
+  {
+    title: "Malta" as AlbumTitle,
+    color: "#4ECDC4",
+    type: "location" as const,
+    description: "Mediterranean islands with crystal waters and ancient history",
+    date: "2025",
+    lat: 35.8989, // Valletta
+    lng: 14.5146,
+    locations: [
+      { lat: 35.8989, lng: 14.5146, description: "Valletta" },
+      { lat: 36.0443, lng: 14.2394, description: "Gozo" },
+      { lat: 35.8860, lng: 14.4028, description: "Mdina" }
+    ],
+    order: 15,
+    photos: []
+  },
+  {
+    title: "Athens" as AlbumTitle,
+    color: "#96CEB4",
+    type: "location" as const,
+    description: "Ancient ruins, lively neighborhoods, and sunset views",
+    date: "2025",
+    lat: 37.9838,
+    lng: 23.7275,
+    locations: [
+      { lat: 37.9715, lng: 23.7257, description: "Acropolis" },
+      { lat: 37.9755, lng: 23.7349, description: "Plaka" },
+      { lat: 37.9719, lng: 23.7267, description: "Areopagus" }
+    ],
+    order: 16,
+    photos: []
+  },
+  {
+    title: "Madrid" as AlbumTitle,
+    color: "#45B7D1",
+    type: "location" as const,
+    description: "Late nights, grand boulevards, and world-class art",
+    date: "2025",
+    lat: 40.4168,
+    lng: -3.7038,
+    locations: [
+      { lat: 40.4153, lng: -3.6844, description: "Retiro" },
+      { lat: 40.4138, lng: -3.6921, description: "Prado" },
+      { lat: 40.4203, lng: -3.7058, description: "Gran Vía" }
+    ],
+    order: 17,
+    photos: []
+  },
+  {
+    title: "Germany" as AlbumTitle,
+    color: "#FFEAA7",
+    type: "location" as const,
+    description: "Historic cities, modern design, and beer gardens",
+    date: "2025",
+    lat: 52.5200, // Berlin
+    lng: 13.4050,
+    locations: [
+      { lat: 52.5200, lng: 13.4050, description: "Berlin" },
+      { lat: 48.1351, lng: 11.5820, description: "Munich" },
+      { lat: 50.1109, lng: 8.6821, description: "Frankfurt" }
+    ],
+    order: 18,
+    photos: []
+  },
+  {
+    title: "Amalfi Coast" as AlbumTitle,
+    color: "#DDA0DD",
+    type: "location" as const,
+    description: "Cliffside villages, lemon groves, and seaside views",
+    date: "2025",
+    lat: 40.6281, // Positano
+    lng: 14.4850,
+    locations: [
+      { lat: 40.6281, lng: 14.4850, description: "Positano" },
+      { lat: 40.6498, lng: 14.6116, description: "Amalfi" },
+      { lat: 40.6990, lng: 14.7149, description: "Ravello" }
+    ],
+    order: 19,
+    photos: []
   }
 ];
 
