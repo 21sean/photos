@@ -14,6 +14,9 @@ import { AlbumCard } from './card';
 import useHDRSetup from '@/hooks/use-hdr-setup';
 import AlbumList from '@/lib/globes/album-list';
 
+// Flying lines (arc dash) speed: 1 = current speed, smaller = slower, larger = faster
+const FLYING_LINES_SPEED = 0.2;
+
 type Ref = CustomGlobeMethods | undefined; // Reference to globe instance
 type GlobeEl = React.MutableRefObject<Ref>; // React `ref` passed to globe element
 
@@ -481,7 +484,11 @@ function Globe({ albums }: { albums: Array<Album> }) {
   }, [handleMouseEnter]);
   const arcDashLengthCb = React.useCallback(() => randomInRange(0.06, 0.7) / 1, []);
   const arcDashGapCb = React.useCallback(() => randomInRange(0.025, 0.4) * 10, []);
-  const arcDashAnimateTimeCb = React.useCallback(() => randomInRange(0.08, 0.8) * 20000 + 500, []);
+  const arcDashAnimateTimeCb = React.useCallback(() => {
+    const speed = Math.max(0.05, FLYING_LINES_SPEED);
+    const baseDurationMs = randomInRange(0.08, 0.8) * 20000 + 500;
+    return baseDurationMs / speed;
+  }, []);
 
   // Handle navigation when clicking "Click to enter" on album card
   const handleAlbumCardClick = (albumTitle: string) => {
