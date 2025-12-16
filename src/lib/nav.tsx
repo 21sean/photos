@@ -12,6 +12,10 @@ export const Nav: React.FC<{
   isCollapsed?: boolean;
 }> = ({ albums, title = '', isCollapsed = false, ...props }) => {
   const isInAlbum = !!title;
+  const sortedAlbums = React.useMemo(
+    () => [...albums].sort((a, b) => a.title.localeCompare(b.title)),
+    [albums]
+  );
 
   return (
     <nav className="text-lg max-sm:!text-2xl" {...props}>
@@ -30,7 +34,7 @@ export const Nav: React.FC<{
       <ul className={`flex flex-col max-sm:items-center max-sm:mb-8 content-start tracking-tight ${
         isInAlbum ? 'hidden sm:flex sm:flex-col' : ''
       }`}>
-        {albums.map((album, index) => {
+        {sortedAlbums.map((album, index) => {
           const isActive = title.toLowerCase() === album.title.toLowerCase();
           return (
             <li 
