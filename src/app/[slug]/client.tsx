@@ -27,6 +27,7 @@ export default function AlbumPageClient({
 }: AlbumPageClientProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
+  const sortedAlbums = [...albums].sort((a, b) => a.title.localeCompare(b.title));
 
   // Throttled toggle to prevent rapid clicks causing performance issues
   const handleToggle = useCallback(() => {
@@ -89,7 +90,7 @@ export default function AlbumPageClient({
               : 'max-h-96 opacity-100 transform translate3d(0, 0, 0)'
           }`}>
             <ul className="mt-2 pt-4 pb-6 border-t border-gray-300 space-y-2">
-              {albums.map((albumItem, index) => {
+              {sortedAlbums.map((albumItem, index) => {
                 const isActive = album.title.toLowerCase() === albumItem.title.toLowerCase();
                 return (
                   <li 

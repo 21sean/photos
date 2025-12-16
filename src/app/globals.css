@@ -70,9 +70,8 @@ body:has(.globe-container) *:has(.globe-container) {
     
     /* Reduce album list text spacing by 50% (override inline 44px line-height) */
     body:has(.globe-container) .album-list li span {
-      line-height: 29px !important;
-      min-height: 22px !important;
-      /* Safari/WebKit only: make font size 5% smaller */
+      line-height: calc(var(--album-list-line-height, 44px) * 0.66) !important;
+      min-height: calc(var(--album-list-min-height, 44px) * 0.66) !important;
     }
 
     
@@ -277,6 +276,10 @@ body:has(.album-page) {
 /* Album titles default to black; hover stays black; active becomes dark gray */
 .album-list li span {
   color: #000000 !important;
+  font-size: var(--album-list-font-size, inherit);
+  line-height: var(--album-list-line-height, 44px);
+  min-height: var(--album-list-min-height, 44px);
+  display: inline-block;
 }
 .album-list li span:hover {
   color: #000000 !important;
