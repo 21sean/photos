@@ -161,7 +161,7 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
             <span 
               className={`album-list-item ${activeAlbumTitle === album.title ? 'album-title-active' : ''} cursor-pointer hover:text-gray-500 touch-manipulation select-none ${animatingTitle === album.title ? 'typewriter thick' : ''}`}
               onMouseEnter={() => onEnter(album)}
-              onMouseLeave={onLeave}
+              onMouseLeave={() => onLeave()}
               onClick={(e) => handleAlbumTitleClick(album, e)}
               onTouchEnd={(e) => {
                 e.preventDefault();
