@@ -539,11 +539,14 @@ function Globe({ albums }: { albums: Array<Album> }) {
   const onPointClickCb = React.useCallback((point: any) => {
     if (point) {
       const album = point as Album;
+      if (isDesktopChrome) {
+        isPinnedRef.current = true;
+      }
       // Show album card instead of navigating directly (both mobile and desktop)
       // Delegate to album list interaction
       handleMouseEnter(album);
     }
-  }, [handleMouseEnter]);
+  }, [handleMouseEnter, isDesktopChrome]);
   const arcDashLengthCb = React.useCallback(() => randomInRange(0.06, 0.7) / 1, []);
   const arcDashGapCb = React.useCallback(() => randomInRange(0.025, 0.4) * 10, []);
   const arcDashAnimateTimeCb = React.useCallback(() => {
@@ -607,7 +610,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
   return (
     <section
       ref={containerRef as any}
-      className={`globe-container relative
+      className={`globe-container relative ${isDesktopChrome ? 'chrome-desktop' : ''}
         md:px-24
         lg:px-36
         xl:px-48
@@ -666,7 +669,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
           albums={albums}
           activeAlbumTitle={activeAlbumTitle}
           onEnter={handleMouseEnter}
-          onLeave={handleMouseLeave}
+          onLeave={() => handleMouseLeave()}
           onSelect={handleAlbumSelect}
           onHideCard={hideAlbumCard}
         />

@@ -286,6 +286,13 @@ body:has(.album-page) {
   text-align: center;
 }
 
+/* Desktop Chrome-only: nudge the album card lower */
+@media (hover: hover) and (pointer: fine) {
+  body:has(.globe-container.chrome-desktop) aside.absolute.z-50 {
+    transform: translateY(20%);
+  }
+}
+
 /* Album titles default to black; hover stays black; active becomes dark gray */
 .album-list li span {
   color: #000000 !important;
