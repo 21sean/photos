@@ -8,6 +8,7 @@ type Props = {
   activeAlbumTitle?: AlbumTitle;
   onEnter: (album: Album) => void;
   onLeave: () => void;
+  onSelect?: (album: Album) => void;
   onHideCard: () => void;
 };
 
@@ -15,7 +16,7 @@ const BASE_FONT_SIZE_PX = 30; // matches Tailwind text-3xl (1.875rem)
 const BASE_LINE_HEIGHT_PX = 44;
 const MIN_SCALE = 0.55;
 
-function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onHideCard }: Props) {
+function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSelect, onHideCard }: Props) {
   const [isSliding, setIsSliding] = React.useState(false);
   const [animatingTitle, setAnimatingTitle] = React.useState<string | null>(null);
   const [typedMap, setTypedMap] = React.useState<Record<string, string>>({});
@@ -39,6 +40,14 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onHide
       event.preventDefault();
       event.stopPropagation();
     }
+
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+    const isChrome = /Chrome\//.test(ua) && !/Edg\//.test(ua) && !/OPR\//.test(ua);
+    const isDesktop = typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const shouldSlideOnClick = !(isChrome && isDesktop);
+
     // clear any existing timer for this album
     if (typingTimers.current[album.title]) {
       window.clearTimeout(typingTimers.current[album.title]);
@@ -64,8 +73,8 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onHide
     };
     run(0);
 
-    setIsSliding(true);
-    onEnter(album);
+    setIsSliding(shouldSlideOnClick);
+    (onSelect ?? onEnter)(album);
   };
 
   const resetAlbumListPosition = () => {
