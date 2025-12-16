@@ -96,7 +96,8 @@ function usePoints(albums: Array<Album>) {
 
 function useRings(
   globeEl: GlobeEl,
-  setPointAltitude: React.Dispatch<React.SetStateAction<number>>
+  setPointAltitude: React.Dispatch<React.SetStateAction<number>>,
+  isPinnedRef?: React.MutableRefObject<boolean>
 ) {
   const [activeAlbumTitle, setActiveAlbumTitle] = useState<AlbumTitle>();
 
@@ -160,7 +161,10 @@ function useRings(
     }, 0);
     setEnterTimeoutId(id);
   }
-  function handleMouseLeave() {
+  function handleMouseLeave(force = false) {
+    if (!force && isPinnedRef?.current) {
+      return;
+    }
     setPointAltitude(0.002);
     setActiveAlbumTitle(undefined);
 
@@ -467,6 +471,17 @@ function Globe({ albums }: { albums: Array<Album> }) {
 
   const { handleGlobeReady } = useGlobeReady(globeEl);
 
+  const isDesktopChrome = React.useMemo(() => {
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+    const isChrome = /Chrome\//.test(ua) && !/Edg\//.test(ua) && !/OPR\//.test(ua);
+    const isDesktop = typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    return isChrome && isDesktop;
+  }, []);
+
+  const isPinnedRef = useRef(false);
+
   // scene config
   useScene(globeElRef);
 
@@ -483,7 +498,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
     handleMouseEnter,
     handleMouseLeave,
     activeAlbumTitle
-  } = useRings(globeEl, setPointAltitude);
+  } = useRings(globeEl, setPointAltitude, isPinnedRef);
   const activeAlbum = albums.find(album => album.title === activeAlbumTitle);
 
   // arcs animation
@@ -516,7 +531,9 @@ function Globe({ albums }: { albums: Array<Album> }) {
     if (point) {
       handleMouseEnter(point as Album);
     } else {
-      handleMouseLeave();
+      if (!isPinnedRef.current) {
+        handleMouseLeave();
+      }
     }
   }, [handleMouseEnter, handleMouseLeave]);
   const onPointClickCb = React.useCallback((point: any) => {
@@ -544,8 +561,16 @@ function Globe({ albums }: { albums: Array<Album> }) {
   // Hide album card when double-clicking sean.photo text or globe background
   const hideAlbumCard = () => {
     console.log('Hiding album card');
-    handleMouseLeave(); // This will clear the active album and hide the card
+    isPinnedRef.current = false;
+    handleMouseLeave(true); // force clear and hide
   };
+
+  const handleAlbumSelect = React.useCallback((album: Album) => {
+    if (isDesktopChrome) {
+      isPinnedRef.current = true;
+    }
+    handleMouseEnter(album);
+  }, [handleMouseEnter, isDesktopChrome]);
 
 
   // Measure container size to ensure correct canvas fit on iOS Safari
@@ -636,12 +661,13 @@ function Globe({ albums }: { albums: Array<Album> }) {
         customThreeObjectUpdate={customThreeObjectUpdate}
       />
 
-      <section className="content-container text-3xl">
+      <section className={`content-container text-3xl ${isDesktopChrome ? 'fixed left-6 top-24 w-fit' : ''}`}>
         <AlbumList 
           albums={albums}
           activeAlbumTitle={activeAlbumTitle}
           onEnter={handleMouseEnter}
           onLeave={handleMouseLeave}
+          onSelect={handleAlbumSelect}
           onHideCard={hideAlbumCard}
         />
       </section>
