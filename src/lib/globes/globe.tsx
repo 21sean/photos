@@ -335,7 +335,7 @@ function useGlobeReady(globeEl: GlobeEl) {
       const controls = globeEl.current.controls();
       
       // Only disable user interaction, but keep controls enabled for auto-rotation
-      controls.enableZoom = false;
+      controls.enableZoom = true;
       controls.enablePan = false;
       controls.enableRotate = false;
       
@@ -636,7 +636,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
         customThreeObjectUpdate={customThreeObjectUpdate}
       />
 
-      <section className="content-container grow text-3xl">
+      <section className="content-container text-3xl">
         <AlbumList 
           albums={albums}
           activeAlbumTitle={activeAlbumTitle}
