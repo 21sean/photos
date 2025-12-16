@@ -323,11 +323,7 @@ export const mockAlbums = [
     date: "2025",
     lat: 35.8989, // Valletta
     lng: 14.5146,
-    locations: [
-      { lat: 35.8989, lng: 14.5146, description: "Valletta" },
-      { lat: 36.0443, lng: 14.2394, description: "Gozo" },
-      { lat: 35.8860, lng: 14.4028, description: "Mdina" }
-    ],
+    locations: [],
     order: 15,
     photos: []
   },
@@ -369,18 +365,14 @@ export const mockAlbums = [
     type: "location" as const,
     description: "Historic cities, modern design, and beer gardens",
     date: "2025",
-    lat: 52.5200, // Berlin
-    lng: 13.4050,
-    locations: [
-      { lat: 52.5200, lng: 13.4050, description: "Berlin" },
-      { lat: 48.1351, lng: 11.5820, description: "Munich" },
-      { lat: 50.1109, lng: 8.6821, description: "Frankfurt" }
-    ],
+    lat: 48.1351, // Munich
+    lng: 11.5820,
+    locations: [],
     order: 18,
     photos: []
   },
   {
-    title: "Amalfi Coast" as AlbumTitle,
+    title: "Amalfi" as AlbumTitle,
     color: "#DDA0DD",
     type: "location" as const,
     description: "Cliffside villages, lemon groves, and seaside views",
