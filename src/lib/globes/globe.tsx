@@ -23,6 +23,7 @@ type GlobeEl = React.MutableRefObject<Ref>; // React `ref` passed to globe eleme
 interface CustomGlobeMethods extends GlobeMethods {
   controls(): ReturnType<GlobeMethods['controls']> & {
     autoRotateForced: boolean;
+    autoRotateUserPaused: boolean;
   };
 }
 
@@ -181,8 +182,10 @@ function useRings(
       if (globeEl.current?.controls) {
         const controls = globeEl.current.controls();
         controls.autoRotateForced = false; // Allow auto-rotation to resume first
-        controls.autoRotate = true; // Then enable rotation
-        controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED; // Reset to default speed
+        if (!controls.autoRotateUserPaused) {
+          controls.autoRotate = true; // Then enable rotation
+          controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED; // Reset to default speed
+        }
       }
     }, 1100); // Wait for the view transition to complete
 
@@ -276,7 +279,7 @@ function useGlobeReady(globeEl: GlobeEl) {
       const controls = globeEl.current.controls();
       
       // Don't modify anything if rotation is forced to stop
-      if (controls.autoRotateForced) {
+      if (controls.autoRotateForced || controls.autoRotateUserPaused) {
         requestAnimationFrame(autoRotateSpeed);
         return;
       }
@@ -340,6 +343,7 @@ function useGlobeReady(globeEl: GlobeEl) {
       controls.autoRotate = true;
       controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
       controls.autoRotateForced = false; // Initialize the forced flag
+      controls.autoRotateUserPaused = false; // Initialize the user pause flag
 
       const isMobile = typeof window !== 'undefined' && (
         (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
@@ -350,21 +354,62 @@ function useGlobeReady(globeEl: GlobeEl) {
 
       // Start the dynamic rotation speed
       autoRotateSpeed();
+
+      // Enable mouse drag to rotate (capture-phase so OrbitControls sees enableRotate=true)
+      const domEl = (controls as any).domElement as HTMLElement | undefined;
+      if (domEl) {
+        const onPointerDownCapture = (e: PointerEvent) => {
+          // Mouse-only drag rotation
+          if (e.pointerType !== 'mouse') return;
+          if (e.button !== 0) return;
+
+          controls.autoRotateUserPaused = true;
+          controls.autoRotate = false;
+          controls.enableRotate = true;
+        };
+
+        const endDrag = () => {
+          controls.autoRotateUserPaused = false;
+          controls.enableRotate = false;
+
+          if (!controls.autoRotateForced) {
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
+          }
+        };
+
+        domEl.addEventListener('pointerdown', onPointerDownCapture, { capture: true });
+        window.addEventListener('pointerup', endDrag, { passive: true });
+        window.addEventListener('pointercancel', endDrag, { passive: true });
+        window.addEventListener('blur', endDrag, { passive: true } as AddEventListenerOptions);
+
+        // Ensure we clean up listeners
+        const cleanupDrag = () => {
+          domEl.removeEventListener('pointerdown', onPointerDownCapture, { capture: true } as any);
+          window.removeEventListener('pointerup', endDrag as any);
+          window.removeEventListener('pointercancel', endDrag as any);
+          window.removeEventListener('blur', endDrag as any);
+        };
+
+        // Multiple attempts to ensure auto-rotation starts
+        const forceRotation = () => {
+          if (globeEl.current) {
+            const controls = globeEl.current.controls();
+            if (controls.autoRotateForced || controls.autoRotateUserPaused) return;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
+            controls.autoRotateForced = false;
+          }
+        };
+        
+        setTimeout(forceRotation, 100);
+        setTimeout(forceRotation, 500);
+        setTimeout(forceRotation, 1000);
+        setTimeout(forceRotation, 2000);
+
+        return cleanupDrag;
+      }
       
-      // Multiple attempts to ensure auto-rotation starts
-      const forceRotation = () => {
-        if (globeEl.current) {
-          const controls = globeEl.current.controls();
-          controls.autoRotate = true;
-          controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
-          controls.autoRotateForced = false;
-        }
-      };
-      
-      setTimeout(forceRotation, 100);
-      setTimeout(forceRotation, 500);
-      setTimeout(forceRotation, 1000);
-      setTimeout(forceRotation, 2000);
     }
   }, [globeEl, globeReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
