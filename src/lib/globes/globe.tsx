@@ -160,10 +160,15 @@ function useRings(
     setPointAltitude(0.002);
     setActiveAlbumTitle(undefined);
 
+    const isMobile = typeof window !== 'undefined' && (
+      (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
+      window.innerWidth <= 768
+    );
+    const defaultAltitude = isMobile ? 2.8 : 2;
     globeEl.current?.pointOfView(
       {
         lat: 30,
-        altitude: 2
+        altitude: defaultAltitude
       },
       1000
     );
@@ -199,7 +204,7 @@ function generateArcs(albums: Array<Album>) {
         startLng: albums[i].lng,
         endLat: albums[j].lat,
         endLng: albums[j].lng,
-        color: ['red', 'red']
+        color: ['red', 'purple']
       });
     }
   }
@@ -229,8 +234,8 @@ function useCustomLayer(globeEl: GlobeEl) {
       new THREE.SphereGeometry(0.18), // Slightly smaller spheres
       new THREE.MeshBasicMaterial({
         color: '#777777',
-        opacity: 0.2, // Slightly more transparent
-        transparent: true
+        opacity: 0.6, // Slightly more transparent
+        transparent: false
       })
     ), []);
   const customThreeObjectUpdate: GlobeProps['customThreeObjectUpdate'] = React.useCallback((
@@ -333,7 +338,12 @@ function useGlobeReady(globeEl: GlobeEl) {
       controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
       controls.autoRotateForced = false; // Initialize the forced flag
 
-      globeEl.current.pointOfView({ lat: 30, lng: -30, altitude: 2 });
+      const isMobile = typeof window !== 'undefined' && (
+        (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
+        window.innerWidth <= 768
+      );
+      const initialAltitude = isMobile ? 2.8 : 2;
+      globeEl.current.pointOfView({ lat: 30, lng: -30, altitude: initialAltitude });
 
       // Start the dynamic rotation speed
       autoRotateSpeed();
@@ -420,8 +430,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
 
   // rings animation
   const {
-    rings,
-    colorInterpolator,
+    // rings,
+    // colorInterpolator,
     handleMouseEnter,
     handleMouseLeave,
     activeAlbumTitle
@@ -446,7 +456,13 @@ function Globe({ albums }: { albums: Array<Album> }) {
   const polygonAltitudeCb = React.useCallback(() => 0, []);
   const polygonSideColorCb = React.useCallback(() => 'rgba(255, 255, 255, 0)', []);
   const polygonStrokeColorCb = React.useCallback(() => (isMac ? 'black' : 'darkslategray'), [isMac]);
-  const pointColorCb = React.useCallback(() => 'rgba(255, 0, 0, 0.75)', []);
+  const pointColorCb = React.useCallback((point: any) => {
+    const p = point as Partial<Album> & { radius?: number };
+    if (activeAlbumTitle && p.title === activeAlbumTitle) {
+      return 'rgba(0, 200, 0, 0.9)'; // green for selected
+    }
+    return 'rgba(255, 0, 0, 0.75)'; // default red
+  }, [activeAlbumTitle]);
   const pointRadiusCb = React.useCallback((point: any) => (point as { radius: number }).radius, []);
   const onPointHoverCb = React.useCallback((point: any) => {
     if (point) {
@@ -556,11 +572,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
         pointsMerge={true}
         onPointHover={onPointHoverCb}
         onPointClick={onPointClickCb}
-        ringsData={rings}
-        ringColor={() => colorInterpolator}
-        ringMaxRadius="maxR"
-        ringPropagationSpeed="propagationSpeed"
-        ringRepeatPeriod="repeatPeriod"
+        // rings disabled
+        ringsData={[]}
         arcsData={arcs}
         arcColor={'color'}
         arcDashLength={arcDashLengthCb} // the bigger the ranges, the calmer it looks

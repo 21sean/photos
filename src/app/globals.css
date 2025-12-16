@@ -2,39 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  /* Full-height section utility for modern browsers with safe-area support */
-  .fullpage {
-    min-height: 100vh;
-    min-height: 100svh;
-    min-height: 100dvh;
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-}
-
-/* Prefer dvh when supported */
-@supports (height: 100dvh) {
-  .fullpage { min-height: 100dvh; }
-}
-
-/* Fixed overlay that must cover behind iOS address bar */
-.overlay-fixed {
-  position: fixed;
-  inset: 0;
-  height: var(--outer-h, 100vh);
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  overflow: hidden;
-}
-.overlay-fixed .panel {
-  height: 100dvh;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
+/* Temporarily neutralize containing-block creators on the strict ancestor chain only */
+html:has(.globe-container),
+body:has(.globe-container),
+body:has(.globe-container) *:has(.globe-container) {
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+  backdrop-filter: none !important;
+  will-change: auto !important;
+  contain: none !important;
 }
 
 /* iOS Safari specific fixes - PORTRAIT MODE ONLY - GLOBE PAGE ONLY */
@@ -42,47 +19,25 @@
   @media (orientation: portrait) {
     /* Target iOS Safari specifically in portrait - ONLY for globe page */
     body:has(.globe-container) .globe-container {
-      /* Stable full physical screen height for Safari */
-      height: -webkit-fill-available !important;
-      height: var(--screen-h, 100lvh) !important;
+      /* Use stable full height for iOS fixed canvas, include safe areas */
+      height: 100lvh !important; 
+      min-height: 100lvh !important;
       width: 100% !important;
+      inset: 0 !important;              /* top:0; right:0; bottom:0; left:0 */
+
       position: relative !important;
-      top: 0 !important;
-      left: 0 !important;
     }
     
-    /* Move album list down by 7% and adjust positioning - ONLY for globe page */
-    body:has(.globe-container) .content-container {
-      padding-top: calc(env(safe-area-inset-top) + 8px) !important;
-    }
-    
+
     /* Move copyright up to prevent clipping - ONLY for globe page */
     body:has(.globe-container) footer {
-      position: fixed !important;
-      bottom: 2vh !important;
+      position: relative !important;
+      bottom: 5vh !important;
       left: 0 !important;
       right: 0 !important;
       z-index: 20 !important;
-    }
-    
-    /* Fix for iOS address bar hiding/showing - ONLY for globe page */
-    body:has(.globe-container) {
-      /* Prefer stable viewport height and fill available */
-      min-height: 100svh;
-      min-height: -webkit-fill-available;
-      /* Avoid pushing canvas down; manage safe-area within content */
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-      /* Disable scrolling on iOS Safari */
-      overflow: hidden !important;
-      position: relative !important;
-      width: 100% !important;
-    }
-    
-    html:has(.globe-container) {
-      height: -webkit-fill-available;
-      /* Disable scrolling on iOS Safari */
-      overflow: hidden !important;
+      background: transparent !important;
+      padding-bottom: env(safe-area-inset-bottom) !important;
     }
     
     /* Force mobile styles on iOS regardless of viewport width - ONLY for globe page */
@@ -95,11 +50,11 @@
     body:has(.globe-container) aside.absolute.z-50 {
       left: 40vw !important;
       top: 12vh !important; /* Moved up from 16vh */
-      bottom: 71.6vh !important; /* Slightly taller to prevent bottom clipping */
+      bottom: auto !important; /* allow free top positioning */
       max-width: 50vw !important;
       width: 50vw !important;
       font-size: 0.8em !important;
-      padding: 0.75rem !important;
+      padding: 0.4rem !important;
       /* Preserve the fade-in animation on mobile */
       animation: fadeInCard 0.65s ease-out forwards !important;
     }
@@ -115,16 +70,12 @@
     
     /* Reduce album list text spacing by 50% (override inline 44px line-height) */
     body:has(.globe-container) .album-list li span {
-      line-height: 22px !important;
+      line-height: 29px !important;
       min-height: 22px !important;
       /* Safari/WebKit only: make font size 5% smaller */
-      font-size: 95% !important;
     }
 
-    /* Selected/active album title: make gray off-white on iOS Safari */
-    body:has(.globe-container) .album-list li span.album-title-active {
-      color: #ffffff !important;
-    }
+    
     
     /* Revert AlbumCard "Click to enter" to normal size on iOS Safari */
     body:has(.globe-container) aside.absolute.z-50 > span:last-child {
@@ -137,12 +88,80 @@
       transform: translateY(-15%);
       -webkit-transform: translateY(-15%);
     }
-    /* Safari/iOS: position album list ~12lvh from top (30svh general - 18svh) */
+    /* Safari/iOS: position album list closer to top */
     body:has(.globe-container) .album-list-wrapper {
-      transform: translateY(12lvh) !important;
-      -webkit-transform: translateY(12lvh) !important;
+      transform: translateY(6svh) !important;
+      -webkit-transform: translateY(6svh) !important;
     }
   }
+}
+/* No page scroll and white background when underlay is present */
+html:has(.globe-underlay),
+body:has(.globe-underlay) {
+  height: 100%;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Underlay fills largest viewport under iOS bars */
+.globe-underlay {
+  position: fixed;
+  inset: 0;
+  height: 100lvh;
+  width: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* UI layer above underlay; can respect safe areas */
+.globe-ui {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Fallback: ensure white background and no scroll when using only .globe-container */
+html:has(.globe-container),
+body:has(.globe-container) {
+  height: 100dvh;
+  overflow: hidden;
+  background: #fff;
+}
+/* No page scroll and white background when underlay is present */
+html:has(.globe-underlay),
+body:has(.globe-underlay) {
+  height: 100%;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Underlay fills largest viewport under iOS bars */
+.globe-underlay {
+  position: fixed;
+  inset: 0;
+  height: 100lvh;
+  width: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* UI layer above underlay; can respect safe areas */
+.globe-ui {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Fallback: ensure white background and no scroll when using only .globe-container */
+html:has(.globe-container),
+body:has(.globe-container) {
+  height: 100dvh;
+  overflow: hidden;
+  background: #fff;
 }
 
 /* Improve touch handling for iOS */
@@ -184,21 +203,6 @@ body {
   }
 }
 
-/* Alternative: Completely disable landscape functionality */
-@media screen and (orientation: landscape) and (hover: none) and (pointer: coarse) {
-  .globe-container {
-    transform: rotate(90deg);
-    transform-origin: center center;
-    width: 100vh;
-    height: 100vw;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    margin-top: -50vw;
-    margin-left: -50vh;
-  }
-}
-
 /* Text highlighting */
 ::selection {
   background: #04e635;
@@ -206,23 +210,26 @@ body {
 
 /* `Globe` components */
 .globe-container {
+  position: relative;
   display: flex;
   flex-direction: column;
-  height: 100dvh; /* Use dynamic viewport height instead of logical */
-  min-height: -webkit-fill-available; /* iOS Safari */
-  overflow: hidden;
-
-  & > div {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: -10;
-    animation: fadeIn 5s ease-in-out;
-    background-color: rgb(0, 0, 0);
-  }
+}
+.globe-container > div:first-child {
+  position: fixed;
+  inset: 0;
+  height: 100lvh;
+  width: 100%;
+  z-index: 0;
+  pointer-events: none;
+  animation: fadeIn 5s ease-in-out;
+  background-color: #fff;
+}
+.album-page {
+  background-color: #000 !important;
+}
+html:has(.album-page),
+body:has(.album-page) {
+  background: #000 !important;
 }
 
 /* Ensure the WebGL canvas fills the container exactly */
@@ -267,6 +274,30 @@ body {
   text-align: center;
 }
 
+/* Album titles default to black; hover stays black; active becomes dark gray */
+.album-list li span {
+  color: #000000 !important;
+}
+.album-list li span:hover {
+  color: #000000 !important;
+}
+.album-list li span.album-title-active {
+  color: #4b5563 !important; /* gray-600 */
+}
+
+/* On text selection, use dark gray text for these elements */
+.album-list li span::selection,
+.globe-container footer *::selection,
+aside.absolute.z-50 *::selection {
+  color: #4b5563;
+}
+
+/* Footer/copyright text should always be black */
+.globe-container footer,
+.globe-container footer * {
+  color: #000000 !important;
+}
+
 .album-list-sliding {
   transform: translateX(-25vw);
   -webkit-transform: translateX(-25vw); /* iOS Safari fallback */
@@ -278,10 +309,6 @@ body {
 @media (max-width: 768px) and (orientation: portrait), 
        (hover: none) and (pointer: coarse) and (orientation: portrait),
        (max-device-width: 1024px) and (orientation: portrait) {
-  /* Album list/container safe area for all mobile browsers */
-  body:has(.globe-container) .content-container {
-    padding-top: max(env(safe-area-inset-top), 8px) !important;
-  }
 
   /* Default mobile: push album list down; Safari override reduces it above */
   .album-list-wrapper {
@@ -298,7 +325,7 @@ body {
   aside.absolute.z-50 {
     left: 40vw !important;
     top: 12vh !important; /* Moved up from 16vh */
-    bottom: 71.6vh !important; /* Slightly taller to prevent bottom clipping */
+    bottom: 70.6vh !important; /* Slightly taller to prevent bottom clipping */
     max-width: 50vw !important;
     width: 50vw !important;
     font-size: 0.8em !important; /* 20% smaller text */
@@ -340,15 +367,15 @@ body {
     }
     
     body:has(.globe-container) aside.absolute.z-50 {
-      left: 40vw !important;
-      top: 12vh !important; /* Moved up from 16vh */
-      bottom: 72.6vh !important; /* Adjusted for 10% longer card (was 74vh) */
+      left: 36vw !important;
+      top:5.6vh !important; /* 20% higher than 12vh */
+      bottom: auto !important; /* allow free top positioning */
       max-width: 50vw !important;
       width: 50vw !important;
       font-size: 0.8em !important;
       padding: 0.75rem !important;
       /* Preserve the fade-in animation on mobile */
-      animation: fadeInCard 0.65s ease-out forwards !important;
+      animation: fadeInCard 1.65s ease-out forwards !important;
     }
   }
 }
@@ -457,6 +484,17 @@ aside.absolute.z-50 {
   animation: fadeInCard 0.65s ease-out forwards;
   /* Start with opacity 0 for proper fade-in */
   opacity: 0;
+}
+
+/* Album card text should always be black */
+aside.absolute.z-50,
+aside.absolute.z-50 * {
+  color: #000000 !important;
+}
+
+/* "Click to enter" text is the last span in the album card */
+aside.absolute.z-50 > span:last-child {
+  font-style: italic !important;
 }
 
 /* Album card fade-out when disappearing */
@@ -780,7 +818,7 @@ body:has(.globe-container) .album-list li span {
   user-select: none !important;
   pointer-events: auto !important;
   /* Improve touch responsiveness */
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+  -webkit-tap-highlight-color: rgba(52, 234, 204, 0.1) !important;
 }
 
 /* Improve album card touch handling on mobile */
@@ -803,11 +841,7 @@ body:has(.globe-container) aside.absolute.z-50 {
 
 /* iOS Safari scroll fix - GLOBE PAGE ONLY */
 @supports (-webkit-appearance: none) {
-  body:has(.globe-container) {
-    position: relative;
-    overflow-x: hidden;
-  }
-  
+ 
   /* Prevent zoom on input focus for iOS */
   input, textarea, select {
     font-size: 16px;
@@ -831,86 +865,24 @@ body:has(.globe-container) aside.absolute.z-50 {
   }
 }
 
-/* Mobile-only split text effect for album titles on globe page */
-@media (max-width: 768px), (hover: none) and (pointer: coarse) {
-  body:has(.globe-container) .album-title-split {
-    position: relative;
-    display: inline-block;
-    overflow: hidden;
-    /* do not change font, color, size, or background */
-  }
+/* Album title typewriter caret for globe page */
+body:has(.globe-container) .typewriter {
+  --caret: currentColor;
+}
+body:has(.globe-container) .typewriter::after {
+  content: none;
+  border-right: 0;
+  animation: none;
+}
+body:has(.globe-container) .typewriter.thick::after {
+  border-right-width: 1ch;
+}
+body:has(.globe-container) .typewriter.nocaret::after {
+  border-right: 0;
+}
 
-  /* sliding underline bar */
-  body:has(.globe-container) .album-title-split::before {
-    content: "";
-    position: absolute;
-    left: -50%;
-    top: 50%;
-    width: 50%;
-    border-bottom: 2px solid #ffffff; /* effect color only */
-    transform: translateX(0);
-    transition: transform 0.5s cubic-bezier(1, -0.04, 0, 1.16);
-    pointer-events: none;
-  }
-
-  /* top/bottom half containers */
-  body:has(.globe-container) .album-title-split-top,
-  body:has(.globe-container) .album-title-split-bottom {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    height: 50%;
-    overflow: hidden;
-    pointer-events: none; /* keep interactions on the parent */
-  }
-
-  body:has(.globe-container) .album-title-split-top { top: 0; }
-  body:has(.globe-container) .album-title-split-bottom { bottom: 0; }
-
-  /* duplicated text, inherits font and color */
-  body:has(.globe-container) .album-title-split-top::before,
-  body:has(.globe-container) .album-title-split-bottom::before {
-    content: attr(data-text);
-    display: block;
-    position: absolute;
-    left: 0;
-    right: 0;
-    line-height: inherit;
-    color: #ffffff; /* effect color only */
-    transition: transform 0.3s ease-out, opacity 0.2s ease-out;
-    opacity: 0; /* hidden by default so base text remains visible */
-  }
-
-  /* initial offset positions (relative to line height) */
-  body:has(.globe-container) .album-title-split-top::before {
-    transform: translateY(0.6em);
-    top: 0;
-  }
-  body:has(.globe-container) .album-title-split-bottom::before {
-    transform: translateY(-0.6em);
-    bottom: 0;
-  }
-
-  /* keep original text visible by default */
-
-  /* activate only when parent gets .album-title-split-animating (set on click/tap) */
-  body:has(.globe-container) .album-title-split.album-title-split-animating::before {
-    transform: translateX(42rem);
-  }
-
-  body:has(.globe-container) .album-title-split.album-title-split-animating .album-title-split-top::before {
-    transform: translateY(0);
-    transition-delay: .3s;
-    opacity: 1;
-  }
-  body:has(.globe-container) .album-title-split.album-title-split-animating .album-title-split-bottom::before {
-    transform: translateY(0);
-    transition-delay: .3s;
-    opacity: 1;
-  }
-
-  /* hide base text only while the animation plays */
-  body:has(.globe-container) .album-title-split.album-title-split-animating .album-title-text {
-    opacity: 0;
+@media (prefers-reduced-motion) {
+  body:has(.globe-container) .typewriter::after {
+    animation: none;
   }
 }

@@ -6,81 +6,58 @@ export const mockAlbums = [
     title: "Mexico" as AlbumTitle,
     color: "#FF6B6B",
     type: "location" as const,
-    description: "Vibrant culture, ancient ruins, and stunning beaches",
+    description: "Vibrant culture, ancient Mayanruins, and stunning beaches",
     date: "2025",
     lat: 21.1619, // Cancún
     lng: -86.8515,
-    locations: [],
+    locations: [
+      { lat: 21.1619, lng: -86.8515, description: "Cancún" },
+      { lat: 21.1619, lng: -86.8515, description: "Tulum" },
+      { lat: 21.1619, lng: -86.8515, description: "Playa del Carmen" }
+    ],
     order: 1,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=1",
-        title: "Mexican Architecture",
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=2", 
-        title: "Ancient Ruins",
-        width: 800,
-        height: 600
-      },
-      {
-        size: 1920000,
-        url: "https://picsum.photos/1920/1080?random=100&hdr=true",
-        title: "Sunset over Chichen Itza",
-        width: 1920,
-        height: 1080,
-        isHDR: true,
-        colorSpace: "P3" as const,
-        hdrMetadata: {
-          maxLuminance: 1000,
-          minLuminance: 0.01,
-          colorGamut: "P3"
-        }
-      },
-      {
-        size: 2073600,
-        url: "https://picsum.photos/1920/1080?random=101&rec2020=true",
-        title: "Vibrant Market Scene",
-        width: 1920,
-        height: 1080,
-        isHDR: true,
-        colorSpace: "Rec2020" as const,
-        hdrMetadata: {
-          maxLuminance: 4000,
-          minLuminance: 0.005,
-          colorGamut: "Rec2020"
-        }
-      }
-    ]
+    photos: []
   },
   {
     title: "Lisbon" as AlbumTitle,
     color: "#4ECDC4",
     type: "location" as const, 
-    description: "Charming streets, historic trams, and beautiful tiles",
+    description: "Charming streets, historic trams, and amazing seafood",
     date: "2025",
     lat: 38.7223,
     lng: -9.1393,
     locations: [
       { lat: 38.7223, lng: -9.1393, description: "Alfama" },
-      { lat: 38.7071, lng: -9.1364, description: "Bairro Alto" }
+      { lat: 38.7071, lng: -9.1364, description: "Bairro Alto" },
+      { lat: 38.7071, lng: -9.1364, description: "Sintra" }
+
     ],
     order: 2,
     photos: [
       {
         size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/68084daf-56fb-444a-bcd0-919213b71d49.jpeg?h=922b6616516c19b2db62f77772909c18",
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/59953af5-125d-4722-bd7d-0d3b5d8117a7.jpeg?h=055f4fde8ffacf1685a131b248b76d28",
         title: "Lisbon Streets",
         width: 1920,
         height: 1280,
         isHDR: true,
         colorSpace: "P3" as const,
         hdrMetadata: {
-          maxLuminance: 1000,
+          maxLuminance: 2000,
+          minLuminance: 0.01,
+          colorGamut: "P3"
+        }
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/38903464-91cc-4bd1-8e7c-9e50c05878e5.jpeg?h=70f626297e9c62ac9f701f489d2ecfdc",
+        title: "Lisbon Streets",
+        width: 1920,
+        height: 1280,
+        isHDR: true,
+        colorSpace: "P3" as const,
+        hdrMetadata: {
+          maxLuminance: 2000,
           minLuminance: 0.01,
           colorGamut: "P3"
         }
@@ -91,29 +68,37 @@ export const mockAlbums = [
     title: "Porto" as AlbumTitle,
     color: "#45B7D1",
     type: "location" as const,
-    description: "Port wine, azulejo tiles, and medieval charm",
+    description: "Port wine, azulejo tiles, and rundown charm",
     date: "2025", 
     lat: 41.1579,
     lng: -8.6291,
     locations: [
       { lat: 41.1579, lng: -8.6291, description: "Ribeira" },
+      { lat: 41.1579, lng: -8.6291, description: "Douro Valley" },
       { lat: 41.1496, lng: -8.6109, description: "Vila Nova de Gaia" }
     ],
     order: 3,
     photos: [
       {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=5",
-        title: "Dom Luís I Bridge" as AlbumTitle,
-        width: 800,
-        height: 600
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/9085af66-a2f3-4a21-8d3f-822abe822066.jpeg?h=448cc7f82fb57528e152784ce2e47e09",
+        title: "Porto",
+        width: 1920,
+        height: 1280
       },
       {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=6",
-        title: "Port Wine Cellars" as AlbumTitle,
-        width: 800,
-        height: 600
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/6d443b63-49e2-42e1-a319-67e9014ead29.jpeg?h=97d63b2fae508530417b9055e0a0b53b",
+        title: "Porto",
+        width: 1920,
+        height: 1280
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/ed4a41e7-2626-4ed2-8a38-4d12fa8833e3.jpeg?h=72ff4b05c01a8cfba8b6debb51a0075f",
+        title: "Porto",
+        width: 1920,
+        height: 1280
       }
     ]
   },
@@ -121,7 +106,7 @@ export const mockAlbums = [
     title: "Prague" as AlbumTitle,
     color: "#96CEB4",
     type: "location" as const,
-    description: "Gothic architecture and medieval atmosphere",
+    description: "Gothic architecture, Prague Castle, and medieval atmosphere",
     date: "2025", 
     lat: 50.0755,
     lng: 14.4378,
@@ -132,18 +117,11 @@ export const mockAlbums = [
     order: 4,
     photos: [
       {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=7",
-        title: "Charles Bridge" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=8",
-        title: "Astronomical Clock" as AlbumTitle,
-        width: 800,
-        height: 600
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/25dbbb82-532c-4f87-8e52-62433f656137.jpeg?h=1fbc20a5ab3fadcfe77308e8980e9cc4",
+        title: "Prague",
+        width: 1920,
+        height: 1280
       }
     ]
   },
@@ -151,7 +129,7 @@ export const mockAlbums = [
     title: "Barcelona" as AlbumTitle,
     color: "#FFEAA7",
     type: "location" as const,
-    description: "Gaudí's masterpieces and Mediterranean vibes",
+    description: "Gaudí's masterpieces, vibrant nightlife, and Tapas",
     date: "2025", 
     lat: 41.3851,
     lng: 2.1734,
@@ -161,22 +139,7 @@ export const mockAlbums = [
       { lat: 41.3841, lng: 2.1770, description: "Gothic Quarter" }
     ],
     order: 5,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=9",
-        title: "Sagrada Familia" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=10",
-        title: "Park Güell" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "Venice" as AlbumTitle,
@@ -194,18 +157,11 @@ export const mockAlbums = [
     order: 6,
     photos: [
       {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=11",
-        title: "Grand Canal" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=12",
-        title: "St. Mark's Basilica" as AlbumTitle,
-        width: 800,
-        height: 600
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/b9614653-4279-4751-951f-4af3ed81c288.jpeg?h=9d9b9878136972a44a6f6f946b608888",
+        title: "Venice",
+        width: 1920,
+        height: 1280
       }
     ]
   },
@@ -217,22 +173,33 @@ export const mockAlbums = [
     date: "2025", 
     lat: 47.3769, // Zürich
     lng: 8.5417,
-    locations: [],
+    locations: [
+      { lat: 47.3769, lng: 8.5417, description: "Zürich" },
+      { lat: 47.3769, lng: 8.5417, description: "Lucerne" },
+      { lat: 47.3769, lng: 8.5417, description: "Interlaken" }
+    ],
     order: 7,
     photos: [
       {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=13",
-        title: "Matterhorn" as AlbumTitle,
-        width: 800,
-        height: 600
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/5f787495-fda7-40a8-9617-87267fe08c3b.jpeg?h=d7190021e8f42779daa9473f1165375e",
+        title: "Switzerland",
+        width: 1920,
+        height: 1280
       },
       {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=14",
-        title: "Lake Geneva" as AlbumTitle,
-        width: 800,
-        height: 600
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/2f80535e-3cb3-486c-9ce7-6c7744d63e61.jpeg?h=9575feda34345b09511ec8c36fd123c5",
+        title: "Switzerland",
+        width: 1920,
+        height: 1280
+      },
+      {
+        size: 1920000,
+        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/ad2384a2-f9e4-46c9-8cb7-6686761dfaff.jpeg?h=8d825d73540de5fe1bf3120fca60e302",
+        title: "Switzerland",
+        width: 1920,
+        height: 1280
       }
     ]
   },
@@ -250,22 +217,7 @@ export const mockAlbums = [
       { lat: 45.4773, lng: 9.1815, description: "Brera District" }
     ],
     order: 8,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=15",
-        title: "Milan Cathedral" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=16",
-        title: "Galleria Vittorio Emanuele II" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "Tuscany" as AlbumTitle,
@@ -275,25 +227,13 @@ export const mockAlbums = [
     date: "2024", 
     lat: 43.7711,
     lng: 11.2486,
-    locations: [
+    locations: [  
+      { lat: 43.7711, lng: 11.2486, description: "Florence" },
+      { lat: 43.7711, lng: 11.2486, description: "Siena" },
+      { lat: 43.7711, lng: 11.2486, description: "Pisa" }
      ],
     order: 9,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=17",
-        title: "Florence Skyline" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=18",
-        title: "Tuscan Countryside" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "Rome" as AlbumTitle,
@@ -309,28 +249,13 @@ export const mockAlbums = [
       { lat: 41.8986, lng: 12.4769, description: "Trevi Fountain" }
     ],
     order: 10,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=19",
-        title: "Colosseum" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=20",
-        title: "Roman Forum" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "London" as AlbumTitle,
     color: "#A29BFE",
     type: "location" as const,
-    description: "Royal palaces, historic landmarks, and modern culture",
+    description: "Royal palaces, historic landmarks",
     date: "2021", 
     lat: 51.5074,
     lng: -0.1278,
@@ -340,22 +265,7 @@ export const mockAlbums = [
       { lat: 51.5194, lng: -0.1270, description: "Camden" }
     ],
     order: 11,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=21",
-        title: "Big Ben" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=22",
-        title: "Tower Bridge" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "San Diego" as AlbumTitle,
@@ -371,28 +281,13 @@ export const mockAlbums = [
       { lat: 32.6953, lng: -117.1564, description: "Balboa Park" }
     ],
     order: 12,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=23",
-        title: "La Jolla Cove" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=24",
-        title: "Balboa Park" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "Los Angeles" as AlbumTitle,
     color: "#FD79A8",
     type: "location" as const,
-    description: "Hollywood glamour, beaches, and endless sunshine",
+    description: "Hollywood, beaches, and traffic",
     date: "2021", 
     lat: 34.0522,
     lng: -118.2437,
@@ -402,75 +297,33 @@ export const mockAlbums = [
       { lat: 34.0259, lng: -118.7798, description: "Malibu" }
     ],
     order: 13,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=25",
-        title: "Hollywood Sign" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=26",
-        title: "Santa Monica Pier" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   },
   {
     title: "Tennessee" as AlbumTitle,
     color: "#6C5CE7",
     type: "location" as const,
-    description: "Music heritage, southern charm, and natural beauty",
+    description: "Musical heritage, live music on Broadway, Grand Ole Opry",
     date: "2019", 
     lat: 35.7478,
     lng: -86.7945,
-    locations: [
+    locations: [ 
+      { lat: 35.7478, lng: -86.7945, description: "Nashville" },
+      { lat: 35.7478, lng: -86.7945, description: "Memphis" },
+      { lat: 35.7478, lng: -86.7945, description: "Knoxville" }
   ],
     order: 14,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=27",
-        title: "Nashville Skyline" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=28",
-        title: "Great Smoky Mountains" as AlbumTitle,
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   }
 ];
 
 export const mockFolders = [
   {
-    title: "Wedding Photography" as AlbumTitle,
+    title: "hotography" as AlbumTitle,
     parent_title: "Events" as AlbumTitle,
-    description: "Beautiful moments from wedding ceremonies",
+    description: "",
     date: "2024",
     order: 1,
-    photos: [
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=9",
-        title: "Wedding Photo 1" as AlbumTitle,
-        width: 800,
-        height: 600
-      },
-      {
-        size: 480000,
-        url: "https://picsum.photos/800/600?random=10",
-        title: "Wedding Photo 2" as AlbumTitle, 
-        width: 800,
-        height: 600
-      }
-    ]
+    photos: []
   }
 ];
