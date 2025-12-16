@@ -289,7 +289,23 @@ body:has(.album-page) {
 /* Desktop Chrome-only: nudge the album card lower */
 @media (hover: hover) and (pointer: fine) {
   body:has(.globe-container.chrome-desktop) aside.absolute.z-50 {
-    transform: translateY(20%);
+    top: 6rem !important; /* align with chrome desktop album list (top-24) */
+  }
+
+  /* Desktop Chrome-only: pin copyright centered bottom */
+  body:has(.globe-container.chrome-desktop) footer {
+    position: fixed !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: calc(env(safe-area-inset-bottom) + 12px) !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    z-index: 40 !important;
+    background: transparent !important;
+    pointer-events: none !important;
+  }
+  body:has(.globe-container.chrome-desktop) footer .text-3xl {
+    text-align: center !important;
   }
 }
 
