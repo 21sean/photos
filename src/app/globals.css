@@ -219,7 +219,8 @@ body {
   height: 100lvh;
   width: 100%;
   z-index: 0;
-  pointer-events: none;
+  pointer-events: auto;
+  touch-action: none;
   animation: fadeIn 5s ease-in-out;
   background-color: #fff;
 }
@@ -237,6 +238,7 @@ body:has(.album-page) {
   width: 100% !important;
   height: 100% !important;
   display: block;
+  touch-action: none;
 }
 .content-container {
   z-index: 10;
