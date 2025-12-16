@@ -524,7 +524,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
     if (activeAlbumTitle && p.title === activeAlbumTitle) {
       return 'rgba(0, 200, 0, 0.9)'; // green for selected
     }
-    return 'rgba(255, 0, 0, 0.75)'; // default red
+    return 'rgba(10, 31, 68, 0.8)'; // navy blue
   }, [activeAlbumTitle]);
   const pointRadiusCb = React.useCallback((point: any) => (point as { radius: number }).radius, []);
   const onPointHoverCb = React.useCallback((point: any) => {
