@@ -1,6 +1,9 @@
 import { getAlbums, getAlbum } from '@/lib/api';
 import { titleToSlug, slugToAlbumTitle } from '@/lib/api/slug';
 import AlbumPageClient from './client';
+import { notFound } from 'next/navigation';
+
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const albums = await getAlbums();
@@ -12,7 +15,7 @@ export async function generateStaticParams() {
 async function AlbumPage({ params: { slug } }: { params: { slug: string } }) {
   // Guard against non-album routes like favicon.ico
   if (slug.includes('.') || slug.startsWith('_')) {
-    throw new Error('Not found');
+    notFound();
   }
   
   const albumsData = await getAlbums();
