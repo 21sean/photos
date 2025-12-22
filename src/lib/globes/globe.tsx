@@ -17,6 +17,17 @@ import AlbumList from '@/lib/globes/album-list';
 // Flying lines (arc dash) speed: 1 = current speed, smaller = slower, larger = faster
 const FLYING_LINES_SPEED = 0.2;
 
+// Zoom tuning: allow 30% more zoom-in and 50% less zoom-out
+const ZOOM_IN_EXTRA = 0.3;
+const ZOOM_OUT_REDUCTION = 0.5;
+
+type MapMode = 'default' | 'satellite';
+
+// Satellite tuning
+const SATELLITE_TILE_MAX_LEVEL = 16;
+
+const SATELLITE_BACKGROUND_IMAGE_URL: string | null = null;
+
 type Ref = CustomGlobeMethods | undefined; // Reference to globe instance
 type GlobeEl = React.MutableRefObject<Ref>; // React `ref` passed to globe element
 
@@ -25,6 +36,8 @@ interface CustomGlobeMethods extends GlobeMethods {
     autoRotateForced: boolean;
     autoRotateUserPaused: boolean;
   };
+
+  globeTileEngineClearCache?: () => void;
 }
 
 type Ring = {
@@ -274,8 +287,9 @@ function useCustomLayer(globeEl: GlobeEl) {
   };
 }
 
-function useGlobeReady(globeEl: GlobeEl) {
+function useGlobeReady(globeEl: GlobeEl, mapMode: MapMode) {
   const [globeReady, setGlobeReady] = useState(false);
+  const originalLightsRef = useRef<any[] | null>(null);
 
   // faster autoRotate speed over the ocean
   const autoRotateSpeed = () => {
@@ -334,109 +348,176 @@ function useGlobeReady(globeEl: GlobeEl) {
     requestAnimationFrame(autoRotateSpeed);
   };
 
+  // One-time controls setup + drag listeners
   useEffect(() => {
-    if (globeReady && globeEl.current) {
-      const controls = globeEl.current.controls();
-      
-      // Only disable user interaction, but keep controls enabled for auto-rotation
-      controls.enableZoom = true;
-      controls.enablePan = false;
+    if (!globeReady || !globeEl.current) return;
+
+    const controls = globeEl.current.controls();
+
+    // Only disable user interaction, but keep controls enabled for auto-rotation
+    controls.enableZoom = true;
+    controls.enablePan = false;
+    controls.enableRotate = false;
+
+    // Force enable auto-rotation
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
+    controls.autoRotateForced = false; // Initialize the forced flag
+    controls.autoRotateUserPaused = false; // Initialize the user pause flag
+
+    const isMobile = typeof window !== 'undefined' && (
+      (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
+      window.innerWidth <= 768
+    );
+    const initialAltitude = isMobile ? 2.8 : 2;
+    globeEl.current.pointOfView({ lat: 30, lng: -30, altitude: initialAltitude });
+
+    // Start the dynamic rotation speed
+    autoRotateSpeed();
+
+    // Enable mouse drag to rotate (capture-phase so OrbitControls sees enableRotate=true)
+    const domEl = (controls as any).domElement as HTMLElement | undefined;
+    if (!domEl) return;
+
+    const onPointerDownCapture = (e: PointerEvent) => {
+      // Mouse-only drag rotation
+      if (e.pointerType !== 'mouse') return;
+      if (e.button !== 0) return;
+
+      controls.autoRotateUserPaused = true;
+      controls.autoRotate = false;
+      controls.enableRotate = true;
+    };
+
+    const endDrag = () => {
+      controls.autoRotateUserPaused = false;
       controls.enableRotate = false;
-      
-      // Force enable auto-rotation
-      controls.autoRotate = true;
-      controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
-      controls.autoRotateForced = false; // Initialize the forced flag
-      controls.autoRotateUserPaused = false; // Initialize the user pause flag
 
-      const isMobile = typeof window !== 'undefined' && (
-        (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
-        window.innerWidth <= 768
-      );
-      const initialAltitude = isMobile ? 2.8 : 2;
-      globeEl.current.pointOfView({ lat: 30, lng: -30, altitude: initialAltitude });
-
-      // Start the dynamic rotation speed
-      autoRotateSpeed();
-
-      // Enable mouse drag to rotate (capture-phase so OrbitControls sees enableRotate=true)
-      const domEl = (controls as any).domElement as HTMLElement | undefined;
-      if (domEl) {
-        const onPointerDownCapture = (e: PointerEvent) => {
-          // Mouse-only drag rotation
-          if (e.pointerType !== 'mouse') return;
-          if (e.button !== 0) return;
-
-          controls.autoRotateUserPaused = true;
-          controls.autoRotate = false;
-          controls.enableRotate = true;
-        };
-
-        const endDrag = () => {
-          controls.autoRotateUserPaused = false;
-          controls.enableRotate = false;
-
-          if (!controls.autoRotateForced) {
-            controls.autoRotate = true;
-            controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
-          }
-        };
-
-        domEl.addEventListener('pointerdown', onPointerDownCapture, { capture: true });
-        window.addEventListener('pointerup', endDrag, { passive: true });
-        window.addEventListener('pointercancel', endDrag, { passive: true });
-        window.addEventListener('blur', endDrag, { passive: true } as AddEventListenerOptions);
-
-        // Ensure we clean up listeners
-        const cleanupDrag = () => {
-          domEl.removeEventListener('pointerdown', onPointerDownCapture, { capture: true } as any);
-          window.removeEventListener('pointerup', endDrag as any);
-          window.removeEventListener('pointercancel', endDrag as any);
-          window.removeEventListener('blur', endDrag as any);
-        };
-
-        // Multiple attempts to ensure auto-rotation starts
-        const forceRotation = () => {
-          if (globeEl.current) {
-            const controls = globeEl.current.controls();
-            if (controls.autoRotateForced || controls.autoRotateUserPaused) return;
-            controls.autoRotate = true;
-            controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
-            controls.autoRotateForced = false;
-          }
-        };
-        
-        setTimeout(forceRotation, 100);
-        setTimeout(forceRotation, 500);
-        setTimeout(forceRotation, 1000);
-        setTimeout(forceRotation, 2000);
-
-        return cleanupDrag;
+      if (!controls.autoRotateForced) {
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
       }
-      
-    }
+    };
+
+    domEl.addEventListener('pointerdown', onPointerDownCapture, { capture: true });
+    window.addEventListener('pointerup', endDrag, { passive: true });
+    window.addEventListener('pointercancel', endDrag, { passive: true });
+    window.addEventListener('blur', endDrag, { passive: true } as AddEventListenerOptions);
+
+    // Multiple attempts to ensure auto-rotation starts
+    const forceRotation = () => {
+      if (globeEl.current) {
+        const controls = globeEl.current.controls();
+        if (controls.autoRotateForced || controls.autoRotateUserPaused) return;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = DEFAULT_AUTOROTATE_SPEED;
+        controls.autoRotateForced = false;
+      }
+    };
+    setTimeout(forceRotation, 100);
+    setTimeout(forceRotation, 500);
+    setTimeout(forceRotation, 1000);
+    setTimeout(forceRotation, 2000);
+
+    return () => {
+      domEl.removeEventListener('pointerdown', onPointerDownCapture, { capture: true } as any);
+      window.removeEventListener('pointerup', endDrag as any);
+      window.removeEventListener('pointercancel', endDrag as any);
+      window.removeEventListener('blur', endDrag as any);
+    };
   }, [globeEl, globeReady]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Zoom constraints update (varies by map mode)
+  useEffect(() => {
+    if (!globeReady || !globeEl.current) return;
+
+    const controls = globeEl.current.controls();
+    const isMobile = typeof window !== 'undefined' && (
+      (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
+      window.innerWidth <= 768
+    );
+
+    // Clamp zoom range (OrbitControls distances are in world units)
+    const globeRadius = globeEl.current.getGlobeRadius?.() ?? 100;
+    const distanceForAltitude = (altitude: number) => globeRadius * (1 + altitude);
+
+    const baselineMinAltitude = isMobile ? 1.2 : 1;
+    const baselineMaxAltitude = isMobile ? 6 : 4;
+
+    const minAltitude = mapMode === 'satellite'
+      ? (isMobile ? 0.28 : 0.12) // allow much closer zoom on satellite
+      : baselineMinAltitude * (1 - ZOOM_IN_EXTRA);
+
+    const maxAltitude = mapMode === 'satellite'
+      ? baselineMaxAltitude * 3.0 // allow further zoom-out on satellite
+      : baselineMaxAltitude * (1 - ZOOM_OUT_REDUCTION);
+
+    controls.minDistance = distanceForAltitude(minAltitude);
+    controls.maxDistance = distanceForAltitude(Math.max(maxAltitude, (isMobile ? 2.8 : 2)));
+    controls.update?.();
+  }, [globeEl, globeReady, mapMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Satellite-only lighting (replace default lights while satellite is active)
+  useEffect(() => {
+    if (!globeReady || !globeEl.current) return;
+
+    const globe = globeEl.current;
+
+    // Capture original lights once.
+    if (!originalLightsRef.current) {
+      try {
+        originalLightsRef.current = globe.lights();
+      } catch {
+        originalLightsRef.current = null;
+      }
+    }
+
+    if (mapMode !== 'satellite') {
+      if (originalLightsRef.current) {
+        globe.lights(originalLightsRef.current);
+      }
+      return;
+    }
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+    const key = new THREE.DirectionalLight(0xffffff, 0.95);
+    key.position.set(1.2, 0.8, 1.4);
+
+    const fill = new THREE.DirectionalLight(0xffffff, 0.25);
+    fill.position.set(-1.0, -0.2, -1.2);
+
+    const rim = new THREE.DirectionalLight(0xbfd6ff, 0.35);
+    rim.position.set(-0.4, 1.1, 0.2);
+
+    globe.lights([ambient, key, fill, rim]);
+
+    return () => {
+      if (originalLightsRef.current) {
+        globe.lights(originalLightsRef.current);
+      }
+    };
+  }, [globeEl, globeReady, mapMode]);
 
   return {
     handleGlobeReady: () => setGlobeReady(true)
   };
 }
 
-function useScene(globeElRef: Ref) {
+function useScene(globeElRef: Ref, enabled: boolean) {
   useEffect(() => {
     if (!globeElRef) return;
+    if (!enabled) return;
 
     const scene = globeElRef.scene();
 
     const radius = 300;
-    const graticules = new THREE.LineSegments(
-      new GeoJsonGeometry(geoGraticule10(), radius, 2),
-      new THREE.LineBasicMaterial({
-        color: 'lightgrey',
-        transparent: true,
-        opacity: 0.47
-      })
-    );
+    const graticulesMaterial = new THREE.LineBasicMaterial({
+      color: 'lightgrey',
+      transparent: true,
+      opacity: 0.47
+    });
+    const graticulesGeometry = new GeoJsonGeometry(geoGraticule10(), radius, 2);
+    const graticules = new THREE.LineSegments(graticulesGeometry, graticulesMaterial);
     scene.add(graticules);
 
     const innerSphereGeometry = new THREE.SphereGeometry(
@@ -449,16 +530,27 @@ function useScene(globeElRef: Ref) {
       opacity: 0.47,
       transparent: true
     });
-    const innerSphere = new THREE.Mesh(
-      innerSphereGeometry,
-      innerSphereMaterial
-    );
+    const innerSphere = new THREE.Mesh(innerSphereGeometry, innerSphereMaterial);
     innerSphere.renderOrder = Number.MAX_SAFE_INTEGER;
     scene.add(innerSphere);
-  }, [globeElRef]);
+
+    return () => {
+      scene.remove(graticules);
+      scene.remove(innerSphere);
+      graticulesGeometry.dispose?.();
+      graticulesMaterial.dispose?.();
+      innerSphereGeometry.dispose?.();
+      innerSphereMaterial.dispose?.();
+    };
+  }, [globeElRef, enabled]);
 }
 
 const DEFAULT_AUTOROTATE_SPEED = .32; // Reduced by 30% from 1.75
+
+// Satellite tiles (raster). Note: provider usage/terms apply.
+// z/y/x format is used by ArcGIS World Imagery.
+const SATELLITE_TILE_ENGINE_URL = (x: number, y: number, l: number) =>
+  `https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${l}/${y}/${x}`;
 
 function Globe({ albums }: { albums: Array<Album> }) {
   // Initialize HDR capabilities
@@ -469,7 +561,9 @@ function Globe({ albums }: { albums: Array<Album> }) {
   const globeEl = useRef<Ref>();
   const globeElRef: Ref = globeEl.current;
 
-  const { handleGlobeReady } = useGlobeReady(globeEl);
+  const [mapMode, setMapMode] = useState<MapMode>('default');
+
+  const { handleGlobeReady } = useGlobeReady(globeEl, mapMode);
 
   const isDesktopChrome = React.useMemo(() => {
     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
@@ -482,8 +576,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
 
   const isPinnedRef = useRef(false);
 
-  // scene config
-  useScene(globeElRef);
+  // scene config (the current "default" look relies on scene decorations)
+  useScene(globeElRef, mapMode === 'default');
 
   // land shapes
   const { landPolygons, polygonMaterial } = useLandPolygons();
@@ -510,6 +604,11 @@ function Globe({ albums }: { albums: Array<Album> }) {
   // stars in the background
   const { customLayerData, customThreeObject, customThreeObjectUpdate } =
     useCustomLayer(globeEl);
+
+  // Ensure tile cache doesn't mix between modes/providers.
+  useEffect(() => {
+    globeEl.current?.globeTileEngineClearCache?.();
+  }, [mapMode]);
 
   const isMac = React.useMemo(() =>
     navigator.platform.toLowerCase().includes('mac') ||
@@ -634,13 +733,16 @@ function Globe({ albums }: { albums: Array<Album> }) {
         }}
         onGlobeReady={handleGlobeReady}
         animateIn={false}
-        backgroundColor="rgba(0,0,0,0)"
+        backgroundColor={mapMode === 'satellite' ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0)'}
+        backgroundImageUrl={null}
         atmosphereColor="rgba(255, 255, 255, 1)"
-        showGlobe={false}
+        showGlobe={mapMode === 'satellite'}
         showAtmosphere={false}
         showGraticules={false}
-        polygonsData={landPolygons}
-        polygonCapMaterial={polygonMaterial}
+        globeTileEngineUrl={mapMode === 'satellite' ? SATELLITE_TILE_ENGINE_URL : undefined}
+        globeTileEngineMaxLevel={mapMode === 'satellite' ? SATELLITE_TILE_MAX_LEVEL : undefined}
+        polygonsData={mapMode === 'default' ? landPolygons : []}
+        polygonCapMaterial={mapMode === 'default' ? polygonMaterial : undefined}
         polygonsTransitionDuration={0}
         polygonAltitude={polygonAltitudeCb}
         polygonSideColor={polygonSideColorCb}
@@ -665,6 +767,20 @@ function Globe({ albums }: { albums: Array<Album> }) {
       />
 
       <section className={`content-container text-3xl ${isDesktopChrome ? 'fixed left-6 top-24 w-fit' : ''}`}>
+        <div className="mb-3">
+          <label className="mr-2 text-base" htmlFor="map-mode">
+            Map
+          </label>
+          <select
+            id="map-mode"
+            className="map-mode-select text-base px-2 py-1"
+            value={mapMode}
+            onChange={(e) => setMapMode(e.target.value as MapMode)}
+          >
+            <option value="default">Default</option>
+            <option value="satellite">Satellite</option>
+          </select>
+        </div>
         <AlbumList 
           albums={albums}
           activeAlbumTitle={activeAlbumTitle}

@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
+const isExport = process.env.NEXT_OUTPUT === 'export';
+
 const nextConfig = {
-  output: 'export',
+  output: isExport ? 'export' : undefined,
   trailingSlash: true,
-  distDir: 'out',
   // Remove basePath if deploying to root domain
   // basePath: '/photos',
   // assetPrefix: '/photos',

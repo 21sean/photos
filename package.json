@@ -14,7 +14,7 @@
     "check": "tsc --noEmit",
     "check:all": "npm run check && npm run knip && npm run lint && npm run format",
     "test": "npx playwright test",
-    "build:static": "cp next.config.static.mjs next.config.mjs && next build",
+    "build:static": "cross-env NEXT_OUTPUT=export next build",
     "deploy:static": "npm run build:static"
   },
   "dependencies": {
@@ -44,6 +44,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "cross-env": "^7.0.3",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
