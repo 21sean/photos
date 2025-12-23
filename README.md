@@ -1,4 +1,4 @@
-# sean.photo
+# Photos
 
 An interactive HDR photography portfolio featuring travel photos from around the world, displayed on an immersive 3D globe interface.
 
@@ -121,7 +121,3 @@ npm run start
 ## License
 
 Private portfolio project.
-
-## Contact
-
-Visit [sean.ventures](https://sean.ventures) for more information.
