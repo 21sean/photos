@@ -55,9 +55,9 @@ npm run dev
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
-- `npm run format` - Check code formatting with Prettier
-- `npm run format:fix` - Fix code formatting
+- `npm run format:fix` - Fix code formatting with Prettier
 - `npm run check` - Run TypeScript type checking
+- `npm run knip` - Find unused dependencies and exports
 - `npm run check:all` - Run all checks (TypeScript, Knip, ESLint, Prettier)
 - `npm run test` - Run Playwright tests
 - `npm run build:static` - Build as static site for export
