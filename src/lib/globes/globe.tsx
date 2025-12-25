@@ -767,20 +767,23 @@ function Globe({ albums }: { albums: Array<Album> }) {
       />
 
       <section className={`content-container text-3xl ${isDesktopChrome ? 'fixed left-6 top-24 w-fit' : ''}`}>
-        <div className="mb-3">
-          <label className="mr-2 text-base" htmlFor="map-mode">
-            Map
-          </label>
-          <select
-            id="map-mode"
-            className="map-mode-select text-base px-2 py-1"
-            value={mapMode}
-            onChange={(e) => setMapMode(e.target.value as MapMode)}
-          >
-            <option value="default">Default</option>
-            <option value="satellite">Satellite</option>
-          </select>
-        </div>
+        {/* Map type dropdown temporarily disabled */}
+        {false && (
+          <div className="mb-3">
+            <label className="mr-2 text-base" htmlFor="map-mode">
+              Map
+            </label>
+            <select
+              id="map-mode"
+              className="map-mode-select text-base px-2 py-1"
+              value={mapMode}
+              onChange={(e) => setMapMode(e.target.value as MapMode)}
+            >
+              <option value="default">Default</option>
+              <option value="satellite">Satellite</option>
+            </select>
+          </div>
+        )}
         <AlbumList 
           albums={albums}
           activeAlbumTitle={activeAlbumTitle}
@@ -799,8 +802,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
       )}
 
       <footer className={`tracking-tight content`}>
-        <div className="text-3xl text-center md:text-right">
-          <p className="m-0 p-0">&copy; {new Date().getFullYear()}</p>
+        <div className="text-[0.9375rem] leading-tight text-right">
+          <p className="m-0 p-0">&copy; 2026</p>
         </div>
       </footer>
     </section>
