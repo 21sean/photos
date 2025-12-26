@@ -5,13 +5,12 @@ export const types = {
   CUSTOM: 'custom'
 } as const;
 
-export const HexSchema = z.string().regex(/^#([A-Fa-f0-9]{6})$/);
-export type Hex = z.infer<typeof HexSchema>;
+const HexSchema = z.string().regex(/^#([A-Fa-f0-9]{6})$/);
 
-export const AlbumTitleSchema = z.string().brand<'AlbumTitle'>();
+const AlbumTitleSchema = z.string().brand<'AlbumTitle'>();
 export type AlbumTitle = z.infer<typeof AlbumTitleSchema>;
 
-export const AlbumSchema = z.object({
+const AlbumSchema = z.object({
   title: AlbumTitleSchema,
   description: z.string().nullable(),
   date: z.string().nullable(),
