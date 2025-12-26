@@ -77,10 +77,6 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
     (onSelect ?? onEnter)(album);
   };
 
-  const resetAlbumListPosition = () => {
-    setIsSliding(false);
-  };
-
   const recomputeFit = React.useCallback(() => {
     const wrapper = wrapperRef.current;
     const list = listRef.current;

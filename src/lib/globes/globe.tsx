@@ -26,8 +26,6 @@ type MapMode = 'default' | 'satellite';
 // Satellite tuning
 const SATELLITE_TILE_MAX_LEVEL = 16;
 
-const SATELLITE_BACKGROUND_IMAGE_URL: string | null = null;
-
 type Ref = CustomGlobeMethods | undefined; // Reference to globe instance
 type GlobeEl = React.MutableRefObject<Ref>; // React `ref` passed to globe element
 
@@ -39,14 +37,6 @@ interface CustomGlobeMethods extends GlobeMethods {
 
   globeTileEngineClearCache?: () => void;
 }
-
-type Ring = {
-  lat: number;
-  lng: number;
-  maxR: number;
-  propagationSpeed: number;
-  repeatPeriod: number;
-};
 
 type Arc = {
   startLat: number;
@@ -107,35 +97,24 @@ function usePoints(albums: Array<Album>) {
   };
 }
 
-function useRings(
+function useAlbumInteraction(
   globeEl: GlobeEl,
   setPointAltitude: React.Dispatch<React.SetStateAction<number>>,
   isPinnedRef?: React.MutableRefObject<boolean>
 ) {
   const [activeAlbumTitle, setActiveAlbumTitle] = useState<AlbumTitle>();
 
-  const [rings, setRings] = useState<Array<Ring>>([]);
-  const colorInterpolator = React.useCallback((t: number) =>
-    `rgba(255,100,50,${Math.sqrt(1 - t)})`, []);
-
   const [enterTimeoutId, setEnterTimeoutId] = useState<NodeJS.Timeout>();
   function handleMouseEnter({ lat, lng, title, type }: Album) {
-    console.log('Mouse enter:', { title, type, lat, lng });
-    console.log('globeEl current:', globeEl.current);
-
     setActiveAlbumTitle(title);
 
     clearTimeout(enterTimeoutId);
 
     // Stop auto-rotation when hovering over any location
     if (globeEl.current && globeEl.current.controls) {
-      console.log('Stopping rotation...');
       const controls = globeEl.current.controls();
       controls.autoRotateForced = true; // Set forced flag first
       controls.autoRotate = false; // Then disable rotation
-      console.log('AutoRotate set to:', controls.autoRotate);
-    } else {
-      console.log('globeEl.current or controls not available');
     }
 
     const id = setTimeout(() => {
@@ -154,22 +133,8 @@ function useRings(
           },
           1000
         );
-
-        setRings([
-          { lat, lng, maxR: 9, propagationSpeed: 0.88, repeatPeriod: 1777 }
-        ]);
       } else if (type === types.CUSTOM) {
         setPointAltitude(2);
-
-        setRings([
-          {
-            lat: 90,
-            lng: 0,
-            maxR: 180,
-            propagationSpeed: 27,
-            repeatPeriod: 195
-          }
-        ]);
       }
     }, 0);
     setEnterTimeoutId(id);
@@ -205,14 +170,10 @@ function useRings(
         }
       }
     }, 1100); // Wait for the view transition to complete
-
-    setRings([]);
   }
 
   return {
     activeAlbumTitle,
-    rings,
-    colorInterpolator,
     handleMouseEnter,
     handleMouseLeave
   };
@@ -585,14 +546,12 @@ function Globe({ albums }: { albums: Array<Album> }) {
   // `albums` map points
   const { points, pointAltitude, setPointAltitude } = usePoints(albums);
 
-  // rings animation
+  // album interaction (hover, click, view transitions)
   const {
-    // rings,
-    // colorInterpolator,
     handleMouseEnter,
     handleMouseLeave,
     activeAlbumTitle
-  } = useRings(globeEl, setPointAltitude, isPinnedRef);
+  } = useAlbumInteraction(globeEl, setPointAltitude, isPinnedRef);
   const activeAlbum = albums.find(album => album.title === activeAlbumTitle);
 
   // arcs animation
@@ -662,7 +621,6 @@ function Globe({ albums }: { albums: Array<Album> }) {
 
   // Hide album card when double-clicking sean.photo text or globe background
   const hideAlbumCard = () => {
-    console.log('Hiding album card');
     isPinnedRef.current = false;
     handleMouseLeave(true); // force clear and hide
   };
@@ -767,23 +725,6 @@ function Globe({ albums }: { albums: Array<Album> }) {
       />
 
       <section className={`content-container text-3xl ${isDesktopChrome ? 'fixed left-6 top-24 w-fit' : ''}`}>
-        {/* Map type dropdown temporarily disabled */}
-        {false && (
-          <div className="mb-3">
-            <label className="mr-2 text-base" htmlFor="map-mode">
-              Map
-            </label>
-            <select
-              id="map-mode"
-              className="map-mode-select text-base px-2 py-1"
-              value={mapMode}
-              onChange={(e) => setMapMode(e.target.value as MapMode)}
-            >
-              <option value="default">Default</option>
-              <option value="satellite">Satellite</option>
-            </select>
-          </div>
-        )}
         <AlbumList 
           albums={albums}
           activeAlbumTitle={activeAlbumTitle}
