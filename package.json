@@ -18,7 +18,6 @@
     "deploy:static": "npm run build:static"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.958.0",
     "@types/three": "^0.164.0",
     "classnames": "^2.5.1",
     "cobe": "^0.6.3",
