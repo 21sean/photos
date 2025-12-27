@@ -59,11 +59,14 @@ export function HDRImage({
   }, [isHDR, photo.colorSpace]);
   
   const handleImageLoad = useCallback(() => {
-    // Ensure loading animation is visible for at least 500ms
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
+    setIsLoading(false);
   }, []);
+
+  // Handle image error - still show something
+  const handleImageError = useCallback(() => {
+    console.error('Failed to load image:', photo.url);
+    setIsLoading(false);
+  }, [photo.url]);
 
   // Determine optimal image attributes
   const imageProps: React.ImgHTMLAttributes<HTMLImageElement> = {
@@ -74,9 +77,10 @@ export function HDRImage({
     loading: (priority ? 'eager' : 'lazy') as 'eager' | 'lazy',
     decoding: 'async',
     onLoad: handleImageLoad,
+    onError: handleImageError,
     style: {
       ...hdrStyles,
-      opacity: isLoading ? 0 : 1,
+      opacity: isLoading ? 0.3 : 1, // Show faint image while loading instead of invisible
       transition: 'opacity 0.3s ease, filter 0.3s ease',
     },
     className: `hdr-image ${isHDR ? 'hdr-enhanced' : ''} ${className}`,

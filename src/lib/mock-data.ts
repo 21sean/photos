@@ -1,14 +1,50 @@
-// Mock data for photography portfolio
-import { AlbumTitle } from '../types/albums';
+/**
+ * Album Data for Photography Portfolio
+ * 
+ * This file defines album metadata (locations, descriptions, etc.)
+ * Photos are defined separately in photos.ts and linked via R2.
+ * 
+ * To add a new album:
+ * 1. Add album metadata below
+ * 2. Create folder in R2: node scripts/create-r2-folders.js
+ * 3. Add photos to photos.ts
+ * 4. Upload images: node scripts/migrate-to-r2.js
+ */
 
-export const mockAlbums = [
+import { AlbumTitle } from '../types/albums';
+import { toPhotos } from './r2';
+import { albumPhotos } from './photos';
+
+// =============================================================================
+// ALBUM METADATA
+// =============================================================================
+
+interface AlbumMeta {
+  title: string;
+  slug: string; // URL slug and R2 folder name
+  color: string;
+  type: 'location' | 'custom';
+  description: string;
+  date: string;
+  lat: number;
+  lng: number;
+  locations: Array<{
+    lat: number;
+    lng: number;
+    description?: string;
+  }>;
+  order: number;
+}
+
+const albumsMeta: AlbumMeta[] = [
   {
-    title: "Mexico" as AlbumTitle,
+    title: "Mexico",
+    slug: "mexico",
     color: "#FF6B6B",
-    type: "location" as const,
-    description: "Vibrant culture, ancient Mayanruins, and stunning beaches",
+    type: "location",
+    description: "Vibrant culture, ancient Mayan ruins, and stunning beaches",
     date: "2025",
-    lat: 21.1619, // Cancún
+    lat: 21.1619,
     lng: -86.8515,
     locations: [
       { lat: 21.1619, lng: -86.8515, description: "Cancún" },
@@ -16,12 +52,12 @@ export const mockAlbums = [
       { lat: 21.1619, lng: -86.8515, description: "Playa del Carmen" }
     ],
     order: 1,
-    photos: []
   },
   {
-    title: "Lisbon" as AlbumTitle,
+    title: "Lisbon",
+    slug: "lisbon",
     color: "#4ECDC4",
-    type: "location" as const, 
+    type: "location",
     description: "Charming streets, historic trams, and amazing seafood",
     date: "2025",
     lat: 38.7223,
@@ -30,46 +66,16 @@ export const mockAlbums = [
       { lat: 38.7223, lng: -9.1393, description: "Alfama" },
       { lat: 38.7071, lng: -9.1364, description: "Bairro Alto" },
       { lat: 38.7071, lng: -9.1364, description: "Sintra" }
-
     ],
     order: 2,
-    photos: [
-      {
-        size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/59953af5-125d-4722-bd7d-0d3b5d8117a7.jpeg?h=055f4fde8ffacf1685a131b248b76d28",
-        title: "Lisbon Streets",
-        width: 1920,
-        height: 1280,
-        isHDR: true,
-        colorSpace: "P3" as const,
-        hdrMetadata: {
-          maxLuminance: 2000,
-          minLuminance: 0.01,
-          colorGamut: "P3"
-        }
-      },
-      {
-        size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/38903464-91cc-4bd1-8e7c-9e50c05878e5.jpeg?h=70f626297e9c62ac9f701f489d2ecfdc",
-        title: "Lisbon Streets",
-        width: 1920,
-        height: 1280,
-        isHDR: true,
-        colorSpace: "P3" as const,
-        hdrMetadata: {
-          maxLuminance: 2000,
-          minLuminance: 0.01,
-          colorGamut: "P3"
-        }
-      }
-    ]
   },
   {
-    title: "Porto" as AlbumTitle,
+    title: "Porto",
+    slug: "porto",
     color: "#45B7D1",
-    type: "location" as const,
+    type: "location",
     description: "Port wine, azulejo tiles, and rundown charm",
-    date: "2025", 
+    date: "2025",
     lat: 41.1579,
     lng: -8.6291,
     locations: [
@@ -78,36 +84,14 @@ export const mockAlbums = [
       { lat: 41.1496, lng: -8.6109, description: "Vila Nova de Gaia" }
     ],
     order: 3,
-    photos: [
-      {
-        size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/9085af66-a2f3-4a21-8d3f-822abe822066.jpeg?h=448cc7f82fb57528e152784ce2e47e09",
-        title: "Porto",
-        width: 1920,
-        height: 1280
-      },
-      {
-        size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/6d443b63-49e2-42e1-a319-67e9014ead29.jpeg?h=97d63b2fae508530417b9055e0a0b53b",
-        title: "Porto",
-        width: 1920,
-        height: 1280
-      },
-      {
-        size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/ed4a41e7-2626-4ed2-8a38-4d12fa8833e3.jpeg?h=72ff4b05c01a8cfba8b6debb51a0075f",
-        title: "Porto",
-        width: 1920,
-        height: 1280
-      }
-    ]
   },
   {
-    title: "Prague" as AlbumTitle,
+    title: "Prague",
+    slug: "prague",
     color: "#96CEB4",
-    type: "location" as const,
+    type: "location",
     description: "Gothic architecture, Prague Castle, and medieval atmosphere",
-    date: "2025", 
+    date: "2025",
     lat: 50.0755,
     lng: 14.4378,
     locations: [
@@ -115,22 +99,14 @@ export const mockAlbums = [
       { lat: 50.0870, lng: 14.4207, description: "Prague Castle" }
     ],
     order: 4,
-    photos: [
-      {
-        size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/25dbbb82-532c-4f87-8e52-62433f656137.jpeg?h=1fbc20a5ab3fadcfe77308e8980e9cc4",
-        title: "Prague",
-        width: 1920,
-        height: 1280
-      }
-    ]
   },
   {
-    title: "Barcelona" as AlbumTitle,
+    title: "Barcelona",
+    slug: "barcelona",
     color: "#FFEAA7",
-    type: "location" as const,
+    type: "location",
     description: "Gaudí's masterpieces, vibrant nightlife, and Tapas",
-    date: "2025", 
+    date: "2025",
     lat: 41.3851,
     lng: 2.1734,
     locations: [
@@ -139,14 +115,14 @@ export const mockAlbums = [
       { lat: 41.3841, lng: 2.1770, description: "Gothic Quarter" }
     ],
     order: 5,
-    photos: []
   },
   {
-    title: "Venice" as AlbumTitle,
+    title: "Venice",
+    slug: "venice",
     color: "#DDA0DD",
-    type: "location" as const,
+    type: "location",
     description: "Floating city of canals, gondolas, and art",
-    date: "2024", 
+    date: "2024",
     lat: 45.4408,
     lng: 12.3155,
     locations: [
@@ -155,23 +131,15 @@ export const mockAlbums = [
       { lat: 45.4515, lng: 12.3122, description: "Murano" }
     ],
     order: 6,
-    photos: [
-      {
-        size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/b9614653-4279-4751-951f-4af3ed81c288.jpeg?h=9d9b9878136972a44a6f6f946b608888",
-        title: "Venice",
-        width: 1920,
-        height: 1280
-      }
-    ]
   },
   {
-    title: "Switzerland" as AlbumTitle,
+    title: "Switzerland",
+    slug: "switzerland",
     color: "#74B9FF",
-    type: "location" as const,
+    type: "location",
     description: "Alpine peaks, pristine lakes, and charming villages",
-    date: "2025", 
-    lat: 47.3769, // Zürich
+    date: "2025",
+    lat: 47.3769,
     lng: 8.5417,
     locations: [
       { lat: 47.3769, lng: 8.5417, description: "Zürich" },
@@ -179,36 +147,14 @@ export const mockAlbums = [
       { lat: 47.3769, lng: 8.5417, description: "Interlaken" }
     ],
     order: 7,
-    photos: [
-      {
-        size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/5f787495-fda7-40a8-9617-87267fe08c3b.jpeg?h=d7190021e8f42779daa9473f1165375e",
-        title: "Switzerland",
-        width: 1920,
-        height: 1280
-      },
-      {
-        size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/2f80535e-3cb3-486c-9ce7-6c7744d63e61.jpeg?h=9575feda34345b09511ec8c36fd123c5",
-        title: "Switzerland",
-        width: 1920,
-        height: 1280
-      },
-      {
-        size: 1920000,
-        url: "https://cdn.myportfolio.com/74004d49c2c7350fb26995a4a65b0df6/ad2384a2-f9e4-46c9-8cb7-6686761dfaff.jpeg?h=8d825d73540de5fe1bf3120fca60e302",
-        title: "Switzerland",
-        width: 1920,
-        height: 1280
-      }
-    ]
   },
   {
-    title: "Milan" as AlbumTitle,
+    title: "Milan",
+    slug: "milan",
     color: "#00B894",
-    type: "location" as const,
+    type: "location",
     description: "Fashion capital with stunning Gothic architecture",
-    date: "2024", 
+    date: "2024",
     lat: 45.4642,
     lng: 9.1900,
     locations: [
@@ -217,30 +163,30 @@ export const mockAlbums = [
       { lat: 45.4773, lng: 9.1815, description: "Brera District" }
     ],
     order: 8,
-    photos: []
   },
   {
-    title: "Tuscany" as AlbumTitle,
+    title: "Tuscany",
+    slug: "tuscany",
     color: "#FDCB6E",
-    type: "location" as const,
+    type: "location",
     description: "Rolling hills, vineyards, and Renaissance art",
-    date: "2024", 
+    date: "2024",
     lat: 43.7711,
     lng: 11.2486,
-    locations: [  
+    locations: [
       { lat: 43.7711, lng: 11.2486, description: "Florence" },
       { lat: 43.7711, lng: 11.2486, description: "Siena" },
       { lat: 43.7711, lng: 11.2486, description: "Pisa" }
-     ],
+    ],
     order: 9,
-    photos: []
   },
   {
-    title: "Rome" as AlbumTitle,
+    title: "Rome",
+    slug: "rome",
     color: "#E17055",
-    type: "location" as const,
+    type: "location",
     description: "Eternal city of ancient ruins and timeless beauty",
-    date: "2024", 
+    date: "2024",
     lat: 41.9028,
     lng: 12.4964,
     locations: [
@@ -249,14 +195,14 @@ export const mockAlbums = [
       { lat: 41.8986, lng: 12.4769, description: "Trevi Fountain" }
     ],
     order: 10,
-    photos: []
   },
   {
-    title: "London" as AlbumTitle,
+    title: "London",
+    slug: "london",
     color: "#A29BFE",
-    type: "location" as const,
+    type: "location",
     description: "Royal palaces, historic landmarks",
-    date: "2021", 
+    date: "2021",
     lat: 51.5074,
     lng: -0.1278,
     locations: [
@@ -265,14 +211,14 @@ export const mockAlbums = [
       { lat: 51.5194, lng: -0.1270, description: "Camden" }
     ],
     order: 11,
-    photos: []
   },
   {
-    title: "San Diego" as AlbumTitle,
+    title: "San Diego",
+    slug: "san-diego",
     color: "#00CEC9",
-    type: "location" as const,
+    type: "location",
     description: "Perfect weather, beautiful beaches, and laid-back vibes",
-    date: "2018", 
+    date: "2018",
     lat: 32.7157,
     lng: -117.1611,
     locations: [
@@ -281,14 +227,14 @@ export const mockAlbums = [
       { lat: 32.6953, lng: -117.1564, description: "Balboa Park" }
     ],
     order: 12,
-    photos: []
   },
   {
-    title: "Los Angeles" as AlbumTitle,
+    title: "Los Angeles",
+    slug: "los-angeles",
     color: "#FD79A8",
-    type: "location" as const,
+    type: "location",
     description: "Hollywood, beaches, and traffic",
-    date: "2021", 
+    date: "2021",
     lat: 34.0522,
     lng: -118.2437,
     locations: [
@@ -297,40 +243,40 @@ export const mockAlbums = [
       { lat: 34.0259, lng: -118.7798, description: "Malibu" }
     ],
     order: 13,
-    photos: []
   },
   {
-    title: "Tennessee" as AlbumTitle,
+    title: "Tennessee",
+    slug: "tennessee",
     color: "#6C5CE7",
-    type: "location" as const,
+    type: "location",
     description: "Musical heritage, live music on Broadway, Grand Ole Opry",
-    date: "2019", 
+    date: "2019",
     lat: 35.7478,
     lng: -86.7945,
-    locations: [ 
+    locations: [
       { lat: 35.7478, lng: -86.7945, description: "Nashville" },
       { lat: 35.7478, lng: -86.7945, description: "Memphis" },
       { lat: 35.7478, lng: -86.7945, description: "Knoxville" }
-  ],
+    ],
     order: 14,
-    photos: []
   },
   {
-    title: "Malta" as AlbumTitle,
+    title: "Malta",
+    slug: "malta",
     color: "#4ECDC4",
-    type: "location" as const,
+    type: "location",
     description: "Mediterranean islands with crystal waters and ancient history",
     date: "2025",
-    lat: 35.8989, // Valletta
+    lat: 35.8989,
     lng: 14.5146,
     locations: [],
     order: 15,
-    photos: []
   },
   {
-    title: "Athens" as AlbumTitle,
+    title: "Athens",
+    slug: "athens",
     color: "#96CEB4",
-    type: "location" as const,
+    type: "location",
     description: "Ancient ruins, lively neighborhoods, and sunset views",
     date: "2025",
     lat: 37.9838,
@@ -341,12 +287,12 @@ export const mockAlbums = [
       { lat: 37.9719, lng: 23.7267, description: "Areopagus" }
     ],
     order: 16,
-    photos: []
   },
   {
-    title: "Madrid" as AlbumTitle,
+    title: "Madrid",
+    slug: "madrid",
     color: "#45B7D1",
-    type: "location" as const,
+    type: "location",
     description: "Late nights, grand boulevards, and world-class art",
     date: "2025",
     lat: 40.4168,
@@ -357,27 +303,27 @@ export const mockAlbums = [
       { lat: 40.4203, lng: -3.7058, description: "Gran Vía" }
     ],
     order: 17,
-    photos: []
   },
   {
-    title: "Germany" as AlbumTitle,
+    title: "Germany",
+    slug: "germany",
     color: "#FFEAA7",
-    type: "location" as const,
+    type: "location",
     description: "Historic cities, modern design, and beer gardens",
     date: "2025",
-    lat: 48.1351, // Munich
+    lat: 48.1351,
     lng: 11.5820,
     locations: [],
     order: 18,
-    photos: []
   },
   {
-    title: "Amalfi" as AlbumTitle,
+    title: "Amalfi",
+    slug: "amalfi",
     color: "#DDA0DD",
-    type: "location" as const,
+    type: "location",
     description: "Cliffside villages, lemon groves, and seaside views",
     date: "2025",
-    lat: 40.6281, // Positano
+    lat: 40.6281,
     lng: 14.4850,
     locations: [
       { lat: 40.6281, lng: 14.4850, description: "Positano" },
@@ -385,13 +331,39 @@ export const mockAlbums = [
       { lat: 40.6990, lng: 14.7149, description: "Ravello" }
     ],
     order: 19,
-    photos: []
-  }
+  },
 ];
+
+// =============================================================================
+// EXPORTED DATA
+// Combines album metadata with photos from R2
+// =============================================================================
+
+/**
+ * Generate full album objects with photos from R2
+ * This is what the app consumes
+ */
+export const mockAlbums = albumsMeta.map(album => ({
+  title: album.title as AlbumTitle,
+  color: album.color,
+  type: album.type,
+  description: album.description,
+  date: album.date,
+  lat: album.lat,
+  lng: album.lng,
+  locations: album.locations,
+  order: album.order,
+  // Photos come from the separate photos.ts file, converted to full URLs
+  photos: toPhotos(album.slug, albumPhotos[album.slug] || []),
+}));
+
+// =============================================================================
+// FOLDERS (unchanged)
+// =============================================================================
 
 export const mockFolders = [
   {
-    title: "hotography" as AlbumTitle,
+    title: "Photography" as AlbumTitle,
     parent_title: "Events" as AlbumTitle,
     description: "",
     date: "2024",

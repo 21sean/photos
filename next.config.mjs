@@ -9,7 +9,14 @@ const nextConfig = {
   // assetPrefix: '/photos',
   images: {
     unoptimized: true,
-    domains: ['picsum.photos', 'cdn.myportfolio.com']
+    domains: ['picsum.photos', 'cdn.myportfolio.com', 'images.sean.ventures'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.sean.ventures',
+        pathname: '/**',
+      },
+    ],
   }
 };
 
