@@ -66,7 +66,7 @@ export const Masonry = ({
 }) => {
   useLightbox(items);
 
-  const columnWidth = currentColumnWidth();
+  const columnWidth = React.useMemo(() => currentColumnWidth(), []);
   const averageHeight = useAverageHeight(items, columnWidth);
 
   if (items.length === 0) {
@@ -88,7 +88,7 @@ export const Masonry = ({
         columnWidth={columnWidth}
         itemHeightEstimate={averageHeight}
         maxColumnCount={4}
-        overscanBy={1}
+        overscanBy={5}
         {...props}
       />
     </section>
