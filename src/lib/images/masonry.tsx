@@ -6,6 +6,7 @@ import { type RenderComponentProps } from 'masonic';
 import { useLightbox } from '../../hooks/use-lightbox';
 import { Photo } from '@/types';
 import HDRImage from './hdr-image';
+import { isIOSSafari } from '../browser-utils';
 
 const MasonryItem = ({
   width: itemWidth,
@@ -72,6 +73,12 @@ export const Masonry = ({
   const columnWidth = React.useMemo(() => currentColumnWidth(), []);
   const averageHeight = useAverageHeight(items, columnWidth);
 
+  // Detect iOS Safari for specific optimizations
+  const isIOS = isIOSSafari();
+  
+  // Increase overscan on iOS to keep more images rendered off-screen
+  const overscanValue = isIOS ? 12 : 5;
+
   if (items.length === 0) {
     return null;
   }
@@ -83,6 +90,10 @@ export const Masonry = ({
       md:w-[500px] lg:w-[720px] xl:w-[1000px] 2xl:w-[1200px] 3xl:w-[1250px]
       px-2 sm:p-0
       fade-in-delayed`}
+      style={{
+        // iOS-specific optimizations to prevent content reclamation
+        contain: isIOS ? 'layout style' : undefined,
+      }}
     >
       <MasonicMasonry
         items={items}
@@ -91,7 +102,7 @@ export const Masonry = ({
         columnWidth={columnWidth}
         itemHeightEstimate={averageHeight}
         maxColumnCount={4}
-        overscanBy={5}
+        overscanBy={overscanValue}
         {...props}
       />
     </section>

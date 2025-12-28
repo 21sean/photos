@@ -937,3 +937,30 @@ body:has(.globe-container) .typewriter.nocaret::after {
     animation: none;
   }
 }
+
+/* iOS Safari specific image preservation styles */
+@supports (-webkit-touch-callout: none) {
+  .masonry-item img,
+  .hdr-image {
+    /* Prevent iOS from aggressively reclaiming image memory */
+    contain: layout style;
+    /* Prevent iOS from auto-hiding content */
+    content-visibility: visible;
+    /* Force GPU compositing for better performance */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  /* Ensure masonry items maintain their space allocation */
+  .masonry-item {
+    contain: layout style;
+  }
+  
+  /* Mobile image gallery optimization for iOS */
+  #pig img {
+    contain: layout style;
+    content-visibility: visible;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
