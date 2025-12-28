@@ -15,4 +15,10 @@ export type Photo = {
     minLuminance?: number;
     colorGamut?: string;
   };
+  // EXIF metadata
+  iso?: number;
+  aperture?: number;
+  shutterSpeed?: string;
+  focalLength?: string;
+  dateTaken?: string;
 };

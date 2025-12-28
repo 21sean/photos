@@ -3,119 +3,240 @@
     {
       "filename": "IMG_6404.jpeg",
       "title": "IMG 6404",
+      "width": 6336,
+      "height": 9504,
       "size": 26346274,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 5.6,
+      "shutterSpeed": "1/400",
+      "focalLength": "46.0 mm",
+      "dateTaken": "2025-10-27T00:56:29-08:00"
     }
   ],
   "lisbon": [
     {
       "filename": "IMG_4982.jpeg",
       "title": "IMG 4982",
+      "width": 6336,
+      "height": 9504,
       "size": 56031153,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 800,
+      "aperture": 2.8,
+      "shutterSpeed": "1/60",
+      "focalLength": "24.0 mm",
+      "dateTaken": "2025-05-09T05:07:40-08:00"
     },
     {
       "filename": "lisbon-streets-1.jpeg",
       "title": "Lisbon Streets 1",
+      "width": 6336,
+      "height": 9504,
       "size": 41941162,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 5,
+      "shutterSpeed": "1/400",
+      "focalLength": "63.0 mm",
+      "dateTaken": "2025-05-10T05:42:06-08:00"
     },
     {
       "filename": "lisbon-streets-2.jpeg",
       "title": "Lisbon Streets 2",
+      "width": 6336,
+      "height": 9504,
       "size": 45336914,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 125,
+      "aperture": 6.3,
+      "shutterSpeed": "1/500",
+      "focalLength": "70.0 mm",
+      "dateTaken": "2025-05-11T02:19:54-08:00"
+    }
+  ],
+  "madrid": [
+    {
+      "filename": "IMG_6632.jpeg",
+      "title": "IMG 6632",
+      "width": 3000,
+      "height": 2872,
+      "size": 3101007,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 5,
+      "shutterSpeed": "1/5",
+      "focalLength": "42.0 mm",
+      "dateTaken": "2025-11-01T10:00:06-08:00"
     }
   ],
   "malta": [
     {
       "filename": "IMG_5778.jpeg",
       "title": "IMG 5778",
+      "width": 4629,
+      "height": 6944,
       "size": 8876314,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 7.1,
+      "shutterSpeed": "1/500",
+      "focalLength": "52.0 mm",
+      "dateTaken": "2025-10-29T00:22:03-08:00"
     },
     {
       "filename": "IMG_6254.jpeg",
       "title": "IMG 6254",
+      "width": 3878,
+      "height": 5817,
       "size": 9287704,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 3.5,
+      "shutterSpeed": "1/800",
+      "focalLength": "70.0 mm",
+      "dateTaken": "2025-10-30T00:06:54-08:00"
     },
     {
       "filename": "IMG_6256.jpeg",
       "title": "IMG 6256",
+      "width": 2041,
+      "height": 2700,
       "size": 3421759,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 4.5,
+      "shutterSpeed": "1/125",
+      "focalLength": "41.0 mm",
+      "dateTaken": "2025-10-30T00:01:29-08:00"
     }
   ],
   "porto": [
     {
       "filename": "porto-1.jpeg",
       "title": "Porto 1",
+      "width": 6336,
+      "height": 9504,
       "size": 33392313,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 6.3,
+      "shutterSpeed": "1/20",
+      "focalLength": "68.0 mm",
+      "dateTaken": "2025-05-07T12:13:06-08:00"
     },
     {
       "filename": "porto-2.jpeg",
       "title": "Porto 2",
+      "width": 6336,
+      "height": 6638,
       "size": 39110089,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 1000,
+      "aperture": 2.8,
+      "shutterSpeed": "1/4",
+      "focalLength": "24.0 mm",
+      "dateTaken": "2025-05-06T14:38:45-08:00"
     },
     {
       "filename": "porto-3.jpeg",
       "title": "Porto 3",
+      "width": 9504,
+      "height": 6336,
       "size": 24461623,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 4.5,
+      "shutterSpeed": "1/160",
+      "focalLength": "43.0 mm",
+      "dateTaken": "2025-05-07T10:44:52-08:00"
     }
   ],
   "prague": [
     {
       "filename": "prague-1.jpeg",
       "title": "Prague 1",
+      "width": 6336,
+      "height": 9504,
       "size": 37235083,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 6.3,
+      "shutterSpeed": "1/200",
+      "focalLength": "70.0 mm",
+      "dateTaken": "2025-05-04T08:40:31-08:00"
     }
   ],
   "switzerland": [
     {
       "filename": "switzerland-1.jpeg",
       "title": "Switzerland 1",
+      "width": 6336,
+      "height": 9504,
       "size": 31111398,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 4.5,
+      "shutterSpeed": "1/1250",
+      "focalLength": "58.0 mm",
+      "dateTaken": "2025-01-13T07:37:36-08:00"
     },
     {
       "filename": "switzerland-2.jpeg",
       "title": "Switzerland 2",
+      "width": 9504,
+      "height": 6336,
       "size": 28572450,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 5,
+      "shutterSpeed": "1/800",
+      "focalLength": "50.0 mm",
+      "dateTaken": "2025-01-13T04:41:00-08:00"
     },
     {
       "filename": "switzerland-3.jpeg",
       "title": "Switzerland 3",
+      "width": 9504,
+      "height": 6336,
       "size": 22382039,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 5,
+      "shutterSpeed": "1/1600",
+      "focalLength": "28.0 mm",
+      "dateTaken": "2025-01-13T02:11:50-08:00"
     }
   ],
   "venice": [
     {
       "filename": "venice-1.jpeg",
       "title": "Venice 1",
+      "width": 6336,
+      "height": 9504,
       "size": 44543283,
-      "width": 1920,
-      "height": 1280
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 400,
+      "aperture": 8,
+      "shutterSpeed": "1/60",
+      "focalLength": "49.0 mm",
+      "dateTaken": "2024-09-26T08:38:18-08:00"
     }
   ]
 }

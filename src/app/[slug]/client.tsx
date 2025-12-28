@@ -121,7 +121,7 @@ export default function AlbumPageClient({
           </div>
         </div>
 
-        <Masonry className="mt-4 mb-6" items={photos} />
+  <Masonry className="mt-4 mb-6" items={photos} maxColumnCount={1} />
       </div>
     </section>
   );
