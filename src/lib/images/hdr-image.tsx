@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Photo } from '@/types';
 import { detectHDRCapabilities, getHDRImageStyles, isLikelyHDR } from '../hdr-utils';
+import { isIOSSafari } from '../browser-utils';
 
 interface HDRImageProps {
   photo: Photo;
@@ -69,9 +70,7 @@ export function HDRImage({
   }, [photo.url]);
 
   // Detect iOS Safari to apply specific optimizations
-  const isIOSSafari = typeof window !== 'undefined' && 
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && 
-    !(window as any).MSStream;
+  const isIOS = isIOSSafari();
 
   // Determine optimal image attributes
   const imageProps: React.ImgHTMLAttributes<HTMLImageElement> = {
@@ -80,7 +79,7 @@ export function HDRImage({
     height: height || photo.height,
     alt: alt || photo.title || '',
     // Disable lazy loading on iOS Safari to prevent aggressive unloading
-    loading: (priority ? 'eager' : (isIOSSafari ? 'eager' : 'lazy')) as 'eager' | 'lazy',
+    loading: (priority ? 'eager' : (isIOS ? 'eager' : 'lazy')) as 'eager' | 'lazy',
     decoding: 'async',
     // Add fetchPriority for better resource prioritization
     fetchPriority: (priority ? 'high' : 'auto') as 'high' | 'auto',
