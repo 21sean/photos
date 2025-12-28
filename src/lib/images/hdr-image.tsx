@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Photo } from '@/types';
 import { detectHDRCapabilities, getHDRImageStyles, isLikelyHDR } from '../hdr-utils';
+import { isIOSSafari } from '../browser-utils';
 
 interface HDRImageProps {
   photo: Photo;
@@ -68,14 +69,20 @@ export function HDRImage({
     setIsLoading(false);
   }, [photo.url]);
 
+  // Detect iOS Safari to apply specific optimizations
+  const isIOS = isIOSSafari();
+
   // Determine optimal image attributes
   const imageProps: React.ImgHTMLAttributes<HTMLImageElement> = {
     src: photo.url,
     width: width || photo.width,
     height: height || photo.height,
     alt: alt || photo.title || '',
-    loading: (priority ? 'eager' : 'lazy') as 'eager' | 'lazy',
+    // Disable lazy loading on iOS Safari to prevent aggressive unloading
+    loading: (priority ? 'eager' : (isIOS ? 'eager' : 'lazy')) as 'eager' | 'lazy',
     decoding: 'async',
+    // Add fetchPriority for better resource prioritization
+    fetchPriority: (priority ? 'high' : 'auto') as 'high' | 'auto',
     onLoad: handleImageLoad,
     onError: handleImageError,
     style: {
@@ -84,11 +91,13 @@ export function HDRImage({
       transition: 'opacity 0.3s ease, filter 0.3s ease',
       // iOS-specific GPU acceleration optimizations to fix image disappearing and lag.
       // Forces GPU compositing layer for smoother rendering of large images on iOS.
-      WebkitTransform: 'translate3d(0, 0, 0)',
-      transform: 'translate3d(0, 0, 0)',
+      WebkitTransform: 'translateZ(0)',
+      transform: 'translateZ(0)',
       willChange: 'opacity', // Hint for opacity transitions during image loading
       WebkitBackfaceVisibility: 'hidden',
       backfaceVisibility: 'hidden',
+      // Prevent iOS from aggressively reclaiming image memory
+      contain: 'layout style',
     },
     className: `hdr-image ${isHDR ? 'hdr-enhanced' : ''} ${className}`,
   };
