@@ -5,14 +5,13 @@ import { useWindowSize } from '@/hooks/use-window-size';
 import { Photo } from '@/types';
 import { useEffect, useState } from 'react';
 import { isLikelyHDR, getHDRImageStyles } from '../hdr-utils';
+import { isIOSSafari } from '../browser-utils';
 
 function MobileImageWithLoading({ item }: { item: Photo }) {
   const [isLoading, setIsLoading] = useState(true);
 
   // Detect iOS Safari for specific optimizations
-  const isIOSSafari = typeof window !== 'undefined' && 
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && 
-    !(window as any).MSStream;
+  const isIOS = isIOSSafari();
 
   return (
     <div className="relative">
@@ -28,12 +27,12 @@ function MobileImageWithLoading({ item }: { item: Photo }) {
           alt={item.title || ""} 
           className={`w-full h-auto transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
           // Disable lazy loading on iOS Safari to prevent aggressive unloading
-          loading={isIOSSafari ? 'eager' : 'lazy'}
+          loading={isIOS ? 'eager' : 'lazy'}
           style={{
             // iOS-specific optimizations to prevent image unloading
-            contain: isIOSSafari ? 'layout style' : undefined,
-            WebkitTransform: isIOSSafari ? 'translateZ(0)' : undefined,
-            transform: isIOSSafari ? 'translateZ(0)' : undefined,
+            contain: isIOS ? 'layout style' : undefined,
+            WebkitTransform: isIOS ? 'translateZ(0)' : undefined,
+            transform: isIOS ? 'translateZ(0)' : undefined,
           }}
           onLoad={() => {
             // Ensure loading animation is visible for at least 500ms
@@ -83,17 +82,15 @@ function PigGrid({ items }: { items: Array<Photo> }) {
       img.alt = item.title || '';
       
       // Detect iOS Safari for specific optimizations
-      const isIOSSafari = typeof window !== 'undefined' && 
-        /iPad|iPhone|iPod/.test(navigator.userAgent) && 
-        !(window as any).MSStream;
+      const isIOS = isIOSSafari();
       
       // Disable lazy loading on iOS Safari
-      if (!isIOSSafari) {
+      if (!isIOS) {
         img.loading = 'lazy';
       }
       
       // Apply iOS optimizations
-      if (isIOSSafari) {
+      if (isIOS) {
         img.style.contain = 'layout style';
         img.style.webkitTransform = 'translateZ(0)';
         img.style.transform = 'translateZ(0)';

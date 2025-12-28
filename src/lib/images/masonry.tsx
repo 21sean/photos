@@ -6,6 +6,7 @@ import { type RenderComponentProps } from 'masonic';
 import { useLightbox } from '../../hooks/use-lightbox';
 import { Photo } from '@/types';
 import HDRImage from './hdr-image';
+import { isIOSSafari } from '../browser-utils';
 
 const MasonryItem = ({
   width: itemWidth,
@@ -73,12 +74,10 @@ export const Masonry = ({
   const averageHeight = useAverageHeight(items, columnWidth);
 
   // Detect iOS Safari for specific optimizations
-  const isIOSSafari = typeof window !== 'undefined' && 
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && 
-    !(window as any).MSStream;
+  const isIOS = isIOSSafari();
   
   // Increase overscan on iOS to keep more images rendered off-screen
-  const overscanValue = isIOSSafari ? 12 : 5;
+  const overscanValue = isIOS ? 12 : 5;
 
   if (items.length === 0) {
     return null;
@@ -93,7 +92,7 @@ export const Masonry = ({
       fade-in-delayed`}
       style={{
         // iOS-specific optimizations to prevent content reclamation
-        contain: isIOSSafari ? 'layout style' : undefined,
+        contain: isIOS ? 'layout style' : undefined,
       }}
     >
       <MasonicMasonry
