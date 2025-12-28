@@ -84,10 +84,8 @@ function PigGrid({ items }: { items: Array<Photo> }) {
       // Detect iOS Safari for specific optimizations
       const isIOS = isIOSSafari();
       
-      // Disable lazy loading on iOS Safari
-      if (!isIOS) {
-        img.loading = 'lazy';
-      }
+      // Set loading attribute based on iOS detection
+      img.loading = isIOS ? 'eager' : 'lazy';
       
       // Apply iOS optimizations
       if (isIOS) {
