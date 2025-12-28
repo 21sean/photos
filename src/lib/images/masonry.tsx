@@ -72,6 +72,14 @@ export const Masonry = ({
   const columnWidth = React.useMemo(() => currentColumnWidth(), []);
   const averageHeight = useAverageHeight(items, columnWidth);
 
+  // Detect iOS Safari for specific optimizations
+  const isIOSSafari = typeof window !== 'undefined' && 
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && 
+    !(window as any).MSStream;
+  
+  // Increase overscan on iOS to keep more images rendered off-screen
+  const overscanValue = isIOSSafari ? 12 : 5;
+
   if (items.length === 0) {
     return null;
   }
@@ -83,6 +91,10 @@ export const Masonry = ({
       md:w-[500px] lg:w-[720px] xl:w-[1000px] 2xl:w-[1200px] 3xl:w-[1250px]
       px-2 sm:p-0
       fade-in-delayed`}
+      style={{
+        // iOS-specific optimizations to prevent content reclamation
+        contain: isIOSSafari ? 'layout style' : undefined,
+      }}
     >
       <MasonicMasonry
         items={items}
@@ -91,7 +103,7 @@ export const Masonry = ({
         columnWidth={columnWidth}
         itemHeightEstimate={averageHeight}
         maxColumnCount={4}
-        overscanBy={5}
+        overscanBy={overscanValue}
         {...props}
       />
     </section>
