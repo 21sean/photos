@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run sync-photos && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier",
@@ -14,7 +14,7 @@
     "check": "tsc --noEmit",
     "check:all": "npm run check && npm run knip && npm run lint && npm run format",
     "test": "npx playwright test",
-    "build:static": "npm run sync-photos && cross-env NEXT_OUTPUT=export next build",
+    "build:static": "cross-env NEXT_OUTPUT=export next build",
     "deploy:static": "npm run build:static",
     "sync-photos": "./scripts/build-photos-manifest.sh"
   },
