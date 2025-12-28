@@ -9,6 +9,11 @@ import { isLikelyHDR, getHDRImageStyles } from '../hdr-utils';
 function MobileImageWithLoading({ item }: { item: Photo }) {
   const [isLoading, setIsLoading] = useState(true);
 
+  // Detect iOS Safari for specific optimizations
+  const isIOSSafari = typeof window !== 'undefined' && 
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && 
+    !(window as any).MSStream;
+
   return (
     <div className="relative">
       <a
@@ -22,6 +27,14 @@ function MobileImageWithLoading({ item }: { item: Photo }) {
           src={item.url} 
           alt={item.title || ""} 
           className={`w-full h-auto transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+          // Disable lazy loading on iOS Safari to prevent aggressive unloading
+          loading={isIOSSafari ? 'eager' : 'lazy'}
+          style={{
+            // iOS-specific optimizations to prevent image unloading
+            contain: isIOSSafari ? 'layout style' : undefined,
+            WebkitTransform: isIOSSafari ? 'translateZ(0)' : undefined,
+            transform: isIOSSafari ? 'translateZ(0)' : undefined,
+          }}
           onLoad={() => {
             // Ensure loading animation is visible for at least 500ms
             setTimeout(() => {
@@ -68,6 +81,23 @@ function PigGrid({ items }: { items: Array<Photo> }) {
       const img = document.createElement('img');
       img.src = url;
       img.alt = item.title || '';
+      
+      // Detect iOS Safari for specific optimizations
+      const isIOSSafari = typeof window !== 'undefined' && 
+        /iPad|iPhone|iPod/.test(navigator.userAgent) && 
+        !(window as any).MSStream;
+      
+      // Disable lazy loading on iOS Safari
+      if (!isIOSSafari) {
+        img.loading = 'lazy';
+      }
+      
+      // Apply iOS optimizations
+      if (isIOSSafari) {
+        img.style.contain = 'layout style';
+        img.style.webkitTransform = 'translateZ(0)';
+        img.style.transform = 'translateZ(0)';
+      }
       
       // Apply HDR styles if image is HDR
       const isHDR = item.isHDR || isLikelyHDR(item.url);
