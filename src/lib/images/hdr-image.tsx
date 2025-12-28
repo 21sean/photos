@@ -82,6 +82,12 @@ export function HDRImage({
       ...hdrStyles,
       opacity: isLoading ? 0.3 : 1, // Show faint image while loading instead of invisible
       transition: 'opacity 0.3s ease, filter 0.3s ease',
+      // iOS-specific GPU acceleration optimizations
+      WebkitTransform: 'translate3d(0, 0, 0)',
+      transform: 'translate3d(0, 0, 0)',
+      willChange: 'opacity',
+      WebkitBackfaceVisibility: 'hidden',
+      backfaceVisibility: 'hidden',
     },
     className: `hdr-image ${isHDR ? 'hdr-enhanced' : ''} ${className}`,
   };
