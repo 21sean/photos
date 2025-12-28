@@ -66,7 +66,10 @@ export const Masonry = ({
 }) => {
   useLightbox(items);
 
-  const columnWidth = currentColumnWidth();
+  // Memoize column width to prevent recalculation on every render during scrolling.
+  // Window resize events will trigger component re-mount/re-render through parent,
+  // so this will update when needed without causing performance issues during scrolling.
+  const columnWidth = React.useMemo(() => currentColumnWidth(), []);
   const averageHeight = useAverageHeight(items, columnWidth);
 
   if (items.length === 0) {
@@ -88,7 +91,7 @@ export const Masonry = ({
         columnWidth={columnWidth}
         itemHeightEstimate={averageHeight}
         maxColumnCount={4}
-        overscanBy={1}
+        overscanBy={5}
         {...props}
       />
     </section>
