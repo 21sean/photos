@@ -8,6 +8,26 @@ import { Photo } from '@/types';
 import HDRImage from './hdr-image';
 import { isIOSSafari } from '../browser-utils';
 
+// Format EXIF data for overlay
+function formatExifData(photo: Photo): string | null {
+  const parts: string[] = [];
+
+  if (photo.focalLength) {
+    parts.push(photo.focalLength.replace(' mm', 'mm'));
+  }
+  if (photo.aperture) {
+    parts.push(`ƒ/${photo.aperture}`);
+  }
+  if (photo.shutterSpeed) {
+    parts.push(`${photo.shutterSpeed}s`);
+  }
+  if (photo.iso) {
+    parts.push(`ISO ${photo.iso}`);
+  }
+
+  return parts.length ? parts.join('  •  ') : null;
+}
+
 const MasonryItem = ({
   width: itemWidth,
   data: photo
@@ -15,23 +35,35 @@ const MasonryItem = ({
   // Calculate proper scaled dimensions for the masonry item
   const aspectRatio = photo.width / photo.height;
   const scaledHeight = itemWidth / aspectRatio;
+  const exif = formatExifData(photo);
   
   return (
-    <div
-      className="cursor-pointer masonry-item"
-      onClick={() => window.open(photo.url, '_blank', 'noopener,noreferrer')}
-    >
+    <div className="relative group masonry-item select-none">
       <HDRImage
         photo={photo}
         width={itemWidth}
         height={scaledHeight}
-        className="masonry-item"
+        className="masonry-item w-full h-auto block"
       />
+
+      {exif && (
+        <div className="pointer-events-none absolute inset-0 flex items-end justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="bg-black/60 text-white text-[11px] px-3 py-1.5 rounded-full font-mono tracking-wide shadow-lg border border-white/10 backdrop-blur-sm">
+            {exif}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-function currentColumnWidth() {
+function currentColumnWidth(maxColumnCount: number) {
+  // For single-column layouts, fit nicely on screen without being too wide
+  if (maxColumnCount === 1) {
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 800;
+    return Math.min(vw - 32, 760);
+  }
+
   if (window.innerWidth > 2000) {
     // 3xl
     return 425;
@@ -60,17 +92,19 @@ function useAverageHeight(items: Array<Photo>, columnWidth: number) {
 
 export const Masonry = ({
   items = [],
+  maxColumnCount = 4,
   ...props
 }: {
   items: Array<Photo>;
   className?: string;
+  maxColumnCount?: number;
 }) => {
   useLightbox(items);
 
   // Memoize column width to prevent recalculation on every render during scrolling.
   // Window resize events will trigger component re-mount/re-render through parent,
   // so this will update when needed without causing performance issues during scrolling.
-  const columnWidth = React.useMemo(() => currentColumnWidth(), []);
+  const columnWidth = React.useMemo(() => currentColumnWidth(maxColumnCount), [maxColumnCount]);
   const averageHeight = useAverageHeight(items, columnWidth);
 
   // Detect iOS Safari for specific optimizations
@@ -83,13 +117,17 @@ export const Masonry = ({
     return null;
   }
 
+  const containerClass = maxColumnCount === 1
+    ? 'w-full max-w-[820px] mx-auto px-3 sm:px-4 fade-in-delayed'
+    : `h-auto w-full
+      md:w-[500px] lg:w-[720px] xl:w-[1000px] 2xl:w-[1200px] 3xl:w-[1250px]
+      px-2 sm:p-0
+      fade-in-delayed`;
+
   return (
     <section
       id="gallery"
-      className={`h-auto w-full
-      md:w-[500px] lg:w-[720px] xl:w-[1000px] 2xl:w-[1200px] 3xl:w-[1250px]
-      px-2 sm:p-0
-      fade-in-delayed`}
+      className={containerClass}
       style={{
         // iOS-specific optimizations to prevent content reclamation
         contain: isIOS ? 'layout style' : undefined,
@@ -101,7 +139,7 @@ export const Masonry = ({
         columnGutter={window.innerWidth <= 512 ? 9 : 18}
         columnWidth={columnWidth}
         itemHeightEstimate={averageHeight}
-        maxColumnCount={4}
+        maxColumnCount={maxColumnCount}
         overscanBy={overscanValue}
         {...props}
       />

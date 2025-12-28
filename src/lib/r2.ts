@@ -48,6 +48,12 @@ export interface R2Photo {
     minLuminance?: number;
     colorGamut?: string;
   };
+  // EXIF metadata
+  iso?: number;
+  aperture?: number;
+  shutterSpeed?: string;
+  focalLength?: string;
+  dateTaken?: string;
 }
 
 /**
@@ -65,6 +71,12 @@ export function toPhoto(album: string, photo: R2Photo) {
     isHDR: photo.isHDR,
     colorSpace: photo.colorSpace,
     hdrMetadata: photo.hdrMetadata,
+    // EXIF metadata
+    iso: photo.iso,
+    aperture: photo.aperture,
+    shutterSpeed: photo.shutterSpeed,
+    focalLength: photo.focalLength,
+    dateTaken: photo.dateTaken,
   };
 }
 
