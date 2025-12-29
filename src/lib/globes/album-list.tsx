@@ -139,8 +139,8 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
       <ul
         ref={listRef}
         className={`flex flex-col 
-          items-center
-          md:items-start tracking-tight 
+          items-start
+          tracking-tight 
           album-list
           ${isSliding ? 'album-list-sliding' : ''}`}
         style={{

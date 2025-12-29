@@ -61,7 +61,7 @@ async function AboutPage() {
         `}</p>
 
           <p className="mb-32 text-lg text-white">
-            sean.photo
+            
           </p>
 
           <Contact />
