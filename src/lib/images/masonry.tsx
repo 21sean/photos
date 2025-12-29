@@ -7,6 +7,7 @@ import { useLightbox } from '../../hooks/use-lightbox';
 import { Photo } from '@/types';
 import HDRImage from './hdr-image';
 import { isIOSSafari } from '../browser-utils';
+import { FlipIcon } from '../icons';
 
 // Format EXIF data for overlay
 function formatExifData(photo: Photo): string | null {
@@ -32,6 +33,8 @@ const MasonryItem = ({
   width: itemWidth,
   data: photo
 }: RenderComponentProps<Photo>) => {
+  const [isFlipped, setIsFlipped] = React.useState(false);
+  
   // Calculate proper scaled dimensions for the masonry item
   const aspectRatio = photo.width / photo.height;
   const scaledHeight = itemWidth / aspectRatio;
@@ -39,12 +42,28 @@ const MasonryItem = ({
   
   return (
     <div className="relative group masonry-item select-none">
-      <HDRImage
-        photo={photo}
-        width={itemWidth}
-        height={scaledHeight}
-        className="masonry-item w-full h-auto block"
-      />
+      <div 
+        style={{ 
+          transform: isFlipped ? 'scaleX(-1)' : 'scaleX(1)',
+          transition: 'transform 0.3s ease'
+        }}
+      >
+        <HDRImage
+          photo={photo}
+          width={itemWidth}
+          height={scaledHeight}
+          className="masonry-item w-full h-auto block"
+        />
+      </div>
+
+      {/* Flip button */}
+      <button
+        onClick={() => setIsFlipped(!isFlipped)}
+        className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 backdrop-blur-sm"
+        aria-label="Flip image horizontally"
+      >
+        <FlipIcon />
+      </button>
 
       {exif && (
         <div className="pointer-events-none absolute inset-0 flex items-end justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
