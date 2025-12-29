@@ -19,13 +19,9 @@ import AlbumList from '@/lib/globes/album-list';
 // ============================================
 const DARK_MODE = true; // Toggle between dark and light mode
 
-// For country borders, you can use:
-// - Current: land-110m.json (TopoJSON) - just land masses, no country borders
-// - Alternative: ne_110m_admin_0_countries.geojson - individual countries with borders
-//   Download from: https://github.com/vasturiano/react-globe.gl/tree/master/example/datasets
 // Set USE_COUNTRY_POLYGONS = true and add the geojson file to use country borders
 
-const USE_COUNTRY_POLYGONS = false; // Set to true to use individual country polygons with borders
+const USE_COUNTRY_POLYGONS = true; // Set to true to use individual country polygons with borders
 
 // Theme colors (adjust these to customize appearance)
 const THEME = {
@@ -84,11 +80,11 @@ const THEME = {
     
     // Polygons (land/countries)
     polygonCapColor: 0x1a1a20, // Dark navy blue
-    polygonCapOpacity: 0.7,
-    polygonSideColor: 'rgba(255, 2, 2, 0.95)',
-    polygonStrokeColor: '#aa9063ff', // Gray-600
-    polygonStrokeColorAlt: '#005effff', // Gray-700
-    polygonAltitude: 0.0028,
+    polygonCapOpacity: 0.93,
+    polygonSideColor: 'rgba(21, 21, 21, 0.95)',
+    polygonStrokeColor: '#ffffffce', // Gray-600
+    polygonStrokeColorAlt: '#ffffffff', // Gray-700
+    polygonAltitude: -0.0018,
     
     // Graticules (lat/lng grid)
     graticulesColor: '#2d3748',
@@ -119,7 +115,7 @@ const FLYING_LINES_SPEED = 0.3;
 
 // Zoom tuning: allow 30% more zoom-in and 50% less zoom-out
 const ZOOM_IN_EXTRA = 0.6;
-const ZOOM_OUT_REDUCTION = 0.4;
+const ZOOM_OUT_REDUCTION = 0.6;
 
 type Ref = CustomGlobeMethods | undefined; // Reference to globe instance
 type GlobeEl = React.MutableRefObject<Ref>; // React `ref` passed to globe element
@@ -161,12 +157,20 @@ function useLandPolygons() {
   const [landPolygons, setLandPolygons] = useState([]);
   useEffect(() => {
     async function fetchLandPolygons() {
-      const landTopo = await import('../../data/land-110m.json');
-      const landPolygons = topojson.feature(
-        landTopo,
-        landTopo.objects.land
-      ).features;
-      setLandPolygons(landPolygons);
+      if (USE_COUNTRY_POLYGONS) {
+        // Load GeoJSON with individual country polygons and borders
+        const response = await fetch('/data/ne_110m_admin_0_countries.geojson');
+        const countriesGeoJson = await response.json();
+        setLandPolygons(countriesGeoJson.features);
+      } else {
+        // Load TopoJSON with just land masses (no borders)
+        const landTopo = await import('../../data/land-110m.json');
+        const landPolygons = topojson.feature(
+          landTopo,
+          landTopo.objects.land
+        ).features;
+        setLandPolygons(landPolygons);
+      }
     }
     fetchLandPolygons();
   }, []);
@@ -766,8 +770,10 @@ function Globe({ albums }: { albums: Array<Album> }) {
     const el = containerRef.current;
     if (!el) return;
     const update = () => {
-      setContainerWidth(el.clientWidth);
-      setContainerHeight(el.clientHeight);
+      // Use getBoundingClientRect for more accurate dimensions
+      const rect = el.getBoundingClientRect();
+      setContainerWidth(rect.width);
+      setContainerHeight(rect.height);
     };
     update();
     const RO = (window as any).ResizeObserver;
@@ -840,6 +846,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
         ringsData={[]}
         arcsData={arcs}
         arcColor={'color'}
+        arcStroke={.2}
         arcDashLength={arcDashLengthCb} // the bigger the ranges, the calmer it looks
         arcDashGap={arcDashGapCb}
         arcDashAnimateTime={arcDashAnimateTimeCb}
