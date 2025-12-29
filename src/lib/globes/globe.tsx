@@ -14,6 +14,106 @@ import { AlbumCard } from './card';
 import useHDRSetup from '@/hooks/use-hdr-setup';
 import AlbumList from '@/lib/globes/album-list';
 
+// ============================================
+// GLOBE THEME CONFIGURATION
+// ============================================
+const DARK_MODE = true; // Toggle between dark and light mode
+
+// For country borders, you can use:
+// - Current: land-110m.json (TopoJSON) - just land masses, no country borders
+// - Alternative: ne_110m_admin_0_countries.geojson - individual countries with borders
+//   Download from: https://github.com/vasturiano/react-globe.gl/tree/master/example/datasets
+// Set USE_COUNTRY_POLYGONS = true and add the geojson file to use country borders
+
+const USE_COUNTRY_POLYGONS = false; // Set to true to use individual country polygons with borders
+
+// Theme colors (adjust these to customize appearance)
+const THEME = {
+  light: {
+    // Background
+    backgroundColor: 'rgba(255, 255, 255, 0)', // Transparent (uses CSS background)
+    
+    // Globe surface
+    showGlobe: false,
+    globeColor: 0xffffff,
+    
+    // Atmosphere
+    showAtmosphere: false,
+    atmosphereColor: 'lightskyblue',
+    atmosphereAltitude: 0.15,
+    
+    // Polygons (land/countries)
+    polygonCapColor: 0xffffff,
+    polygonCapOpacity: 0.77,
+    polygonSideColor: 'rgba(255, 255, 255, 0)',
+    polygonStrokeColor: 'black',
+    polygonStrokeColorAlt: 'darkslategray', // For non-Mac platforms
+    polygonAltitude: 0,
+    
+    // Graticules (lat/lng grid)
+    graticulesColor: 'lightgrey',
+    graticulesOpacity: 0.47,
+    
+    // Inner sphere
+    innerSphereColor: 0xffffff,
+    innerSphereOpacity: 0.47,
+    
+    // Stars (custom layer)
+    starsColor: '#777777',
+    starsOpacity: 0.6,
+    
+    // Points (location markers)
+    pointColor: 'rgba(10, 31, 68, 0.8)', // Navy blue
+    pointColorActive: 'rgba(0, 200, 0, 0.9)', // Green for selected
+    
+    // Arcs
+    arcColors: ['red', 'purple'],
+  },
+  dark: {
+    // Background
+    backgroundColor: '#2b2b2bff', // Default react-globe.gl dark background
+    
+    // Globe surface
+    showGlobe: false,
+    globeColor: 0x1a1a2e,
+    
+    // Atmosphere
+    showAtmosphere: true,
+    atmosphereColor: 'rgba(218, 224, 240, 1)', // Royal blue glow
+    atmosphereAltitude: 0.2,
+    
+    // Polygons (land/countries)
+    polygonCapColor: 0x1a1a20, // Dark navy blue
+    polygonCapOpacity: 0.7,
+    polygonSideColor: 'rgba(255, 2, 2, 0.95)',
+    polygonStrokeColor: '#aa9063ff', // Gray-600
+    polygonStrokeColorAlt: '#005effff', // Gray-700
+    polygonAltitude: 0.0028,
+    
+    // Graticules (lat/lng grid)
+    graticulesColor: '#2d3748',
+    graticulesOpacity: 0.4,
+    
+    // Inner sphere
+    innerSphereColor: 0x000000,
+    innerSphereOpacity: 0.9,
+    
+    // Stars (custom layer)
+    starsColor: '#8888aa',
+    starsOpacity: 0.7,
+    
+    // Points (location markers)
+    pointColor: 'rgba(255, 255, 255, 1)', // Light blue
+    pointColorActive: 'rgba(243, 0, 0, 0.95)', // Bright green
+    
+    // Arcs
+    arcColors: ['#ff6b6b', '#a855f7'], // Coral red to purple
+  }
+};
+
+const theme = DARK_MODE ? THEME.dark : THEME.light;
+// ============================================
+
 // Flying lines (arc dash) speed: 1 = current speed, smaller = slower, larger = faster
 const FLYING_LINES_SPEED = 0.3;
 
@@ -71,8 +171,8 @@ function useLandPolygons() {
     fetchLandPolygons();
   }, []);
   const polygonMaterial = React.useMemo(() => new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    opacity: 0.77,
+    color: theme.polygonCapColor,
+    opacity: theme.polygonCapOpacity,
     transparent: true
   }), []);
 
@@ -510,9 +610,9 @@ function useScene(globeElRef: Ref, enabled: boolean) {
 
     const radius = 300;
     const graticulesMaterial = new THREE.LineBasicMaterial({
-      color: 'lightgrey',
+      color: theme.graticulesColor,
       transparent: true,
-      opacity: 0.47
+      opacity: theme.graticulesOpacity
     });
     const graticulesGeometry = new GeoJsonGeometry(geoGraticule10(), radius, 2);
     const graticules = new THREE.LineSegments(graticulesGeometry, graticulesMaterial);
@@ -524,8 +624,8 @@ function useScene(globeElRef: Ref, enabled: boolean) {
       32
     );
     const innerSphereMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffffff /* it's neat to try different colors here */,
-      opacity: 0.47,
+      color: theme.innerSphereColor,
+      opacity: theme.innerSphereOpacity,
       transparent: true
     });
     const innerSphere = new THREE.Mesh(innerSphereGeometry, innerSphereMaterial);
@@ -599,15 +699,15 @@ function Globe({ albums }: { albums: Array<Album> }) {
     navigator.userAgent.toLowerCase().includes('mac')
   , []);
 
-  const polygonAltitudeCb = React.useCallback(() => 0, []);
-  const polygonSideColorCb = React.useCallback(() => 'rgba(255, 255, 255, 0)', []);
-  const polygonStrokeColorCb = React.useCallback(() => (isMac ? 'black' : 'darkslategray'), [isMac]);
+  const polygonAltitudeCb = React.useCallback(() => theme.polygonAltitude, []);
+  const polygonSideColorCb = React.useCallback(() => theme.polygonSideColor, []);
+  const polygonStrokeColorCb = React.useCallback(() => (isMac ? theme.polygonStrokeColor : theme.polygonStrokeColorAlt), [isMac]);
   const pointColorCb = React.useCallback((point: any) => {
     const p = point as Partial<Album> & { radius?: number };
     if (activeAlbumTitle && p.title === activeAlbumTitle) {
-      return 'rgba(0, 200, 0, 0.9)'; // green for selected
+      return theme.pointColorActive;
     }
-    return 'rgba(10, 31, 68, 0.8)'; // navy blue
+    return theme.pointColor;
   }, [activeAlbumTitle]);
   const pointRadiusCb = React.useCallback((point: any) => (point as { radius: number }).radius, []);
   const onPointHoverCb = React.useCallback((point: any) => {
@@ -692,7 +792,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
   return (
     <section
       ref={containerRef as any}
-      className={`globe-container relative ${isDesktopChrome ? 'chrome-desktop' : ''}
+      className={`globe-container relative ${isDesktopChrome ? 'chrome-desktop' : ''} ${DARK_MODE ? 'dark-mode' : ''}
         md:px-24
         lg:px-36
         xl:px-48
@@ -711,23 +811,24 @@ function Globe({ albums }: { albums: Array<Album> }) {
           ? stableOuterHeight // exact stable height to avoid overshoot
           : ((containerHeight && containerHeight > 0) ? containerHeight : (height && height > 0 ? height : undefined))}
         rendererConfig={{ 
-          antialias: true, // Better performance
+          antialias: true,
           powerPreference: "high-performance"
         }}
         onGlobeReady={handleGlobeReady}
         animateIn={false}
-  backgroundColor={'rgba(0,0,0,0)'}
+        backgroundColor={theme.backgroundColor}
         backgroundImageUrl={null}
-        atmosphereColor="rgba(255, 255, 255, 1)"
-  showGlobe={false}
-        showAtmosphere={false}
+        atmosphereColor={theme.atmosphereColor}
+        atmosphereAltitude={theme.atmosphereAltitude}
+        showGlobe={theme.showGlobe}
+        showAtmosphere={theme.showAtmosphere}
         showGraticules={false}
-  polygonsData={landPolygons}
-  polygonCapMaterial={polygonMaterial}
+        polygonsData={landPolygons}
+        polygonCapMaterial={polygonMaterial}
         polygonsTransitionDuration={0}
         polygonAltitude={polygonAltitudeCb}
         polygonSideColor={polygonSideColorCb}
-        polygonStrokeColor={polygonStrokeColorCb} // compensate for platform's polygon rendering differences
+        polygonStrokeColor={polygonStrokeColorCb}
         pointsData={points}
         pointColor={pointColorCb}
         pointAltitude={pointAltitude}
@@ -747,7 +848,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
         customThreeObjectUpdate={customThreeObjectUpdate}
       />
 
-      <section className={`content-container text-3xl ${isDesktopChrome ? 'fixed left-6 top-24 w-fit' : ''}`}>
+      <section className={`content-container text-2xl ${isDesktopChrome ? 'fixed left-6 top-24 w-fit' : ''}`}>
         <AlbumList 
           albums={albums}
           activeAlbumTitle={activeAlbumTitle}

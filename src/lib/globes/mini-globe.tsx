@@ -6,6 +6,17 @@ import createGlobe, { COBEOptions, Marker } from 'cobe';
 import { useCallback, useEffect, useRef } from 'react';
 import { useSpring } from '@react-spring/web';
 
+// ============================================
+// GLOBE CONFIGURATION - Adjust these values
+// ============================================
+const MAP_BRIGHTNESS = 8.2;
+const MAP_BASE_BRIGHTNESS = 1;
+const GLOW_COLOR: [number, number, number] = [44 / 255, 40 / 255, 59 / 255];
+const DIFFUSE = 1.25;
+const DARK = 0.1;
+const BASE_COLOR: [number, number, number] = [93 / 255, 22 / 255, 22 / 255];
+// ============================================
+
 const GLOBE_CONFIG: COBEOptions = {
   width: 1024,
   height: 1024,
@@ -13,14 +24,14 @@ const GLOBE_CONFIG: COBEOptions = {
   devicePixelRatio: 2,
   phi: 0,
   theta: 0.42,
-  dark: 0,
-  diffuse: 0.5,
+  dark: DARK,
+  diffuse: DIFFUSE,
   mapSamples: 30_000,
-  mapBrightness: 1,
-  mapBaseBrightness: 0,
-  baseColor: [0.995, 0.995, 0.995],
+  mapBrightness: MAP_BRIGHTNESS,
+  mapBaseBrightness: MAP_BASE_BRIGHTNESS,
+  baseColor: BASE_COLOR,
   markerColor: [251 / 255, 21 / 255, 21 / 255],
-  glowColor: [1, 1, 1],
+  glowColor: GLOW_COLOR,
   opacity: 0.55,
   markers: []
 };

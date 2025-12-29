@@ -219,12 +219,12 @@ body:has(.album-page) {
 
   body:has(.globe-container) .album-list-wrapper {
     pointer-events: auto;
-    max-height: min(100dvh, calc((100dvh - 8rem) * 1.2));
+    max-height: min(80dvh, calc(100dvh - 10rem));
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding-right: 0.35rem; /* give a little room for the scrollbar */
-    transform: translateY(6svh);
-    -webkit-transform: translateY(6svh);
+    transform: translateY(2svh);
+    -webkit-transform: translateY(2svh);
   }
 
   body:has(.globe-container) .album-list {
@@ -302,9 +302,9 @@ body:has(.album-page) {
 /* Album titles default to black; hover stays black; active becomes dark gray */
 .album-list li span {
   color: #000000 !important;
-  font-size: var(--album-list-font-size, inherit);
-  line-height: var(--album-list-line-height, 44px);
-  min-height: var(--album-list-min-height, 44px);
+  font-size: var(--album-list-font-size, 1.25rem);
+  line-height: var(--album-list-line-height, 1.75rem);
+  min-height: var(--album-list-min-height, 1.75rem);
   display: inline-block;
 }
 .album-list li span:hover {
@@ -312,6 +312,17 @@ body:has(.album-page) {
 }
 .album-list li span.album-title-active {
   color: #4b5563 !important; /* gray-600 */
+}
+
+/* Dark mode: white text for album list */
+.globe-container.dark-mode .album-list li span {
+  color: #ffffff !important;
+}
+.globe-container.dark-mode .album-list li span:hover {
+  color: #e5e7eb !important; /* gray-200 */
+}
+.globe-container.dark-mode .album-list li span.album-title-active {
+  color: #9ca3af !important; /* gray-400 */
 }
 
 /* On text selection, use dark gray text for these elements */
@@ -325,6 +336,25 @@ aside.absolute.z-50 *::selection {
 .globe-container footer,
 .globe-container footer * {
   color: #000000 !important;
+}
+
+/* Dark mode: white footer text */
+.globe-container.dark-mode footer,
+.globe-container.dark-mode footer * {
+  color: #ffffff !important;
+}
+
+/* Dark mode: album card styling */
+.globe-container.dark-mode aside.absolute.z-50 {
+  background-color: rgba(15, 15, 25, 0.95) !important;
+  border-color: #374151 !important; /* gray-700 */
+  color: #ffffff !important;
+}
+.globe-container.dark-mode aside.absolute.z-50 * {
+  color: #ffffff !important;
+}
+.globe-container.dark-mode aside.absolute.z-50 span:last-child:hover {
+  background-color: rgba(55, 65, 81, 0.8) !important; /* gray-700 */
 }
 
 .album-list-sliding {
@@ -341,7 +371,7 @@ aside.absolute.z-50 *::selection {
 
   /* Default mobile: push album list down; Safari override reduces it above */
   .album-list-wrapper {
-    transform: translateY(30svh);
+    transform: translateY(15svh);
     -webkit-transform: translateY(30svh);
   }
 
