@@ -61,7 +61,7 @@ export default function AlbumPageClient({
               </div>
 
               {!!album.topCities?.length && (
-                <div className="mt-2 flex flex-wrap gap-2">
+                <div className="mt-2 flex flex-wrap gap-2 -translate-x-[1%]">
                   {album.topCities.slice(0, 3).map((place) => (
                     <span
                       key={place}

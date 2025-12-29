@@ -46,6 +46,20 @@ type Arc = {
   color: Array<string>;
 };
 
+type LatLng = { lat: number; lng: number };
+
+function isMobileDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  return (
+    (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
+    window.innerWidth <= 768
+  );
+}
+
+function coordKey(lat: number, lng: number, precision = 4): string {
+  return `${lat.toFixed(precision)},${lng.toFixed(precision)}`;
+}
+
 function randomInRange(min: number, max: number): number {
   return Math.random() * (max - min) + min;
 }
@@ -76,17 +90,28 @@ function usePoints(albums: Array<Album>) {
   const [altitude, setAltitude] = useState(0.002);
   const points = React.useMemo(() => {
     const pts: Array<any> = [];
+
+    const seen = new Set<string>();
+
+    const pushUnique = (point: any) => {
+      const k = coordKey(point.lat, point.lng);
+      if (seen.has(k)) return;
+      seen.add(k);
+      pts.push(point);
+    };
+
     const locations = albums.filter(album => album.type === types.LOCATION);
     for (const album of locations) {
-      pts.push(
-        { ...album, radius: 0.19 },
-        ...album.locations.map(location => ({
+      // Prefer the bigger "album" dot when there is overlap.
+      pushUnique({ ...album, radius: 0.19 });
+      for (const location of album.locations) {
+        pushUnique({
           ...album,
           lat: location.lat,
           lng: location.lng,
           radius: 0.135
-        }))
-      );
+        });
+      }
     }
     return pts;
   }, [albums]);
@@ -120,11 +145,7 @@ function useAlbumInteraction(
     const id = setTimeout(() => {
       if (type === types.LOCATION) {
         // Slightly more zoomed out on mobile devices
-        const isMobile = typeof window !== 'undefined' && (
-          (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
-          window.innerWidth <= 768
-        );
-        const altitudeOnFocus = isMobile ? 1.2 : 1;
+        const altitudeOnFocus = isMobileDevice() ? 1.2 : 1;
         globeEl.current?.pointOfView(
           {
             lat,
@@ -146,11 +167,7 @@ function useAlbumInteraction(
     setPointAltitude(0.002);
     setActiveAlbumTitle(undefined);
 
-    const isMobile = typeof window !== 'undefined' && (
-      (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
-      window.innerWidth <= 768
-    );
-    const defaultAltitude = isMobile ? 2.8 : 2;
+    const defaultAltitude = isMobileDevice() ? 2.8 : 2;
     globeEl.current?.pointOfView(
       {
         lat: 30,
@@ -180,19 +197,100 @@ function useAlbumInteraction(
 }
 
 function generateArcs(albums: Array<Album>) {
-  const data = [];
-  for (let i = 0; i < albums.length; i++) {
-    for (let j = i + 1; j < albums.length; j++) {
-      data.push({
-        startLat: albums[i].lat,
-        startLng: albums[i].lng,
-        endLat: albums[j].lat,
-        endLng: albums[j].lng,
+  // Note: previously we connected *every* pair of albums which can create a very dense
+  // "spokes" effect where some visually-identical city dots spawn lots of overlapping lines.
+  // Here we:
+  //   1) Build a unique list of points (album + its sub-locations)
+  //   2) Build undirected arcs between points
+  //   3) Cap number of outgoing arcs per origin point
+
+  // Tuning: keep the globe readable when many points share an origin.
+  const MAX_OUTGOING_PER_ORIGIN = 12;
+
+  // Dedupe precision (degrees). 4 decimals is ~11m lat, good enough to merge identical dots.
+  const key = (p: LatLng) => coordKey(p.lat, p.lng);
+
+  const points: LatLng[] = [];
+  const seen = new Set<string>();
+
+  for (const album of albums) {
+    const candidates: LatLng[] = [
+      { lat: album.lat, lng: album.lng },
+      ...album.locations.map(l => ({ lat: l.lat, lng: l.lng }))
+    ];
+
+    for (const p of candidates) {
+      const k = key(p);
+      if (seen.has(k)) continue;
+      seen.add(k);
+      points.push(p);
+    }
+  }
+
+  // Build arcs in a stable order so the capped set doesn't change between renders.
+  const baseArcs: Arc[] = [];
+  for (let i = 0; i < points.length; i++) {
+    for (let j = i + 1; j < points.length; j++) {
+      baseArcs.push({
+        startLat: points[i].lat,
+        startLng: points[i].lng,
+        endLat: points[j].lat,
+        endLng: points[j].lng,
         color: ['red', 'purple']
       });
     }
   }
-  return data;
+
+  if (!baseArcs.length) return baseArcs;
+
+  // Bucket by origin and cap outgoing arcs. Also dedupe destinations per origin.
+  const outgoing = new Map<string, Arc[]>();
+  const outgoingDestSeen = new Map<string, Set<string>>();
+
+  const addOutgoing = (arc: Arc) => {
+    const origin: LatLng = { lat: arc.startLat, lng: arc.startLng };
+    const dest: LatLng = { lat: arc.endLat, lng: arc.endLng };
+    const originKey = key(origin);
+    const destKey = key(dest);
+
+    const list = outgoing.get(originKey) ?? [];
+    const destSet = outgoingDestSeen.get(originKey) ?? new Set<string>();
+
+    // Avoid multiple arcs from same origin to same destination (common with duplicate dots).
+    if (destSet.has(destKey)) return;
+    destSet.add(destKey);
+
+    // Cap outgoing count.
+    if (list.length >= MAX_OUTGOING_PER_ORIGIN) return;
+
+    list.push(arc);
+    outgoing.set(originKey, list);
+    outgoingDestSeen.set(originKey, destSet);
+  };
+
+  // Stable deterministic selection: sort by straight-line distance in degree space.
+  // Prefer nearer destinations to avoid huge starbursts.
+  const distance2 = (a: Arc) => {
+    const dLat = a.startLat - a.endLat;
+    const dLng = a.startLng - a.endLng;
+    return dLat * dLat + dLng * dLng;
+  };
+
+  const arcsSorted = [...baseArcs].sort((a, b) => distance2(a) - distance2(b));
+  for (const arc of arcsSorted) {
+    // Add both directions so caps apply symmetrically per point.
+    addOutgoing(arc);
+    addOutgoing({
+      startLat: arc.endLat,
+      startLng: arc.endLng,
+      endLat: arc.startLat,
+      endLng: arc.startLng,
+      color: arc.color
+    });
+  }
+
+  // Flatten; arcs are directed now (fine for react-globe.gl).
+  return Array.from(outgoing.values()).flat();
 }
 
 function useArcs(albums: Array<Album>) {
@@ -326,11 +424,7 @@ function useGlobeReady(globeEl: GlobeEl, mapMode: MapMode) {
     controls.autoRotateForced = false; // Initialize the forced flag
     controls.autoRotateUserPaused = false; // Initialize the user pause flag
 
-    const isMobile = typeof window !== 'undefined' && (
-      (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
-      window.innerWidth <= 768
-    );
-    const initialAltitude = isMobile ? 2.8 : 2;
+    const initialAltitude = isMobileDevice() ? 2.8 : 2;
     globeEl.current.pointOfView({ lat: 30, lng: -30, altitude: initialAltitude });
 
     // Start the dynamic rotation speed
@@ -393,10 +487,7 @@ function useGlobeReady(globeEl: GlobeEl, mapMode: MapMode) {
     if (!globeReady || !globeEl.current) return;
 
     const controls = globeEl.current.controls();
-    const isMobile = typeof window !== 'undefined' && (
-      (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) ||
-      window.innerWidth <= 768
-    );
+    const isMobile = isMobileDevice();
 
     // Clamp zoom range (OrbitControls distances are in world units)
     const globeRadius = globeEl.current.getGlobeRadius?.() ?? 100;
