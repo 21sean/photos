@@ -42,12 +42,7 @@ body:has(.globe-container) *:has(.globe-container) {
       padding-right: env(safe-area-inset-right) !important;
     }
     
-    /* Force mobile styles on iOS regardless of viewport width - ONLY for globe page */
-    body:has(.globe-container) .album-list-sliding {
-      transform: translateX(-31vw) !important;
-      -webkit-transform: translateX(-31vw) !important;
-    }
-    
+ 
     /* Move album card up and improve positioning - ONLY for globe page */
     body:has(.globe-container) aside.absolute.z-50 {
       left: 40vw !important;
@@ -70,14 +65,7 @@ body:has(.globe-container) *:has(.globe-container) {
       -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
     }
     
-    /* Reduce album list text spacing by 50% (override inline 44px line-height) */
-    body:has(.globe-container) .album-list li span {
-      line-height: calc(var(--album-list-line-height, 44px) * 0.66) !important;
-      min-height: calc(var(--album-list-min-height, 44px) * 0.66) !important;
-    }
 
-    
-    
     /* Revert AlbumCard "Click to enter" to normal size on iOS Safari */
     body:has(.globe-container) aside.absolute.z-50 > span:last-child {
       transform: none;
@@ -89,46 +77,7 @@ body:has(.globe-container) *:has(.globe-container) {
       transform: translateY(-15%);
       -webkit-transform: translateY(-15%);
     }
-    /* Safari/iOS: position album list closer to top */
-    body:has(.globe-container) .album-list-wrapper {
-      transform: translateY(6svh) !important;
-      -webkit-transform: translateY(6svh) !important;
-    }
   }
-}
-/* No page scroll and white background when underlay is present */
-html:has(.globe-underlay),
-body:has(.globe-underlay) {
-  height: 100%;
-  overflow: hidden;
-  background: #fff;
-}
-
-/* Underlay fills largest viewport under iOS bars */
-.globe-underlay {
-  position: fixed;
-  inset: 0;
-  height: 100lvh;
-  width: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* UI layer above underlay; can respect safe areas */
-.globe-ui {
-  position: relative;
-  z-index: 1;
-  min-height: 100dvh;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* Fallback: ensure white background and no scroll when using only .globe-container */
-html:has(.globe-container),
-body:has(.globe-container) {
-  height: 100dvh;
-  overflow: hidden;
-  background: #fff;
 }
 /* No page scroll and white background when underlay is present */
 html:has(.globe-underlay),
@@ -260,6 +209,27 @@ body:has(.album-page) {
 .album-list-wrapper,
 .album-list {
   pointer-events: none;
+}
+
+/* Touch devices (iOS Safari et al.): allow scrolling the album list and cap height so all destinations stay visible */
+@media (hover: none) and (pointer: coarse) {
+  body:has(.globe-container) .content-container {
+    pointer-events: auto;
+  }
+
+  body:has(.globe-container) .album-list-wrapper {
+    pointer-events: auto;
+    max-height: min(100dvh, calc((100dvh - 8rem) * 1.2));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 0.35rem; /* give a little room for the scrollbar */
+    transform: translateY(6svh);
+    -webkit-transform: translateY(6svh);
+  }
+
+  body:has(.globe-container) .album-list {
+    pointer-events: auto;
+  }
 }
 
 .album-list-item {
@@ -409,22 +379,9 @@ aside.absolute.z-50 *::selection {
   }
 }
 
-/* iOS-specific mobile detection using touch capability - PORTRAIT ONLY - GLOBE PAGE ONLY */
-@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
-  body:has(.globe-container) .album-list-sliding {
-    transform: translateX(-31vw) !important;
-    -webkit-transform: translateX(-31vw) !important;
-  }
-}
-
 /* Force mobile behavior for iOS Safari regardless of reported viewport width - PORTRAIT ONLY - GLOBE PAGE ONLY */
 @supports (-webkit-touch-callout: none) {
   @media (max-device-width: 1024px) and (orientation: portrait) {
-    body:has(.globe-container) .album-list-sliding {
-      transform: translateX(-31vw) !important;
-      -webkit-transform: translateX(-31vw) !important;
-    }
-    
     body:has(.globe-container) aside.absolute.z-50 {
       left: 36vw !important;
       top:5.6vh !important; /* 20% higher than 12vh */
@@ -742,22 +699,6 @@ aside.absolute.z-50.fade-out {
   }
 }
 
-/* P3 color gamut support */
-@media (color-gamut: p3) {
-  .hdr-image[data-color-space="P3"] {
-    /* Use P3 color space when available */
-    color-space: display-p3;
-  }
-}
-
-/* Rec2020 color gamut support */
-@media (color-gamut: rec2020) {
-  .hdr-image[data-color-space="Rec2020"] {
-    /* Use Rec2020 color space when available */
-    color-space: rec2020;
-  }
-}
-
 /* High luminance displays - iPhone 16 Pro (1000+ nits) */
 @media (min-luminance: 100) {
   .hdr-enhanced {
@@ -769,8 +710,6 @@ aside.absolute.z-50.fade-out {
   .hdr-image[data-gain-map] {
     /* Let the browser handle gain map processing */
     image-rendering: auto;
-    /* Preserve full dynamic range */
-    color-space: display-p3;
   }
 }
 
@@ -792,8 +731,6 @@ aside.absolute.z-50.fade-out {
 .hdr-image {
   /* Support for JPEG XL and AVIF with gain maps */
   image-orientation: from-image;
-  /* Prevent color space conversion during scaling */
-  color-interpolation: auto;
 }
 
 /* HDR metadata tooltips */
@@ -820,8 +757,6 @@ aside.absolute.z-50.fade-out {
   .hdr-image {
     /* Enable ISO 21496-1 gain map processing */
     image-orientation: from-image;
-    /* Optimize for iPhone 16 Pro's 1600 nit peak brightness */
-    color-space: display-p3;
   }
   
   /* iPhone 16 Pro HDR performance optimizations */
@@ -854,7 +789,6 @@ aside.absolute.z-50.fade-out {
   
   .hdr-image {
     /* Enhanced color handling for iPhone 16 Pro */
-    color-space: display-p3;
     /* Optimize for gain map processing */
     image-rendering: -webkit-optimize-contrast;
     /* Smooth HDR transitions on device rotation */
