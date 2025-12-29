@@ -15,11 +15,11 @@ import useHDRSetup from '@/hooks/use-hdr-setup';
 import AlbumList from '@/lib/globes/album-list';
 
 // Flying lines (arc dash) speed: 1 = current speed, smaller = slower, larger = faster
-const FLYING_LINES_SPEED = 0.2;
+const FLYING_LINES_SPEED = 0.3;
 
 // Zoom tuning: allow 30% more zoom-in and 50% less zoom-out
-const ZOOM_IN_EXTRA = 0.3;
-const ZOOM_OUT_REDUCTION = 0.5;
+const ZOOM_IN_EXTRA = 0.6;
+const ZOOM_OUT_REDUCTION = 0.4;
 
 type Ref = CustomGlobeMethods | undefined; // Reference to globe instance
 type GlobeEl = React.MutableRefObject<Ref>; // React `ref` passed to globe element

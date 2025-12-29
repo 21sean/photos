@@ -4,7 +4,7 @@ import { Album } from '@/types';
 import cn from 'classnames';
 import createGlobe, { COBEOptions, Marker } from 'cobe';
 import { useCallback, useEffect, useRef } from 'react';
-import { useSpring } from 'react-spring';
+import { useSpring } from '@react-spring/web';
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 1024,

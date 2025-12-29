@@ -48,7 +48,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 21.1619,
     lng: -86.8515,
-    topCities: ["Playa Del Carmen", "Chichén Itzá],
+    topCities: ["Playa Del Carmen", "Chichén Itzá"],
     locations: [
       { lat: 21.1619, lng: -86.8515, description: "Cancún" },
       { lat: 21.1619, lng: -86.8515, description: "Tulum" },
