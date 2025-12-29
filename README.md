@@ -4,12 +4,12 @@ An interactive HDR photography portfolio featuring travel photos from around the
 
 ## Features
 
-- **Interactive 3D Globe**: Explore photo albums by location on a rotating globe with smooth zoom and interaction controls
-- **HDR Support**: Full support for High Dynamic Range images with P3 color gamut for stunning visual quality
-- **Responsive Gallery**: Beautiful photo galleries with PhotoSwipe integration for full-screen viewing
-- **Location-Based Albums**: Photos organized by travel destinations with geographic coordinates
-- **Modern UI**: Clean, minimalist interface built with Tailwind CSS
-- **Static Export**: Support for static site generation for fast, CDN-friendly deployment
+- **Interactive 3D Globe**: Explore albums by location on a rotating globe with smooth interaction
+- **HDR-aware pipeline**: EXIF + HDR metadata extracted at build time; P3-aware image styling
+- **Responsive gallery**: Masonry layout with hover EXIF badge (focal/aperture/shutter/ISO)
+- **Location-based albums**: Photos organized by destination
+- **Modern UI**: Tailwind CSS + Next.js App Router
+- **Static export ready**: Ship as a static site or run SSR
 
 ## Technology Stack
 
@@ -17,7 +17,6 @@ An interactive HDR photography portfolio featuring travel photos from around the
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **3D Visualization**: [React Three Fiber](https://docs.pmnd.rs/react-three-fiber), [Three.js](https://threejs.org/), [Cobe](https://github.com/shuding/cobe)
-- **Gallery**: [PhotoSwipe](https://photoswipe.com/) for image viewing
 - **Layout**: [Masonic](https://github.com/jaredLunde/masonic) for masonry grid layouts
 
 ## Getting Started
@@ -45,7 +44,7 @@ npm install
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+4. Open http://localhost:3000 in your browser
 
 ## Development
 
@@ -86,16 +85,20 @@ src/
 
 ## Data Configuration
 
-Photo albums and locations are defined in `src/lib/mock-data.ts`. Each album includes:
+Photos are sourced from Cloudflare R2 and materialized into `src/lib/photos.json` (generated). Albums live in `src/lib/mock-data.ts` and reference photos via `src/lib/photos.ts` helpers.
 
-- **title**: Album name and location
-- **color**: Theme color for the album
-- **description**: Brief description of the location
-- **date**: Year(s) of visit
-- **lat/lng**: Geographic coordinates
-- **photos**: Array of photo objects with URLs, dimensions, and HDR metadata
+### Photo manifest generation (EXIF + HDR)
 
-Images are hosted on `cdn.myportfolio.com` and support HDR display with P3 color space.
+Run the sync script to rebuild `src/lib/photos.json` from the R2 bucket and extract EXIF:
+
+```sh
+npm run sync:photos      # or: node scripts/sync-photos.js
+# Optional flags:
+#   --dry-run   Preview JSON to stdout
+#   --quick     Skip EXIF extraction (faster)
+```
+
+The script pulls width/height, ISO, aperture, shutter, focal length, date, GPS (if present), and tries to capture HDR mastering luminance if available. HDR fields appear under `hdrMetadata` when present.
 
 ## Deployment
 
