@@ -12,8 +12,8 @@ type Props = {
   onHideCard: () => void;
 };
 
-const BASE_FONT_SIZE_PX = 30; // matches Tailwind text-3xl (1.875rem)
-const BASE_LINE_HEIGHT_PX = 44;
+const BASE_FONT_SIZE_PX = 24; // 20% smaller than original 30px
+const BASE_LINE_HEIGHT_PX = 35; // 20% smaller than original 44px
 const MIN_SCALE = 0.55;
 
 function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSelect, onHideCard }: Props) {
