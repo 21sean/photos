@@ -16,6 +16,9 @@ const AlbumSchema = z.object({
   date: z.string().nullable(),
   lat: z.number(),
   lng: z.number(),
+  // Optional short list of cities/areas (2–3) to show in the album title box
+  // e.g. Amalfi: Pompeii · Positano · Sorrento
+  topCities: z.array(z.string()).optional(),
   locations: z.array(
     z.object({
       description: z.string().optional(),
