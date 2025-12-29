@@ -21,11 +21,6 @@ const FLYING_LINES_SPEED = 0.2;
 const ZOOM_IN_EXTRA = 0.3;
 const ZOOM_OUT_REDUCTION = 0.5;
 
-type MapMode = 'default' | 'satellite';
-
-// Satellite tuning
-const SATELLITE_TILE_MAX_LEVEL = 16;
-
 type Ref = CustomGlobeMethods | undefined; // Reference to globe instance
 type GlobeEl = React.MutableRefObject<Ref>; // React `ref` passed to globe element
 
@@ -34,8 +29,6 @@ interface CustomGlobeMethods extends GlobeMethods {
     autoRotateForced: boolean;
     autoRotateUserPaused: boolean;
   };
-
-  globeTileEngineClearCache?: () => void;
 }
 
 type Arc = {
@@ -346,9 +339,8 @@ function useCustomLayer(globeEl: GlobeEl) {
   };
 }
 
-function useGlobeReady(globeEl: GlobeEl, mapMode: MapMode) {
+function useGlobeReady(globeEl: GlobeEl) {
   const [globeReady, setGlobeReady] = useState(false);
-  const originalLightsRef = useRef<any[] | null>(null);
 
   // faster autoRotate speed over the ocean
   const autoRotateSpeed = () => {
@@ -482,7 +474,7 @@ function useGlobeReady(globeEl: GlobeEl, mapMode: MapMode) {
     };
   }, [globeEl, globeReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Zoom constraints update (varies by map mode)
+  // Zoom constraints update
   useEffect(() => {
     if (!globeReady || !globeEl.current) return;
 
@@ -496,59 +488,13 @@ function useGlobeReady(globeEl: GlobeEl, mapMode: MapMode) {
     const baselineMinAltitude = isMobile ? 1.2 : 1;
     const baselineMaxAltitude = isMobile ? 6 : 4;
 
-    const minAltitude = mapMode === 'satellite'
-      ? (isMobile ? 0.28 : 0.12) // allow much closer zoom on satellite
-      : baselineMinAltitude * (1 - ZOOM_IN_EXTRA);
-
-    const maxAltitude = mapMode === 'satellite'
-      ? baselineMaxAltitude * 3.0 // allow further zoom-out on satellite
-      : baselineMaxAltitude * (1 - ZOOM_OUT_REDUCTION);
+    const minAltitude = baselineMinAltitude * (1 - ZOOM_IN_EXTRA);
+    const maxAltitude = baselineMaxAltitude * (1 - ZOOM_OUT_REDUCTION);
 
     controls.minDistance = distanceForAltitude(minAltitude);
     controls.maxDistance = distanceForAltitude(Math.max(maxAltitude, (isMobile ? 2.8 : 2)));
     controls.update?.();
-  }, [globeEl, globeReady, mapMode]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Satellite-only lighting (replace default lights while satellite is active)
-  useEffect(() => {
-    if (!globeReady || !globeEl.current) return;
-
-    const globe = globeEl.current;
-
-    // Capture original lights once.
-    if (!originalLightsRef.current) {
-      try {
-        originalLightsRef.current = globe.lights();
-      } catch {
-        originalLightsRef.current = null;
-      }
-    }
-
-    if (mapMode !== 'satellite') {
-      if (originalLightsRef.current) {
-        globe.lights(originalLightsRef.current);
-      }
-      return;
-    }
-
-    const ambient = new THREE.AmbientLight(0xffffff, 0.55);
-    const key = new THREE.DirectionalLight(0xffffff, 0.95);
-    key.position.set(1.2, 0.8, 1.4);
-
-    const fill = new THREE.DirectionalLight(0xffffff, 0.25);
-    fill.position.set(-1.0, -0.2, -1.2);
-
-    const rim = new THREE.DirectionalLight(0xbfd6ff, 0.35);
-    rim.position.set(-0.4, 1.1, 0.2);
-
-    globe.lights([ambient, key, fill, rim]);
-
-    return () => {
-      if (originalLightsRef.current) {
-        globe.lights(originalLightsRef.current);
-      }
-    };
-  }, [globeEl, globeReady, mapMode]);
+  }, [globeEl, globeReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     handleGlobeReady: () => setGlobeReady(true)
@@ -599,11 +545,6 @@ function useScene(globeElRef: Ref, enabled: boolean) {
 
 const DEFAULT_AUTOROTATE_SPEED = .32; // Reduced by 30% from 1.75
 
-// Satellite tiles (raster). Note: provider usage/terms apply.
-// z/y/x format is used by ArcGIS World Imagery.
-const SATELLITE_TILE_ENGINE_URL = (x: number, y: number, l: number) =>
-  `https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${l}/${y}/${x}`;
-
 function Globe({ albums }: { albums: Array<Album> }) {
   // Initialize HDR capabilities
   useHDRSetup();
@@ -613,9 +554,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
   const globeEl = useRef<Ref>();
   const globeElRef: Ref = globeEl.current;
 
-  const [mapMode, setMapMode] = useState<MapMode>('default');
-
-  const { handleGlobeReady } = useGlobeReady(globeEl, mapMode);
+  const { handleGlobeReady } = useGlobeReady(globeEl);
 
   const isDesktopChrome = React.useMemo(() => {
     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
@@ -628,8 +567,8 @@ function Globe({ albums }: { albums: Array<Album> }) {
 
   const isPinnedRef = useRef(false);
 
-  // scene config (the current "default" look relies on scene decorations)
-  useScene(globeElRef, mapMode === 'default');
+  // scene config (the current look relies on scene decorations)
+  useScene(globeElRef, true);
 
   // land shapes
   const { landPolygons, polygonMaterial } = useLandPolygons();
@@ -654,11 +593,6 @@ function Globe({ albums }: { albums: Array<Album> }) {
   // stars in the background
   const { customLayerData, customThreeObject, customThreeObjectUpdate } =
     useCustomLayer(globeEl);
-
-  // Ensure tile cache doesn't mix between modes/providers.
-  useEffect(() => {
-    globeEl.current?.globeTileEngineClearCache?.();
-  }, [mapMode]);
 
   const isMac = React.useMemo(() =>
     navigator.platform.toLowerCase().includes('mac') ||
@@ -782,16 +716,14 @@ function Globe({ albums }: { albums: Array<Album> }) {
         }}
         onGlobeReady={handleGlobeReady}
         animateIn={false}
-        backgroundColor={mapMode === 'satellite' ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0)'}
+  backgroundColor={'rgba(0,0,0,0)'}
         backgroundImageUrl={null}
         atmosphereColor="rgba(255, 255, 255, 1)"
-        showGlobe={mapMode === 'satellite'}
+  showGlobe={false}
         showAtmosphere={false}
         showGraticules={false}
-        globeTileEngineUrl={mapMode === 'satellite' ? SATELLITE_TILE_ENGINE_URL : undefined}
-        globeTileEngineMaxLevel={mapMode === 'satellite' ? SATELLITE_TILE_MAX_LEVEL : undefined}
-        polygonsData={mapMode === 'default' ? landPolygons : []}
-        polygonCapMaterial={mapMode === 'default' ? polygonMaterial : undefined}
+  polygonsData={landPolygons}
+  polygonCapMaterial={polygonMaterial}
         polygonsTransitionDuration={0}
         polygonAltitude={polygonAltitudeCb}
         polygonSideColor={polygonSideColorCb}
