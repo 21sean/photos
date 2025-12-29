@@ -41,6 +41,11 @@ export interface R2Photo {
   width: number;
   height: number;
   size?: number;
+
+  // Optional AI-enrichment fields (written into `src/lib/photos.json`)
+  aiDescriptionHtml?: string;
+  fun_fact?: string;
+
   isHDR?: boolean;
   colorSpace?: 'sRGB' | 'P3' | 'Rec2020';
   hdrMetadata?: {
@@ -68,6 +73,11 @@ export function toPhoto(album: string, photo: R2Photo) {
     width: photo.width,
     height: photo.height,
     size: photo.size || 0,
+
+    // AI enrichment (optional)
+    aiDescriptionHtml: photo.aiDescriptionHtml,
+    fun_fact: photo.fun_fact,
+
     isHDR: photo.isHDR,
     colorSpace: photo.colorSpace,
     hdrMetadata: photo.hdrMetadata,
