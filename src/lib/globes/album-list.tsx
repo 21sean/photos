@@ -139,7 +139,7 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
       <ul
         ref={listRef}
         className={`flex flex-col 
-          items-start
+          items-center md:items-start
           tracking-tight 
           album-list
           ${isSliding ? 'album-list-sliding' : ''}`}
@@ -179,5 +179,4 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
 
 const AlbumList = React.memo(AlbumListComponent);
 export default AlbumList;
-
 
