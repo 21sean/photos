@@ -56,6 +56,20 @@ export default function AlbumPageClient({
               <h1 className="font-normal text-2xl text-gray-600 min-w-32">
                 {album.title}
               </h1>
+
+              {!!album.topCities?.length && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {album.topCities.slice(0, 3).map((place) => (
+                    <span
+                      key={place}
+                      className="inline-flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-1 text-sm text-gray-700"
+                    >
+                      {place}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               <div className="text-gray-500 text-sm mt-1">
                 {album.date}
               </div>

@@ -28,6 +28,8 @@ interface AlbumMeta {
   date: string;
   lat: number;
   lng: number;
+  // Hardcoded “top 2–3” cities/areas to show as pills on the album page.
+  topCities?: string[];
   locations: Array<{
     lat: number;
     lng: number;
@@ -46,6 +48,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 21.1619,
     lng: -86.8515,
+    topCities: ["Cancún", "Tulum", "Playa del Carmen"],
     locations: [
       { lat: 21.1619, lng: -86.8515, description: "Cancún" },
       { lat: 21.1619, lng: -86.8515, description: "Tulum" },
@@ -62,6 +65,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 38.7223,
     lng: -9.1393,
+    topCities: ["Alfama", "Bairro Alto", "Sintra"],
     locations: [
       { lat: 38.7223, lng: -9.1393, description: "Alfama" },
       { lat: 38.7071, lng: -9.1364, description: "Bairro Alto" },
@@ -78,6 +82,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 41.1579,
     lng: -8.6291,
+    topCities: ["Ribeira", "Douro Valley", "Vila Nova de Gaia"],
     locations: [
       { lat: 41.1579, lng: -8.6291, description: "Ribeira" },
       { lat: 41.1579, lng: -8.6291, description: "Douro Valley" },
@@ -94,6 +99,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 50.0755,
     lng: 14.4378,
+    topCities: ["Old Town", "Prague Castle"],
     locations: [
       { lat: 50.0755, lng: 14.4378, description: "Old Town Square" },
       { lat: 50.0870, lng: 14.4207, description: "Prague Castle" }
@@ -109,6 +115,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 41.3851,
     lng: 2.1734,
+    topCities: ["Sagrada Familia", "Park Güell", "Gothic Quarter"],
     locations: [
       { lat: 41.4036, lng: 2.1744, description: "Sagrada Familia" },
       { lat: 41.4145, lng: 2.1527, description: "Park Güell" },
@@ -125,6 +132,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2024",
     lat: 45.4408,
     lng: 12.3155,
+    topCities: ["St. Mark's", "Rialto", "Murano"],
     locations: [
       { lat: 45.4340, lng: 12.3384, description: "St. Mark's Square" },
       { lat: 45.4381, lng: 12.3343, description: "Rialto Bridge" },
@@ -141,6 +149,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 47.3769,
     lng: 8.5417,
+    topCities: ["Zürich", "Lucerne", "Interlaken"],
     locations: [
       { lat: 47.3769, lng: 8.5417, description: "Zürich" },
       { lat: 47.3769, lng: 8.5417, description: "Lucerne" },
@@ -157,6 +166,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2024",
     lat: 45.4642,
     lng: 9.1900,
+    topCities: ["Duomo", "La Scala", "Brera"],
     locations: [
       { lat: 45.4642, lng: 9.1900, description: "Duomo" },
       { lat: 45.4668, lng: 9.1905, description: "La Scala" },
@@ -173,6 +183,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2024",
     lat: 43.7711,
     lng: 11.2486,
+    topCities: ["Florence", "Siena", "Pisa"],
     locations: [
       { lat: 43.7711, lng: 11.2486, description: "Florence" },
       { lat: 43.7711, lng: 11.2486, description: "Siena" },
@@ -189,6 +200,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2024",
     lat: 41.9028,
     lng: 12.4964,
+    topCities: ["Colosseum", "Vatican City", "Trevi"],
     locations: [
       { lat: 41.8902, lng: 12.4922, description: "Colosseum" },
       { lat: 41.9029, lng: 12.4534, description: "Vatican City" },
@@ -205,6 +217,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2021",
     lat: 51.5074,
     lng: -0.1278,
+    topCities: ["Westminster", "Tower", "Camden"],
     locations: [
       { lat: 51.5007, lng: -0.1246, description: "Westminster" },
       { lat: 51.5081, lng: -0.0759, description: "Tower of London" },
@@ -221,6 +234,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2018",
     lat: 32.7157,
     lng: -117.1611,
+    topCities: ["Downtown", "La Jolla", "Balboa Park"],
     locations: [
       { lat: 32.7157, lng: -117.1611, description: "Downtown" },
       { lat: 32.7648, lng: -117.2297, description: "La Jolla" },
@@ -237,6 +251,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2021",
     lat: 34.0522,
     lng: -118.2437,
+    topCities: ["Hollywood", "Santa Monica", "Malibu"],
     locations: [
       { lat: 34.0928, lng: -118.3287, description: "Hollywood" },
       { lat: 34.0195, lng: -118.4912, description: "Santa Monica" },
@@ -253,6 +268,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2019",
     lat: 35.7478,
     lng: -86.7945,
+    topCities: ["Nashville", "Memphis", "Knoxville"],
     locations: [
       { lat: 35.7478, lng: -86.7945, description: "Nashville" },
       { lat: 35.7478, lng: -86.7945, description: "Memphis" },
@@ -269,6 +285,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 35.8989,
     lng: 14.5146,
+    topCities: [],
     locations: [],
     order: 15,
   },
@@ -281,6 +298,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 37.9838,
     lng: 23.7275,
+    topCities: ["Acropolis", "Plaka", "Areopagus"],
     locations: [
       { lat: 37.9715, lng: 23.7257, description: "Acropolis" },
       { lat: 37.9755, lng: 23.7349, description: "Plaka" },
@@ -297,6 +315,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 40.4168,
     lng: -3.7038,
+    topCities: ["Retiro", "Prado", "Gran Vía"],
     locations: [
       { lat: 40.4153, lng: -3.6844, description: "Retiro" },
       { lat: 40.4138, lng: -3.6921, description: "Prado" },
@@ -313,6 +332,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 48.1351,
     lng: 11.5820,
+    topCities: [],
     locations: [],
     order: 18,
   },
@@ -325,6 +345,8 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 40.6281,
     lng: 14.4850,
+    // Example from your request:
+    topCities: ["Pompeii", "Positano", "Sorrento"],
     locations: [
       { lat: 40.6281, lng: 14.4850, description: "Positano" },
       { lat: 40.6498, lng: 14.6116, description: "Amalfi" },
@@ -351,6 +373,7 @@ export const mockAlbums = albumsMeta.map(album => ({
   date: album.date,
   lat: album.lat,
   lng: album.lng,
+  topCities: album.topCities?.filter(Boolean).slice(0, 3) ?? [],
   locations: album.locations,
   order: album.order,
   // Photos come from the separate photos.ts file, converted to full URLs
