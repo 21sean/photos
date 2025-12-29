@@ -108,13 +108,6 @@ The script pulls width/height, ISO, aperture, shutter, focal length, date, GPS (
 - `gps`: *only if missing* in the entry, a best-guess `{ lat, lng, altitude? }`
 
 It’s intentionally single-photo-only so you can validate output quality before running anything in bulk.
-
-#### Setup
-
-The script reads your key from `OPENAI_API_KEY` (it is **not** stored in the repo).
-
-> If you ever pasted a key into chat or committed it anywhere, rotate the key in OpenAI immediately.
-
 #### Run (dry-run)
 
 ```sh
