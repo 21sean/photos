@@ -4,7 +4,7 @@ An interactive HDR photography portfolio featuring travel photos from around the
 
 ## Features
 
-- **Interactive 3D Globe**: Explore albums by location on a rotating globe with smooth interaction
+- **Interactive 3D Globe**: Explore albums by location 
 - **HDR-aware pipeline**: EXIF + HDR metadata extracted at build time; P3-aware image styling
 - **Responsive gallery**: Masonry layout with hover EXIF badge (focal/aperture/shutter/ISO)
 - **Location-based albums**: Photos organized by destination
