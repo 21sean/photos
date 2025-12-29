@@ -48,7 +48,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 21.1619,
     lng: -86.8515,
-    topCities: ["Cancún", "Tulum", "Playa del Carmen"],
+    topCities: ["Playa Del Carmen", "Chichén Itzá],
     locations: [
       { lat: 21.1619, lng: -86.8515, description: "Cancún" },
       { lat: 21.1619, lng: -86.8515, description: "Tulum" },
@@ -149,7 +149,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2025",
     lat: 47.3769,
     lng: 8.5417,
-    topCities: ["Zürich", "Lucerne", "Interlaken"],
+    topCities: ["Zürich", "Interlaken"],
     locations: [
       { lat: 47.3769, lng: 8.5417, description: "Zürich" },
       { lat: 47.3769, lng: 8.5417, description: "Lucerne" },
@@ -183,7 +183,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2024",
     lat: 43.7711,
     lng: 11.2486,
-    topCities: ["Florence", "Siena", "Pisa"],
+    topCities: ["Florence", "Siena", "San Gimignano"],
     locations: [
       { lat: 43.7711, lng: 11.2486, description: "Florence" },
       { lat: 43.7711, lng: 11.2486, description: "Siena" },
@@ -234,7 +234,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2018",
     lat: 32.7157,
     lng: -117.1611,
-    topCities: ["Downtown", "La Jolla", "Balboa Park"],
+    topCities: ["Del Mar", "La Jolla", "Balboa Park"],
     locations: [
       { lat: 32.7157, lng: -117.1611, description: "Downtown" },
       { lat: 32.7648, lng: -117.2297, description: "La Jolla" },
@@ -268,7 +268,7 @@ const albumsMeta: AlbumMeta[] = [
     date: "2019",
     lat: 35.7478,
     lng: -86.7945,
-    topCities: ["Nashville", "Memphis", "Knoxville"],
+    topCities: ["Nashville"],
     locations: [
       { lat: 35.7478, lng: -86.7945, description: "Nashville" },
       { lat: 35.7478, lng: -86.7945, description: "Memphis" },
