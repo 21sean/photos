@@ -295,7 +295,14 @@ body:has(.album-page) {
   -webkit-transition: -webkit-transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
                       text-align 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-align: left;
-  align-items: flex-start;
+  align-items: center;
+}
+
+/* Desktop and large-screen default keeps left alignment */
+@media (min-width: 769px) {
+  .album-list {
+    align-items: flex-start;
+  }
 }
 
 /* Desktop Chrome-only: nudge the album card lower */
