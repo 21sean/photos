@@ -288,7 +288,20 @@
       "aperture": 7.1,
       "shutterSpeed": "1/500",
       "focalLength": "52.0 mm",
-      "dateTaken": "2025-10-29T00:22:03-08:00"
+      "dateTaken": "2025-10-29T00:22:03-08:00",
+      "aiDescriptionHtml": "The ornate limestone facade of a historic building in Malta features detailed carvings and a royal coat of arms above tall, arched windows reflecting a clear sky on a sunny day, with a person cleaning one of the windows.",
+      "fun_fact": "Malta's limestone is known as Globigerina limestone, a soft, workable stone that has been used in construction for thousands of years.",
+      "gps": {
+        "lat": 35.8997,
+        "lng": 14.5146
+      },
+      "aiLocationGuess": {
+        "name": "Valletta, Malta",
+        "confidence": 0.8,
+        "reasoningShort": "The architectural style, limestone material, and context from the album name 'malta' suggest this is a building in Valletta, Malta.",
+        "generatedAt": "2025-12-29T06:29:02.256Z",
+        "model": "gpt-4.1-mini"
+      }
     },
     {
       "filename": "IMG_6254.jpeg",
@@ -302,7 +315,20 @@
       "aperture": 3.5,
       "shutterSpeed": "1/800",
       "focalLength": "70.0 mm",
-      "dateTaken": "2025-10-30T00:06:54-08:00"
+      "dateTaken": "2025-10-30T00:06:54-08:00",
+      "aiDescriptionHtml": "Malta's capital Valletta was built by the Knights of St. John in the 16th century and is a UNESCO World Heritage site.",
+      "fun_fact": "",
+      "gps": {
+        "lat": 35.8997,
+        "lng": 14.5146
+      },
+      "aiLocationGuess": {
+        "name": "Valletta",
+        "confidence": 0.85,
+        "reasoningShort": "The architectural style and warm yellow stone walls along with the statue's religious theme are characteristic of Valletta, Malta.",
+        "generatedAt": "2025-12-29T06:29:09.610Z",
+        "model": "gpt-4.1-mini"
+      }
     },
     {
       "filename": "IMG_6256.jpeg",
@@ -316,7 +342,20 @@
       "aperture": 4.5,
       "shutterSpeed": "1/125",
       "focalLength": "41.0 mm",
-      "dateTaken": "2025-10-30T00:01:29-08:00"
+      "dateTaken": "2025-10-30T00:01:29-08:00",
+      "aiDescriptionHtml": "Traditional Maltese balconies are known as 'gallarija' and were initially introduced by the Spanish in the 17th century.",
+      "fun_fact": "",
+      "gps": {
+        "lat": 35.8978,
+        "lng": 14.5146
+      },
+      "aiLocationGuess": {
+        "name": "Valletta, Malta",
+        "confidence": 0.8,
+        "reasoningShort": "The distinctive Maltese wooden enclosed balcony and limestone building facade strongly suggest a location in Valletta, Malta.",
+        "generatedAt": "2025-12-29T06:29:16.640Z",
+        "model": "gpt-4.1-mini"
+      }
     }
   ],
   "mexico": [

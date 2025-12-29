@@ -100,6 +100,39 @@ npm run sync:photos      # or: node scripts/sync-photos.js
 
 The script pulls width/height, ISO, aperture, shutter, focal length, date, GPS (if present), and tries to capture HDR mastering luminance if available. HDR fields appear under `hdrMetadata` when present.
 
+### AI enrichment (single photo)
+
+`script` updates **one** entry in `src/lib/photos.json` with:
+
+- `aiDescriptionHtml`: Wikipedia-style 1–2 sentence overview using HTML links (`<a href="...">…</a>`)
+- `gps`: *only if missing* in the entry, a best-guess `{ lat, lng, altitude? }`
+
+It’s intentionally single-photo-only so you can validate output quality before running anything in bulk.
+
+#### Setup
+
+The script reads your key from `OPENAI_API_KEY` (it is **not** stored in the repo).
+
+> If you ever pasted a key into chat or committed it anywhere, rotate the key in OpenAI immediately.
+
+#### Run (dry-run)
+
+```sh
+OPENAI_API_KEY="..." node scripts/enrich-photo-ai.js --album mexico --filename IMG_4684.jpeg --dry-run
+```
+
+#### Run (write)
+
+```sh
+OPENAI_API_KEY="..." node scripts/enrich-photo-ai.js --album mexico --filename IMG_4684.jpeg
+```
+
+Optional (recommended): pass an image URL so the model can actually see the photo:
+
+```sh
+OPENAI_API_KEY="..." node scripts/enrich-photo-ai.js --album mexico --filename IMG_4684.jpeg --image-url "jpeg" --dry-run
+```
+
 ## Deployment
 
 ### Static Export
