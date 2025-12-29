@@ -6,6 +6,7 @@ import { Photo } from '@/types';
 import { useEffect, useState } from 'react';
 import { isLikelyHDR, getHDRImageStyles } from '../hdr-utils';
 import { isIOSSafari } from '../browser-utils';
+import { FlipIcon } from '../icons';
 
 // Format EXIF metadata for display
 function formatExifData(item: Photo): string | null {
@@ -31,6 +32,7 @@ function formatExifData(item: Photo): string | null {
 
 function MobileImageWithLoading({ item }: { item: Photo }) {
   const [isLoading, setIsLoading] = useState(true);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   // Detect iOS Safari for specific optimizations
   const isIOS = isIOSSafari();
@@ -56,7 +58,8 @@ function MobileImageWithLoading({ item }: { item: Photo }) {
             // iOS-specific optimizations to prevent image unloading
             contain: isIOS ? 'layout style' : undefined,
             WebkitTransform: isIOS ? 'translateZ(0)' : undefined,
-            transform: isIOS ? 'translateZ(0)' : undefined,
+            transform: isFlipped ? 'scaleX(-1)' : (isIOS ? 'translateZ(0)' : undefined),
+            transition: 'transform 0.3s ease',
           }}
           onLoad={() => {
             // Ensure loading animation is visible for at least 500ms
@@ -74,6 +77,22 @@ function MobileImageWithLoading({ item }: { item: Photo }) {
           </div>
         )}
       </a>
+      
+      {/* Flip button */}
+      {!isLoading && (
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsFlipped(!isFlipped);
+          }}
+          className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 backdrop-blur-sm z-10"
+          aria-label="Flip image horizontally"
+        >
+          <FlipIcon />
+        </button>
+      )}
+      
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900 z-50 min-h-[200px]">
           <div className="loader"></div>
@@ -161,6 +180,66 @@ function PigGrid({ items }: { items: Array<Photo> }) {
       anchor.appendChild(img);
       wrapper.appendChild(anchor);
       
+      // Create flip button
+      const flipButton = document.createElement('button');
+      flipButton.setAttribute('aria-label', 'Flip image horizontally');
+      flipButton.className = 'pig-flip-button';
+      flipButton.style.cssText = `
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        border-radius: 9999px;
+        padding: 8px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease, background 0.2s ease;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 10;
+      `;
+      
+      // Create flip icon SVG
+      flipButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; display: block;">
+          <path d="M21 8v13H3" />
+          <path d="M3 3h.01" />
+          <path d="M7 3h.01" />
+          <path d="M11 3h.01" />
+          <path d="M15 3h.01" />
+          <path d="M19 3h.01" />
+          <rect x="3" y="7" width="18" height="14" rx="2" />
+          <line x1="12" y1="7" x2="12" y2="21" />
+        </svg>
+      `;
+      
+      // Add flip state tracking
+      let isFlipped = false;
+      img.style.transition = 'transform 0.3s ease';
+      
+      // Add flip button click handler
+      flipButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        isFlipped = !isFlipped;
+        img.style.transform = isFlipped ? 'scaleX(-1)' : (isIOS ? 'translateZ(0)' : 'scaleX(1)');
+        if (isIOS && isFlipped) {
+          img.style.transform = 'translateZ(0) scaleX(-1)';
+        }
+      });
+      
+      // Add hover effect to button
+      flipButton.addEventListener('mouseenter', () => {
+        flipButton.style.background = 'rgba(0, 0, 0, 0.7)';
+      });
+      flipButton.addEventListener('mouseleave', () => {
+        flipButton.style.background = 'rgba(0, 0, 0, 0.5)';
+      });
+      
+      wrapper.appendChild(flipButton);
+      
       // Create EXIF overlay if metadata exists
       const exifData = formatExifData(item);
       if (exifData) {
@@ -196,12 +275,22 @@ function PigGrid({ items }: { items: Array<Photo> }) {
         overlay.appendChild(badge);
         wrapper.appendChild(overlay);
         
-        // Add hover events
+        // Add hover events for overlay and flip button
         wrapper.addEventListener('mouseenter', () => {
           overlay.style.opacity = '1';
+          flipButton.style.opacity = '1';
         });
         wrapper.addEventListener('mouseleave', () => {
           overlay.style.opacity = '0';
+          flipButton.style.opacity = '0';
+        });
+      } else {
+        // If no EXIF, still show flip button on hover
+        wrapper.addEventListener('mouseenter', () => {
+          flipButton.style.opacity = '1';
+        });
+        wrapper.addEventListener('mouseleave', () => {
+          flipButton.style.opacity = '0';
         });
       }
       
