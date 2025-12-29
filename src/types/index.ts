@@ -8,6 +8,10 @@ export type Photo = {
   width: number;
   height: number;
   title?: string;
+
+  aiDescriptionHtml?: string;
+  fun_fact?: string;
+
   isHDR?: boolean;
   colorSpace?: 'sRGB' | 'P3' | 'Rec2020';
   hdrMetadata?: {

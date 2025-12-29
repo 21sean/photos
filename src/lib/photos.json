@@ -600,7 +600,21 @@
       "aperture": 8,
       "shutterSpeed": "1/60",
       "focalLength": "49.0 mm",
-      "dateTaken": "2024-09-26T08:38:18-08:00"
+      "dateTaken": "2024-09-26T08:38:18-08:00",
+      "aiDescriptionHtml": "A small motorboat cruises along a narrow Venetian canal flanked by historic buildings with weathered façades and gothic windows under a cloudy sky.",
+      "gps": {
+        "lat": 45.4408,
+        "lng": 12.3155,
+        "altitude": 2
+      },
+      "aiLocationGuess": {
+        "name": "Venice",
+        "confidence": 0.9,
+        "reasoningShort": "The canal, architecture, striped mooring poles, and boat style are characteristic of Venice.",
+        "generatedAt": "2025-12-29T06:09:04.631Z",
+        "model": "gpt-4.1-mini"
+      },
+      "fun_fact": "Venice is built on more than 100 small islands connected by over 400 bridges."
     },
     {
       "filename": "venice-1.jpeg",
