@@ -1,6 +1,90 @@
 {
   "amalfi": [
     {
+      "filename": "IMG_5780.JPG",
+      "title": "IMG 5780",
+      "width": 9504,
+      "height": 6336,
+      "size": 10814948,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 2.8,
+      "shutterSpeed": "1/3200",
+      "focalLength": "66.0 mm",
+      "dateTaken": "2025-10-28T03:27:24-08:00"
+    },
+    {
+      "filename": "IMG_5782.JPG",
+      "title": "IMG 5782",
+      "width": 6336,
+      "height": 9504,
+      "size": 7470655,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 5,
+      "shutterSpeed": "1/320",
+      "focalLength": "70.0 mm",
+      "dateTaken": "2025-10-28T03:25:49-08:00"
+    },
+    {
+      "filename": "IMG_5783.JPG",
+      "title": "IMG 5783",
+      "width": 5959,
+      "height": 6336,
+      "size": 11092384,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 7.1,
+      "shutterSpeed": "1/500",
+      "focalLength": "24.0 mm",
+      "dateTaken": "2025-10-28T03:19:02-08:00"
+    },
+    {
+      "filename": "IMG_5796.JPG",
+      "title": "IMG 5796",
+      "width": 6336,
+      "height": 9504,
+      "size": 13651261,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 2.8,
+      "shutterSpeed": "1/400",
+      "focalLength": "54.0 mm",
+      "dateTaken": "2025-10-28T02:59:03-08:00"
+    },
+    {
+      "filename": "IMG_5797.JPG",
+      "title": "IMG 5797",
+      "width": 5216,
+      "height": 5733,
+      "size": 12549066,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 4,
+      "shutterSpeed": "1/800",
+      "focalLength": "63.0 mm",
+      "dateTaken": "2025-10-28T03:09:57-08:00"
+    },
+    {
+      "filename": "IMG_6342.jpeg",
+      "title": "IMG 6342",
+      "width": 9504,
+      "height": 6336,
+      "size": 36405972,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 5,
+      "shutterSpeed": "1/640",
+      "focalLength": "48.0 mm",
+      "dateTaken": "2025-10-27T05:01:58-08:00"
+    },
+    {
       "filename": "IMG_6404.jpeg",
       "title": "IMG 6404",
       "width": 6336,
@@ -13,6 +97,64 @@
       "shutterSpeed": "1/400",
       "focalLength": "46.0 mm",
       "dateTaken": "2025-10-27T00:56:29-08:00"
+    }
+  ],
+  "athens": [
+    {
+      "filename": "IMG_6218.JPG",
+      "title": "IMG 6218",
+      "width": 6336,
+      "height": 9504,
+      "size": 12067493,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 5,
+      "shutterSpeed": "1/400",
+      "focalLength": "70.0 mm",
+      "dateTaken": "2025-11-01T03:02:44-08:00"
+    },
+    {
+      "filename": "IMG_6219.JPG",
+      "title": "IMG 6219",
+      "width": 2157,
+      "height": 3124,
+      "size": 1779141,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 7.1,
+      "shutterSpeed": "1/250",
+      "focalLength": "49.0 mm",
+      "dateTaken": "2025-11-01T01:34:53-08:00"
+    },
+    {
+      "filename": "IMG_6251.JPG",
+      "title": "IMG 6251",
+      "width": 6336,
+      "height": 9504,
+      "size": 12051419,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 3.5,
+      "shutterSpeed": "1/1600",
+      "focalLength": "70.0 mm",
+      "dateTaken": "2025-11-02T01:51:12-08:00"
+    },
+    {
+      "filename": "IMG_6253.JPG",
+      "title": "IMG 6253",
+      "width": 6614,
+      "height": 6336,
+      "size": 11808576,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 200,
+      "aperture": 2.8,
+      "shutterSpeed": "1/125",
+      "focalLength": "42.0 mm",
+      "dateTaken": "2025-10-31T03:37:36-08:00"
     }
   ],
   "germany": [
@@ -357,7 +499,51 @@
       "dateTaken": "2025-05-04T08:40:31-08:00"
     }
   ],
+  "san-diego": [
+    {
+      "filename": "IMG_5162.JPG",
+      "title": "IMG 5162",
+      "width": 4353,
+      "height": 5967,
+      "size": 10357171,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 2.8,
+      "shutterSpeed": "1/400",
+      "focalLength": "70.0 mm",
+      "dateTaken": "2025-10-06T17:47:57-08:00"
+    },
+    {
+      "filename": "IMG_5164.JPG",
+      "title": "IMG 5164",
+      "width": 9504,
+      "height": 6336,
+      "size": 15377238,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 5.6,
+      "shutterSpeed": "1/640",
+      "focalLength": "24.0 mm",
+      "dateTaken": "2025-10-06T17:43:26-08:00"
+    }
+  ],
   "switzerland": [
+    {
+      "filename": "IMG_4990.jpeg",
+      "title": "IMG 4990",
+      "width": 9504,
+      "height": 6336,
+      "size": 28572450,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 100,
+      "aperture": 5,
+      "shutterSpeed": "1/800",
+      "focalLength": "50.0 mm",
+      "dateTaken": "2025-01-13T04:41:00-08:00"
+    },
     {
       "filename": "switzerland-1.jpeg",
       "title": "Switzerland 1",
@@ -402,6 +588,20 @@
     }
   ],
   "venice": [
+    {
+      "filename": "_DSC2180.avif",
+      "title": " DSC2180",
+      "width": 6336,
+      "height": 9504,
+      "size": 23201381,
+      "camera": "ILCE-7RM4A",
+      "lens": "FE 24-70mm F2.8 GM II",
+      "iso": 400,
+      "aperture": 8,
+      "shutterSpeed": "1/60",
+      "focalLength": "49.0 mm",
+      "dateTaken": "2024-09-26T08:38:18-08:00"
+    },
     {
       "filename": "venice-1.jpeg",
       "title": "Venice 1",
