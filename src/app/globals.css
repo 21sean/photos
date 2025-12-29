@@ -972,3 +972,17 @@ body:has(.globe-container) .typewriter.nocaret::after {
     transform: translateZ(0);
   }
 }
+
+/* Dark Globe Mode Styles */
+/* When dark mode is active (satellite view), make album list text white */
+body:has(.globe-container.dark-globe) .album-list li span {
+  color: #ffffff !important;
+}
+
+body:has(.globe-container.dark-globe) .album-list li span:hover {
+  color: rgba(255, 255, 255, 0.8) !important; /* lighter white on hover */
+}
+
+body:has(.globe-container.dark-globe) .album-list li span.album-title-active {
+  color: rgba(255, 255, 255, 0.7) !important; /* even lighter for active */
+}

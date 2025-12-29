@@ -8,6 +8,7 @@ import { GeoJsonGeometry } from 'three-geojson-geometry';
 import { geoGraticule10 } from 'd3-geo';
 import * as topojson from 'topojson-client';
 import { useWindowSize } from '@/hooks/use-window-size';
+import { useShake } from '@/hooks/use-shake';
 import { Album, AlbumTitle, types } from '@/types/albums';
 import { titleToSlug } from '@/lib/api/slug';
 import { AlbumCard } from './card';
@@ -513,16 +514,72 @@ const DEFAULT_AUTOROTATE_SPEED = .32; // Reduced by 30% from 1.75
 const SATELLITE_TILE_ENGINE_URL = (x: number, y: number, l: number) =>
   `https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${l}/${y}/${x}`;
 
+/**
+ * Detects if the current browser is iOS Safari
+ */
+function isIOSSafari(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return false;
+  }
+  
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+  const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+  
+  return isIOS && isSafari;
+}
+
+/**
+ * Hook for persisting dark mode state in localStorage
+ */
+function useDarkMode() {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const stored = localStorage.getItem('globe-dark-mode');
+      return stored === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleDarkMode = React.useCallback(() => {
+    setIsDarkMode(prev => {
+      const newValue = !prev;
+      try {
+        localStorage.setItem('globe-dark-mode', String(newValue));
+      } catch {
+        // Ignore localStorage errors
+      }
+      return newValue;
+    });
+  }, []);
+
+  return { isDarkMode, toggleDarkMode };
+}
+
 function Globe({ albums }: { albums: Array<Album> }) {
   // Initialize HDR capabilities
   useHDRSetup();
   
+  // Dark mode state management
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
+  
+  // Shake detection for iOS Safari only
+  const isIOSSafariBrowser = React.useMemo(() => isIOSSafari(), []);
+  
+  useShake({
+    threshold: 15,
+    cooldown: 1000,
+    onShake: isIOSSafariBrowser ? toggleDarkMode : undefined
+  });
   
   // object config
   const globeEl = useRef<Ref>();
   const globeElRef: Ref = globeEl.current;
 
-  const [mapMode, setMapMode] = useState<MapMode>('default');
+  // Map isDarkMode to mapMode: dark mode = satellite, light mode = default
+  const mapMode: MapMode = isDarkMode ? 'satellite' : 'default';
 
   const { handleGlobeReady } = useGlobeReady(globeEl, mapMode);
 
@@ -667,7 +724,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
   return (
     <section
       ref={containerRef as any}
-      className={`globe-container relative ${isDesktopChrome ? 'chrome-desktop' : ''}
+      className={`globe-container relative ${isDesktopChrome ? 'chrome-desktop' : ''} ${isDarkMode ? 'dark-globe' : ''}
         md:px-24
         lg:px-36
         xl:px-48
