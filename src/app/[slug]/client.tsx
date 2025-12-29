@@ -84,11 +84,11 @@ export default function AlbumPageClient({
           </button>
           
           {/* Mobile destinations list inside the white box */}
-          <div className={`sm:hidden overflow-hidden will-change-transform transition-all duration-500 ease-in-out ${
+          <div className={`sm:hidden will-change-transform transition-all duration-500 ease-in-out ${
             isCollapsed 
-              ? 'max-h-0 opacity-0 transform translate3d(0, -10px, 0)' 
-              : 'max-h-96 opacity-100 transform translate3d(0, 0, 0)'
-          }`}>
+              ? 'max-h-0 opacity-0 overflow-hidden transform translate3d(0, -10px, 0)' 
+              : 'max-h-[84vh] opacity-100 overflow-y-auto overscroll-contain transform translate3d(0, 0, 0)'
+          }`} style={{ WebkitOverflowScrolling: isCollapsed ? undefined : 'touch' }}>
             <ul className="mt-2 pt-4 pb-6 border-t border-gray-300 space-y-2">
               {sortedAlbums.map((albumItem, index) => {
                 const isActive = album.title.toLowerCase() === albumItem.title.toLowerCase();
