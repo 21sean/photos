@@ -344,7 +344,8 @@ body:has(.album-page) {
     -webkit-overflow-scrolling: touch;
     padding-right: 0.35rem; /* give a little room for the scrollbar */
     transform: translateY(2svh);
-    -webkit-transform: translateY(2svh);
+    -webkit-transform: translateX(-3svh) translateY(4svh);
+
   }
 
   body:has(.globe-container) .album-list {
@@ -385,7 +386,7 @@ body:has(.album-page) {
   -webkit-transition: -webkit-transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
                       text-align 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-align: left;
-  align-items: center;
+  align-items: left;
 }
 
 /* Desktop and large-screen default keeps left alignment */
@@ -474,12 +475,12 @@ aside.absolute.z-50 *::selection {
   color: #ffffff !important;
 }
 .globe-container.dark-mode aside.absolute.z-50 span:last-child:hover {
-  background-color: rgba(55, 65, 81, 0.8) !important; /* gray-700 */
+  background-color: rgba(78, 88, 105, 0.8) !important; /* gray-700 */
 }
 
 .album-list-sliding {
   transform: translateX(-25vw);
-  -webkit-transform: translateX(-25vw); /* iOS Safari fallback */
+  -webkit-transform: translateX(-55vw); /* iOS Safari fallback */
   text-align: left;
 }
 
@@ -504,10 +505,10 @@ aside.absolute.z-50 *::selection {
   aside.absolute.z-50 {
     left: 40vw !important;
     top: 12vh !important; /* Moved up from 16vh */
-    bottom: 70.6vh !important; /* Slightly taller to prevent bottom clipping */
+    bottom: 60.6vh !important; /* Slightly taller to prevent bottom clipping */
     max-width: 50vw !important;
     width: 50vw !important;
-    font-size: 0.8em !important; /* 20% smaller text */
+    font-size: 0.7em !important; /* 20% smaller text */
     padding: 0.75rem !important; /* Reduce padding for mobile */
     /* Preserve the fade-in animation on mobile */
     animation: fadeInCard 0.65s ease-out forwards !important;
@@ -520,13 +521,7 @@ aside.absolute.z-50 *::selection {
     margin-bottom: 0.5rem !important; /* Add margin between marquee and click text */
   }
   
-  /* Ensure click to enter text is visible and not clipped */
-  aside.absolute.z-50 > span:last-child {
-    margin-top: auto !important; /* Push to bottom of card */
-    padding-top: 0.5rem !important;
-    flex-shrink: 0 !important; /* Prevent shrinking */
-    font-size: 0.75rem !important; /* Smaller "Click to enter" text on mobile */
-  }
+ 
 }
 
 /* Force mobile behavior for iOS Safari regardless of reported viewport width - PORTRAIT ONLY - GLOBE PAGE ONLY */
@@ -538,7 +533,7 @@ aside.absolute.z-50 *::selection {
       bottom: auto !important; /* allow free top positioning */
       max-width: 50vw !important;
       width: 50vw !important;
-      font-size: 0.8em !important;
+      font-size: 0.5em !important;
       padding: 0.75rem !important;
       /* Preserve the fade-in animation on mobile */
       animation: fadeInCard 1.65s ease-out forwards !important;
@@ -566,7 +561,7 @@ aside.absolute.z-50 *::selection {
 }
 
 /* Hide album navigation on mobile when in album page */
-@media (max-width: 640px) {
+@media (max-width: 620px) {
   .album-nav-mobile-hidden {
     display: none !important;
   }
@@ -625,7 +620,7 @@ aside.absolute.z-50 *::selection {
   
   /* Fix viewport height issues on mobile browsers */
   html, body {
-    min-height: 100vh;
+    min-height: 100svh;
     min-height: -webkit-fill-available;
   }
   
@@ -647,7 +642,7 @@ aside.absolute.z-50 {
   background-color: rgba(0, 0, 0, 0.3) !important;
   backdrop-filter: blur(2px);
   /* Fade-in animation - 30% slower */
-  animation: fadeInCard 0.65s ease-out forwards;
+  animation: fadeInCard 0.95s ease-out forwards;
   /* Start with opacity 0 for proper fade-in */
   opacity: 0;
 }
@@ -794,8 +789,8 @@ aside.absolute.z-50.fade-out {
   gap: 1rem;
   min-width: 100%;
   line-height: 1.2; /* reduce vertical clipping */
-  animation: marquee 13s linear infinite; /* 30% slower */
-  -webkit-animation: marquee 13s linear infinite;
+  animation: marquee 19s linear infinite; /* 30% slower */
+  -webkit-animation: marquee 19s linear infinite;
 }
 
 
@@ -874,7 +869,7 @@ aside.absolute.z-50.fade-out {
 /* Loading states for HDR images */
 .hdr-image[data-loading="true"] {
   opacity: 0.7;
-  filter: blur(1px);
+  filter: blur(0px);
 }
 
 /* Modern HDR format support */
@@ -987,13 +982,13 @@ body:has(.globe-container) aside.absolute.z-50 {
  
   /* Prevent zoom on input focus for iOS */
   input, textarea, select {
-    font-size: 16px;
+    font-size: 12px;
   }
   
   /* Safari/WebKit only: album list font-size 30% smaller for tighter layout */
   body:has(.globe-container) .album-list li span {
-    font-size: 0.665rem !important;
-    line-height: 1.2 !important;
+    font-size: 85% !important;
+    line-height: .3 !important;
   }
   /* Safari/WebKit only: move marquee a bit higher */
   body:has(.globe-container) aside.absolute.z-50 .marquee {
@@ -1002,7 +997,7 @@ body:has(.globe-container) aside.absolute.z-50 {
   }
   
   /* Fix for iOS Safari viewport units - GLOBE PAGE ONLY */
-  @media screen and (max-height: 900px) {
+  @media screen and (max-height: 1000px) {
     body:has(.globe-container) .globe-container {
       height: 100vh !important;
     }
