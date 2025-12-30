@@ -82,7 +82,7 @@ const THEME = {
     polygonCapColor: 0x1a1a20, // Dark navy blue
     polygonCapOpacity: 0.93,
     polygonSideColor: 'rgba(21, 21, 21, 0.95)',
-    polygonStrokeColor: '#ffffffce', // Gray-600
+    polygonStrokeColor: '#f0000000', // Gray-600
     polygonStrokeColorAlt: '#ffffffff', // Gray-700
     polygonAltitude: -0.0018,
     
