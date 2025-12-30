@@ -600,6 +600,18 @@ function useGlobeReady(globeEl: GlobeEl) {
     controls.update?.();
   }, [globeEl, globeReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Supersampling for better antialiasing - biggest visual improvement for polygon edges
+  useEffect(() => {
+    if (!globeReady || !globeEl.current) return;
+
+    const renderer = globeEl.current.renderer();
+    if (!renderer) return;
+
+    // Set pixel ratio (capped at 2 for performance)
+    // This renders at higher resolution and downsamples, cleaning up polygon borders
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  }, [globeEl, globeReady]);
+
   return {
     handleGlobeReady: () => setGlobeReady(true)
   };
