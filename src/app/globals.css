@@ -128,23 +128,57 @@ body:has(.globe-container) *:has(.globe-container) {
       overflow: hidden !important;
       max-height: none !important;
     }
-    
+
+    /* Center-to-left animation */
+    /* Initial state: centered in middle of screen */
+    /* On sliding (click): animate to left side */
     body:has(.globe-container) .album-list {
-      text-align: left !important;
       gap: 0 !important;
+      align-items: center !important;
+      -webkit-transform: translateX(0%) !important;
+      transform: translateX(0%) !important;
+      -webkit-transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
-    
+
     body:has(.globe-container) .album-list li {
-      text-align: left !important;
+      -webkit-transform: translateX(0) !important;
+      transform: translateX(0) !important;
+      -webkit-transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    /* On click - animate to left side */
+    /* IMPORTANT: Do NOT change align-items here - it's not animatable and causes teleporting */
+    /* Keep align-items: center from base state, only animate transform */
+    /* Animate the list container AND each li to create left-align effect */
+    body:has(.globe-container) .album-list.album-list-sliding {
+      -webkit-transform: translateX(-37vw) !important;
+      transform: translateX(-37vw) !important;
+    }
+
+    body:has(.globe-container) .album-list.album-list-sliding li {
+      -webkit-transform: translateX(50%) !important;
+      transform: translateX(50%) !important;
+    }
+
+    body:has(.globe-container) .album-list li {
       line-height: 1.15 !important; /* tighter spacing */
       margin-bottom: -0.1rem !important; /* reduce vertical gap */
     }
-    
-    body:has(.globe-container) .album-list li span {
+
+    body:has(.globe-container) .album-list.album-list-sliding li {
       text-align: left !important;
+    }
+
+    body:has(.globe-container) .album-list li span {
       font-size: 0.665rem !important; /* 30% smaller than 0.95rem */
       line-height: 1.2 !important; /* tighter spacing */
       min-height: auto !important;
+    }
+
+    body:has(.globe-container) .album-list.album-list-sliding li span {
+      text-align: left !important;
     }
 
     /* Position copyright BOTTOM right - ONLY for globe page */
@@ -169,7 +203,7 @@ body:has(.globe-container) *:has(.globe-container) {
       width: 50vw !important;
       font-size: 0.8em !important;
       padding: 0.4rem !important;
-      animation: fadeInCard 0.65s ease-out forwards !important;
+      animation: fadeInCard 0.95s ease-out forwards !important;
     }
     
     /* Improve tap target for click to enter text - ONLY for globe page */
@@ -344,7 +378,7 @@ body:has(.album-page) {
     -webkit-overflow-scrolling: touch;
     padding-right: 0.35rem; /* give a little room for the scrollbar */
     transform: translateY(2svh);
-    -webkit-transform: translateX(-3svh) translateY(4svh);
+    -webkit-transform: translateY(4svh);
 
   }
 
@@ -381,12 +415,9 @@ body:has(.album-page) {
 /* Album list slide animation */
 .album-list {
   will-change: transform;
-  transition: transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-              text-align 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  -webkit-transition: -webkit-transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-                      text-align 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  -webkit-transition: all 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-align: left;
-  align-items: left;
 }
 
 /* Desktop and large-screen default keeps left alignment */
@@ -478,10 +509,12 @@ aside.absolute.z-50 *::selection {
   background-color: rgba(78, 88, 105, 0.8) !important; /* gray-700 */
 }
 
-.album-list-sliding {
-  transform: translateX(-25vw);
-  -webkit-transform: translateX(-55vw); /* iOS Safari fallback */
-  text-align: left;
+/* Non-iOS Safari sliding animation */
+@supports not (-webkit-touch-callout: none) {
+  .album-list-sliding {
+    transform: translateX(-25vw);
+    text-align: left;
+  }
 }
 
 /* Mobile-specific adjustments - Updated for iOS Safari */
@@ -496,9 +529,11 @@ aside.absolute.z-50 *::selection {
     -webkit-transform: translateY(30svh);
   }
 
-  .album-list-sliding {
-    transform: translateX(-31vw);
-    -webkit-transform: translateX(-31vw); /* iOS Safari fallback */
+  /* Non-iOS Safari mobile sliding - iOS uses keyframe animation instead */
+  @supports not (-webkit-touch-callout: none) {
+    .album-list-sliding {
+      transform: translateX(-31vw);
+    }
   }
   
   /* Album card positioning for mobile - aligned with bottom of album list */
@@ -527,6 +562,13 @@ aside.absolute.z-50 *::selection {
 /* Force mobile behavior for iOS Safari regardless of reported viewport width - PORTRAIT ONLY - GLOBE PAGE ONLY */
 @supports (-webkit-touch-callout: none) {
   @media (max-device-width: 1024px) and (orientation: portrait) {
+    /* Override album list sliding for iOS Safari - animate to left side */
+    /* Do NOT change align-items - it's not animatable and causes teleporting */
+    body:has(.globe-container) .album-list.album-list-sliding {
+      -webkit-transform: translateX(-47vw) !important;
+      transform: translateX(-47vw) !important;
+    }
+
     body:has(.globe-container) aside.absolute.z-50 {
       left: 36vw !important;
       top:5.6vh !important; /* 20% higher than 12vh */
