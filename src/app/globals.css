@@ -136,13 +136,14 @@ body:has(.globe-container) *:has(.globe-container) {
     
     body:has(.globe-container) .album-list li {
       text-align: left !important;
-      line-height: 1.5 !important;
+      line-height: 1.15 !important; /* tighter spacing */
+      margin-bottom: -0.1rem !important; /* reduce vertical gap */
     }
     
     body:has(.globe-container) .album-list li span {
       text-align: left !important;
-      font-size: 0.95rem !important;
-      line-height: 1.5 !important;
+      font-size: 0.665rem !important; /* 30% smaller than 0.95rem */
+      line-height: 1.2 !important; /* tighter spacing */
       min-height: auto !important;
     }
 
@@ -989,9 +990,10 @@ body:has(.globe-container) aside.absolute.z-50 {
     font-size: 16px;
   }
   
-  /* Safari/WebKit only: album list font-size 5% smaller */
+  /* Safari/WebKit only: album list font-size 30% smaller for tighter layout */
   body:has(.globe-container) .album-list li span {
-    font-size: 95% !important;
+    font-size: 0.665rem !important;
+    line-height: 1.2 !important;
   }
   /* Safari/WebKit only: move marquee a bit higher */
   body:has(.globe-container) aside.absolute.z-50 .marquee {
