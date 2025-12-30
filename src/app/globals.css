@@ -1050,6 +1050,23 @@ body:has(.globe-container) aside.absolute.z-50 {
 body:has(.globe-container) .typewriter {
   --caret: currentColor;
 }
+
+/* iOS Safari: Stabilize typewriter item during slide animation */
+@supports (-webkit-touch-callout: none) {
+  @media (max-device-width: 1024px) and (orientation: portrait) {
+    /* The li containing typewriter should NOT transform - it stays in place */
+    body:has(.globe-container) .album-list.album-list-sliding li:has(.typewriter) {
+      -webkit-transform: translateX(0) !important;
+      transform: translateX(0) !important;
+    }
+    body:has(.globe-container) .album-list.album-list-sliding .typewriter {
+      /* Prevent width changes from causing layout shifts */
+      display: inline-block !important;
+      min-width: 100% !important;
+      text-align: left !important;
+    }
+  }
+}
 body:has(.globe-container) .typewriter::after {
   content: none;
   border-right: 0;
