@@ -10,12 +10,15 @@
 html, body {
   height: 100%;
   margin: 0;
-  background: #1a1a1f; /* Dark gray that blends with globe atmosphere */
+  padding: 0;
+  background: transparent; /* Allow wave background to show through */
 }
 
 body {
   min-height: 100dvh;
   min-height: -webkit-fill-available;
+  margin: 0;
+  padding: 0;
 }
 
 /* App wrapper with safe-area support - only on body level */
@@ -45,7 +48,7 @@ body.app {
   padding: 0 !important;
   margin: 0;
   overflow: hidden;
-  background: #1a1a1f;
+  background: transparent;
   position: relative;
 }
 
@@ -228,7 +231,7 @@ html:has(.globe-underlay),
 body:has(.globe-underlay) {
   height: 100%;
   overflow: hidden;
-  background: #1a1a1f !important;
+  background: transparent !important;
 }
 
 /* Underlay fills largest viewport under iOS bars */
@@ -250,18 +253,18 @@ body:has(.globe-underlay) {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Fallback: dark gray background that blends with globe atmosphere */
+/* Fallback: transparent background for wave effect */
 html:has(.globe-container),
 body:has(.globe-container) {
   height: 100%;
   overflow: hidden;
-  background: #1a1a1f !important;
+  background: transparent !important;
 }
 
 /* Globe page override - extend into safe areas */
 body.app:has(.globe-container) {
   padding: 0;
-  background: #1a1a1f !important;
+  background: transparent !important;
   height: 100lvh;
   min-height: 100lvh;
 }
@@ -327,14 +330,28 @@ body {
   pointer-events: auto;
   touch-action: none;
   animation: fadeIn 5s ease-in-out;
-  background-color: #1a1a1f; /* Blends with globe atmosphere */
+  background-color: transparent; /* Allow wave background to show */
 }
 .album-page {
-  background-color: #000 !important;
+  background-color: transparent !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 html:has(.album-page),
 body:has(.album-page) {
-  background: #000 !important;
+  background: transparent !important;
+}
+
+/* Album page navigation container - 100% black background */
+.album-page > div:first-child {
+  background-color: #000 !important;
+  min-height: 100vh;
+}
+
+/* Album page photos container - 80% black background */
+.album-page > .MuiStack-root {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  min-height: 100vh;
 }
 
 /* Ensure the WebGL canvas fills the container exactly */
