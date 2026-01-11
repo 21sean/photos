@@ -48,7 +48,7 @@ body.app {
   padding: 0 !important;
   margin: 0;
   overflow: hidden;
-  background: transparent;
+  background: #1a1a1f;
   position: relative;
 }
 
@@ -231,7 +231,7 @@ html:has(.globe-underlay),
 body:has(.globe-underlay) {
   height: 100%;
   overflow: hidden;
-  background: transparent !important;
+  background: #1a1a1f !important;
 }
 
 /* Underlay fills largest viewport under iOS bars */
@@ -258,13 +258,18 @@ html:has(.globe-container),
 body:has(.globe-container) {
   height: 100%;
   overflow: hidden;
-  background: transparent !important;
+  background: #1a1a1f !important;
+}
+
+/* Hide wave background on globe/home page */
+body:has(.globe-container) > div:first-child.-z-10 {
+  display: none !important;
 }
 
 /* Globe page override - extend into safe areas */
 body.app:has(.globe-container) {
   padding: 0;
-  background: transparent !important;
+  background: #1a1a1f !important;
   height: 100lvh;
   min-height: 100lvh;
 }
@@ -330,7 +335,7 @@ body {
   pointer-events: auto;
   touch-action: none;
   animation: fadeIn 5s ease-in-out;
-  background-color: transparent; /* Allow wave background to show */
+  background-color: #1a1a1f; /* Blends with globe atmosphere */
 }
 .album-page {
   background-color: transparent !important;
