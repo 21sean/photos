@@ -9,6 +9,7 @@ export type Photo = {
   height: number;
   title?: string;
 
+  aiDescription?: string;
   aiDescriptionHtml?: string;
   fun_fact?: string;
 

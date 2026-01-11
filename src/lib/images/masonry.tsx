@@ -8,6 +8,7 @@ import { Photo } from '@/types';
 import HDRImage from './hdr-image';
 import { isIOSSafari } from '../browser-utils';
 import { FlipIcon } from '../icons';
+import ScrollReveal from '../fx/scroll-reveal';
 
 // Format EXIF data for overlay
 function formatExifData(photo: Photo): string | null {
@@ -27,6 +28,26 @@ function formatExifData(photo: Photo): string | null {
   }
 
   return parts.length ? parts.join('  •  ') : null;
+}
+
+// Extract plain text from HTML string
+function stripHtml(html: string): string {
+  // Simple HTML tag removal for SSR compatibility
+  return html
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .trim();
+}
+
+// Get description text from photo
+function getDescriptionText(photo: Photo): string | null {
+  if (photo.aiDescription) return photo.aiDescription;
+  if (photo.aiDescriptionHtml) return stripHtml(photo.aiDescriptionHtml);
+  return null;
 }
 
 const MasonryItem = ({
@@ -75,39 +96,77 @@ const MasonryItem = ({
         )}
       </div>
 
-      {!!photo.aiDescriptionHtml && (
-        <div className="mt-2 px-1">
-          <div className="relative">
-            <div className="pointer-events-none absolute -inset-x-1 -inset-y-1 rounded-md bg-gradient-to-b from-black/0 via-black/0 to-black/5" />
-            <div
-              className="relative text-[12px] leading-snug text-zinc-200"
-              dangerouslySetInnerHTML={{ __html: photo.aiDescriptionHtml }}
-            />
+      {(() => {
+        const descriptionText = getDescriptionText(photo);
+        return descriptionText ? (
+          <div className="mt-4 px-1">
+            <div className="relative">
+              <ScrollReveal
+                size="md"
+                variant="muted"
+                enableBlur={true}
+                baseOpacity={0.15}
+                blurStrength={3}
+                staggerDelay={0.03}
+                threshold={0.3}
+                duration={0.6}
+                textClassName="font-light"
+              >
+                {descriptionText}
+              </ScrollReveal>
+            </div>
           </div>
-        </div>
-      )}
+        ) : null;
+      })()}
     </div>
   );
 };
 
-function currentColumnWidth(maxColumnCount: number) {
-  // For single-column layouts, fit nicely on screen without being too wide
+function calculateColumnWidthForViewport(maxColumnCount: number, firstPhoto?: Photo) {
+  // For single-column layouts, calculate optimal width based on first photo
   if (maxColumnCount === 1) {
     const vw = typeof window !== 'undefined' ? window.innerWidth : 800;
-    return Math.min(vw - 32, 760);
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+    
+    if (vw <= 640) {
+      return vw - 16; // Nearly full width on mobile
+    }
+    
+    // Account for left nav and padding
+    const navWidth = vw > 640 ? 160 : 0;
+    const horizontalPadding = 48;
+    const availableWidth = vw - navWidth - horizontalPadding;
+    
+    if (firstPhoto) {
+      const aspectRatio = firstPhoto.width / firstPhoto.height;
+      const isLandscape = aspectRatio > 1;
+      
+      if (isLandscape) {
+        // Landscape: use more horizontal space
+        const maxHeightFromVh = vh * 0.65;
+        const widthForMaxHeight = maxHeightFromVh * aspectRatio;
+        return Math.min(availableWidth, widthForMaxHeight, 1000);
+      } else {
+        // Portrait: fit in viewport height
+        const headerHeight = 110;
+        const bottomMargin = 80;
+        const availableHeight = vh - headerHeight - bottomMargin;
+        const widthForHeight = availableHeight * aspectRatio;
+        return Math.min(availableWidth, widthForHeight, 700);
+      }
+    }
+    
+    // Fallback
+    return Math.min(availableWidth, 600);
   }
 
   if (window.innerWidth > 2000) {
-    // 3xl
     return 425;
   } else if (window.innerWidth > 1536) {
-    // 2xl
     return 400;
   } else if (window.innerWidth > 1280) {
-    // xl
     return 350;
   } else {
-    // mobile-ish
     return 250;
   }
 }
@@ -126,18 +185,25 @@ function useAverageHeight(items: Array<Photo>, columnWidth: number) {
 export const Masonry = ({
   items = [],
   maxColumnCount = 4,
+  style,
   ...props
 }: {
   items: Array<Photo>;
   className?: string;
   maxColumnCount?: number;
+  style?: React.CSSProperties;
 }) => {
   useLightbox(items);
 
-  // Memoize column width to prevent recalculation on every render during scrolling.
-  // Window resize events will trigger component re-mount/re-render through parent,
-  // so this will update when needed without causing performance issues during scrolling.
-  const columnWidth = React.useMemo(() => currentColumnWidth(maxColumnCount), [maxColumnCount]);
+  // Use style width if provided (from parent), otherwise calculate based on viewport
+  const firstPhoto = items[0];
+  const columnWidth = React.useMemo(() => {
+    // If style.width is provided, use it (minus a small padding)
+    if (style?.width && typeof style.width === 'number') {
+      return style.width;
+    }
+    return calculateColumnWidthForViewport(maxColumnCount, firstPhoto);
+  }, [maxColumnCount, firstPhoto, style?.width]);
   const averageHeight = useAverageHeight(items, columnWidth);
 
   // Detect iOS Safari for specific optimizations
@@ -151,7 +217,7 @@ export const Masonry = ({
   }
 
   const containerClass = maxColumnCount === 1
-    ? 'w-full max-w-[820px] mx-auto px-3 sm:px-4 fade-in-delayed'
+    ? 'w-full px-2 sm:px-0 fade-in-delayed'
     : `h-auto w-full
       md:w-[500px] lg:w-[720px] xl:w-[1000px] 2xl:w-[1200px] 3xl:w-[1250px]
       px-2 sm:p-0
@@ -164,6 +230,7 @@ export const Masonry = ({
       style={{
         // iOS-specific optimizations to prevent content reclamation
         contain: isIOS ? 'layout style' : undefined,
+        ...style,
       }}
     >
       <MasonicMasonry
