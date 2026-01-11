@@ -3,14 +3,46 @@
 import dynamic from 'next/dynamic';
 import Nav from '@/lib/nav';
 import { GlobeIcon } from '@/lib/icons';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Album, AlbumList } from '@/types/albums';
 import { Photo } from '@/types';
 import { titleToSlug } from '@/lib/api/slug';
+import Stack from '@mui/material/Stack';
 
-const Masonry = dynamic(() => import('@/lib/images/masonry'), {
+const SingleColumnGallery = dynamic(() => import('@/lib/images/single-column-gallery'), {
   ssr: false
 });
+
+// Calculate width that fits first image in viewport
+function calculateContentWidth(firstPhoto?: Photo): number {
+  if (typeof window === 'undefined') return 500;
+  
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  
+  // Account for left nav and padding
+  const navWidth = vw > 640 ? 160 : 0;
+  const horizontalPadding = 32;
+  const availableWidth = vw - navWidth - horizontalPadding;
+  
+  // Header + margin at top, some margin at bottom
+  const headerHeight = 110;
+  const bottomMargin = 80;
+  const availableHeight = vh - headerHeight - bottomMargin;
+  
+  if (vw <= 640) {
+    return vw - 16;
+  }
+  
+  if (firstPhoto) {
+    const aspectRatio = firstPhoto.width / firstPhoto.height;
+    const widthForHeight = availableHeight * aspectRatio;
+    return Math.min(availableWidth, widthForHeight, 700);
+  }
+  
+  // Fallback for portrait
+  return Math.min(availableWidth, availableHeight * 0.67, 600);
+}
 
 interface AlbumPageClientProps {
   albums: AlbumList;
@@ -38,18 +70,19 @@ export default function AlbumPageClient({
     setTimeout(() => setIsAnimating(false), 500);
   }, [isCollapsed, isAnimating]);
 
+  // Calculate content width based on first photo to ensure alignment
+  const contentWidth = useMemo(() => calculateContentWidth(photos[0]), [photos]);
+
   return (
-    <section className="album-page flex flex-col sm:flex-row sm:my-4" id="top">
-      <div className="pt-3 sm:pt-6 sm:pl-10 sm:pr-20 lg:pl-20 lg:pr-40 space-y-1">
+    <section className="album-page flex flex-col sm:flex-row sm:mt-4 sm:mb-0 w-full" id="top">
+      <div className="pt-3 sm:pt-6 sm:pl-10 sm:pr-8 lg:pl-16 lg:pr-12 space-y-1 flex-shrink-0">
         <Nav albums={albums} title={album.title} isCollapsed={isCollapsed} />
       </div>
 
-      <div className="flex flex-col items-start">
+      <Stack spacing={2} sx={{ flex: 1, minWidth: 0, alignItems: 'center' }}>
         <div
-          className={`rounded-lg bg-gray-100
-            mx-auto sm:m-0
-            px-5 py-4
-            min-w-[calc(100%-16px)] max-w-[600px] sm:min-w-[400px]`}
+          className="rounded-lg bg-gray-100 px-5 py-4"
+          style={{ width: contentWidth, maxWidth: '100%' }}
         >
           <div className="flex justify-between items-start mb-4">
             <div>
@@ -134,8 +167,11 @@ export default function AlbumPageClient({
           </div>
         </div>
 
-  <Masonry className="mt-4 mb-6" items={photos} maxColumnCount={1} />
-      </div>
+        <SingleColumnGallery 
+          className="pb-8" 
+          photos={photos}
+        />
+      </Stack>
     </section>
   );
 }
