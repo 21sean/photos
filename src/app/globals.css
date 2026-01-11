@@ -359,6 +359,28 @@ body:has(.album-page) {
   min-height: 100vh;
 }
 
+/* iOS Safari ONLY - fix black space above album container */
+@supports (-webkit-touch-callout: none) {
+  .album-page {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  .album-page > .MuiStack-root {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  /* Remove min-height that causes extra space on iOS */
+  .album-page > div:first-child {
+    min-height: auto !important;
+  }
+  
+  .album-page > .MuiStack-root {
+    min-height: auto !important;
+  }
+}
+
 /* Ensure the WebGL canvas fills the container exactly */
 .globe-container > canvas,
 .globe-container canvas {
