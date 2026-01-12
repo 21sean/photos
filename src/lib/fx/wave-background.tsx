@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const vertexShaderSource = `
   attribute vec4 a_position;
@@ -57,6 +57,13 @@ function WaveBackground({
   className = "",
 }: WaveBackgroundProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Fade in after mount
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -157,7 +164,9 @@ function WaveBackground({
         width: '100vw',
         height: '100vh',
         margin: 0,
-        padding: 0
+        padding: 0,
+        opacity: isVisible ? 1 : 0,
+        transition: 'opacity 1.5s ease-in-out'
       }}
     >
       <canvas

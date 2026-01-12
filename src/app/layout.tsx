@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import WaveBackground from '@/lib/fx/wave-background';
 
 const sansSerifFont = localFont({
   src: '../fonts/TASAOrbiterVF.woff2',
@@ -50,7 +49,6 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
       </head>
       <body>
-        <WaveBackground backdropBlurAmount="md" />
         {children}
       </body>
     </html>
