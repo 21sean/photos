@@ -261,10 +261,6 @@ body:has(.globe-container) {
   background: #1a1a1f !important;
 }
 
-/* Hide wave background on globe/home page */
-body:has(.globe-container) > div:first-child.-z-10 {
-  display: none !important;
-}
 
 /* Globe page override - extend into safe areas */
 body.app:has(.globe-container) {
@@ -347,16 +343,44 @@ body:has(.album-page) {
   background: transparent !important;
 }
 
-/* Album page navigation container - 100% black background */
-.album-page > div:first-child {
-  background-color: #000 !important;
-  min-height: 100vh;
+/* Album page full-width black background layer */
+.album-page {
+  position: relative;
 }
 
-/* Album page photos container - 80% black background */
-.album-page > .MuiStack-root {
-  background-color: rgba(0, 0, 0, 0.8) !important;
+.album-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Album page navigation container - transparent, sticky on scroll */
+.album-page > div:nth-child(2) {
+  background-color: transparent !important;
   min-height: 100vh;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  z-index: 10;
+}
+
+/* Nav collapse animation on scroll */
+.album-page > div:nth-child(2).nav-scroll-collapsed {
+  min-height: auto !important;
+}
+
+/* Album page photos container */
+.album-page > .MuiStack-root {
+  background-color: transparent !important;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 /* iOS Safari ONLY - fix black space above album container */
@@ -372,7 +396,7 @@ body:has(.album-page) {
   }
   
   /* Remove min-height that causes extra space on iOS */
-  .album-page > div:first-child {
+  .album-page > div:nth-child(2) {
     min-height: auto !important;
   }
   
