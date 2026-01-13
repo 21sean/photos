@@ -3,6 +3,69 @@
 @tailwind utilities;
 
 /* ========================================
+   Custom Scrollbar Styling for Album Pages
+   ======================================== */
+
+/* Album page scrollbar - thin and modern */
+.album-page,
+.album-page * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 114, 128, 0.6) rgba(31, 41, 55, 0.4);
+}
+
+/* WebKit browsers (Chrome, Safari, Edge) */
+.album-page::-webkit-scrollbar,
+.album-page *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.album-page::-webkit-scrollbar-track,
+.album-page *::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.4);
+  border-radius: 4px;
+}
+
+.album-page::-webkit-scrollbar-thumb,
+.album-page *::-webkit-scrollbar-thumb {
+  background: rgba(107, 114, 128, 0.6);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.album-page::-webkit-scrollbar-thumb:hover,
+.album-page *::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.8);
+  background-clip: content-box;
+}
+
+/* Main page scrollbar for album pages */
+html:has(.album-page)::-webkit-scrollbar {
+  width: 10px;
+}
+
+html:has(.album-page)::-webkit-scrollbar-track {
+  background: rgba(17, 24, 39, 0.8);
+}
+
+html:has(.album-page)::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(75, 85, 99, 0.8) 0%, rgba(107, 114, 128, 0.6) 100%);
+  border-radius: 5px;
+  border: 2px solid rgba(17, 24, 39, 0.8);
+}
+
+html:has(.album-page)::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(107, 114, 128, 0.9) 0%, rgba(156, 163, 175, 0.8) 100%);
+}
+
+/* Firefox scrollbar for album pages */
+html:has(.album-page) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 114, 128, 0.7) rgba(17, 24, 39, 0.8);
+}
+
+/* ========================================
    iOS Safari Safe-Area & Viewport Fixes
    ======================================== */
 
