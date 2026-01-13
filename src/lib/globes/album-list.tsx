@@ -179,4 +179,3 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
 
 const AlbumList = React.memo(AlbumListComponent);
 export default AlbumList;
-

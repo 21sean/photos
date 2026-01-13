@@ -12,3 +12,16 @@ export function isIOSSafari(): boolean {
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && 
     !(window as any).MSStream;
 }
+
+/**
+ * Detect if the current browser is Chrome (excluding Edge)
+ * Used to enable Chrome-specific features like the background switcher
+ */
+export function isChrome(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+  const userAgent = navigator.userAgent;
+  // Check for Chrome but exclude Edge (which also contains "Chrome" in UA)
+  return /Chrome/.test(userAgent) && !/Edg/.test(userAgent);
+}

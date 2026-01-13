@@ -8,29 +8,36 @@ const vertexShaderSource = `
   }
 `;
 
-// Fragment shader with color uniform support
-const createFragmentShaderSource = () => `
+const fragmentShaderSource = `
 precision mediump float;
+uniform vec2 iResolution; // Canvas resolution (width, height)
+uniform float iTime;       // Time in seconds since the animation started
+uniform vec2 iMouse;      // Mouse coordinates (x, y)
+uniform vec3 u_color;     // Custom color uniform
 
-uniform vec2 iResolution;
-uniform float iTime;
-uniform vec3 u_color;
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+    vec2 uv = (1.0 * fragCoord - iResolution.xy) / min(iResolution.x, iResolution.y);
+    float t = iTime * 0.325; // 65% of original 0.5 speed
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    vec2 uv = (2.0 * fragCoord - iResolution.xy) / min(iResolution.x, iResolution.y);
+    vec2 mouse_uv = (4.0 * iMouse - iResolution.xy) / min(iResolution.x, iResolution.y);
 
-    for(float i = 1.0; i < 8.0; i++) {
-        uv.y += i * 0.1 / i * 
-            sin(uv.x * i * i + iTime * 0.5) * sin(uv.y * i * i + iTime * 0.5);
+    float mouseInfluence = 0.0;
+    if (length(iMouse) > 0.0) {
+        float dist_to_mouse = distance(uv, mouse_uv);
+        mouseInfluence = smoothstep(0.8, 0.0, dist_to_mouse);
     }
 
-    // Base intensity from UV
-    float intensity = uv.y + 0.5;
-    
-    // Apply color with intensity variation
-    vec3 col = u_color * intensity;
-    
-    fragColor = vec4(col, 1.0);
+    for(float i = 8.0; i < 20.0; i++) {
+        uv.x += 0.6 / i * cos(i * 2.5 * uv.y + t);
+        uv.y += 0.6 / i * cos(i * 1.5 * uv.x + t);
+    }
+
+    float wave = abs(sin(t - uv.y - uv.x + mouseInfluence * 8.0));
+    float glow = smoothstep(0.9, 0.0, wave);
+
+    vec3 color = glow * u_color; // Use the custom color here
+
+    fragColor = vec4(color, 1.0);
 }
 
 void main() {
@@ -40,9 +47,9 @@ void main() {
 
 export type BlurSize = "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 
-interface WaveBackgroundProps {
+interface ShaderBackgroundProps {
   backdropBlurAmount?: BlurSize;
-  color?: string; // Hex color like "#3B82F6" for blue
+  color?: string;
   className?: string;
 }
 
@@ -65,13 +72,17 @@ const hexToRgb = (hex: string): [number, number, number] => {
   return [r, g, b];
 };
 
-function WaveBackground({
+function ShaderBackground({
   backdropBlurAmount = "sm",
-  color, // undefined means use default blue gradient
+  color = "#07eae6",
   className = "",
-}: WaveBackgroundProps): JSX.Element {
+}: ShaderBackgroundProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  
+  // Use refs for mouse state to avoid re-creating WebGL context
+  const mousePositionRef = useRef({ x: 0, y: 0 });
+  const isHoveringRef = useRef(false);
   const colorRef = useRef(color);
 
   // Update color ref when prop changes
@@ -95,7 +106,10 @@ function WaveBackground({
       return;
     }
 
-    const compileShader = (type: number, source: string): WebGLShader | null => {
+    const compileShader = (
+      type: number,
+      source: string
+    ): WebGLShader | null => {
       const shader = gl.createShader(type);
       if (!shader) return null;
       gl.shaderSource(shader, source);
@@ -109,7 +123,10 @@ function WaveBackground({
     };
 
     const vertexShader = compileShader(gl.VERTEX_SHADER, vertexShaderSource);
-    const fragmentShader = compileShader(gl.FRAGMENT_SHADER, createFragmentShaderSource());
+    const fragmentShader = compileShader(
+      gl.FRAGMENT_SHADER,
+      fragmentShaderSource
+    );
     if (!vertexShader || !fragmentShader) return;
 
     const program = gl.createProgram();
@@ -139,6 +156,7 @@ function WaveBackground({
 
     const iResolutionLocation = gl.getUniformLocation(program, "iResolution");
     const iTimeLocation = gl.getUniformLocation(program, "iTime");
+    const iMouseLocation = gl.getUniformLocation(program, "iMouse");
     const uColorLocation = gl.getUniformLocation(program, "u_color");
 
     let animationId: number;
@@ -147,41 +165,70 @@ function WaveBackground({
     const render = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      
+
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;
       }
-      
+
       gl.viewport(0, 0, width, height);
 
       const currentTime = (Date.now() - startTime) / 1000;
 
+      // Update color uniform from ref
+      const [r, g, b] = hexToRgb(colorRef.current);
+      gl.uniform3f(uColorLocation, r, g, b);
+
       gl.uniform2f(iResolutionLocation, width, height);
       gl.uniform1f(iTimeLocation, currentTime);
       
-      // Set color - default to a nice blue if no color specified
-      const currentColor = colorRef.current || "#4A90D9";
-      const [r, g, b] = hexToRgb(currentColor);
-      gl.uniform3f(uColorLocation, r, g, b);
+      // Read mouse position from refs instead of state
+      gl.uniform2f(
+        iMouseLocation,
+        isHoveringRef.current ? mousePositionRef.current.x : 0,
+        isHoveringRef.current ? height - mousePositionRef.current.y : 0
+      );
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       animationId = requestAnimationFrame(render);
     };
 
+    const handleMouseMove = (event: MouseEvent) => {
+      mousePositionRef.current = {
+        x: event.clientX,
+        y: event.clientY,
+      };
+    };
+
+    const handleMouseEnter = () => {
+      isHoveringRef.current = true;
+    };
+
+    const handleMouseLeave = () => {
+      isHoveringRef.current = false;
+      mousePositionRef.current = { x: 0, y: 0 };
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("mouseenter", handleMouseEnter);
+    canvas.addEventListener("mouseleave", handleMouseLeave);
+
     render();
 
     return () => {
       cancelAnimationFrame(animationId);
+      window.removeEventListener("mousemove", handleMouseMove);
+      canvas.removeEventListener("mouseenter", handleMouseEnter);
+      canvas.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, []);
+  }, []); // Empty dependency array - only run once on mount
 
   const finalBlurClass = blurClassMap[backdropBlurAmount] || blurClassMap["sm"];
 
   return (
-    <div 
+    <div
       className={`overflow-hidden -z-10 ${className}`}
-      style={{ 
+      style={{
         position: 'fixed',
         top: 0,
         left: 0,
@@ -197,7 +244,7 @@ function WaveBackground({
     >
       <canvas
         ref={canvasRef}
-        style={{ 
+        style={{
           display: "block",
           position: 'absolute',
           top: 0,
@@ -206,7 +253,7 @@ function WaveBackground({
           height: '100%'
         }}
       />
-      <div 
+      <div
         className={finalBlurClass}
         style={{
           position: 'absolute',
@@ -220,4 +267,4 @@ function WaveBackground({
   );
 }
 
-export default WaveBackground;
+export default ShaderBackground;
