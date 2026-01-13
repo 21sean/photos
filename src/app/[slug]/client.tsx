@@ -315,7 +315,7 @@ export default function AlbumPageClient({
           </button>
           
           {/* Mobile destinations list inside the dark box */}
-          <div className={`sm:hidden will-change-transform transition-all duration-500 ease-in-out ${
+          <div className={`sm:hidden will-change-transform transition-all duration-500 ease-in-out scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-500 ${
             isCollapsed 
               ? 'max-h-0 opacity-0 overflow-hidden transform translate3d(0, -10px, 0)' 
               : 'max-h-[84vh] opacity-100 overflow-y-auto overscroll-contain transform translate3d(0, 0, 0)'
