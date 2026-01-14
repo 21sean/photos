@@ -9,6 +9,7 @@ import HDRImage from './hdr-image';
 import { isIOSSafari } from '../browser-utils';
 import { FlipIcon } from '../icons';
 import ScrollReveal from '../fx/scroll-reveal';
+import { setupImageCleanup } from './ios-image-cleanup';
 
 // Format EXIF data for overlay
 function formatExifData(photo: Photo): string | null {
@@ -194,6 +195,7 @@ export const Masonry = ({
   style?: React.CSSProperties;
 }) => {
   useLightbox(items);
+  const containerRef = React.useRef<HTMLElement>(null);
 
   // Use style width if provided (from parent), otherwise calculate based on viewport
   const firstPhoto = items[0];
@@ -209,8 +211,22 @@ export const Masonry = ({
   // Detect iOS Safari for specific optimizations
   const isIOS = isIOSSafari();
   
-  // Increase overscan on iOS to keep more images rendered off-screen
-  const overscanValue = isIOS ? 12 : 5;
+  // REDUCED overscan on iOS to minimize memory pressure
+  // iOS Safari has ~500MB per tab limit; fewer buffered images = less memory
+  const overscanValue = isIOS ? 2 : 5;
+
+  // Setup iOS image memory cleanup
+  React.useEffect(() => {
+    // Delay to ensure masonic has rendered images
+    const timeoutId = setTimeout(() => {
+      const cleanup = setupImageCleanup(containerRef.current, {
+        rootMargin: '150% 0px',
+      });
+      return cleanup;
+    }, 300);
+    
+    return () => clearTimeout(timeoutId);
+  }, [items]);
 
   if (items.length === 0) {
     return null;
@@ -225,6 +241,7 @@ export const Masonry = ({
 
   return (
     <section
+      ref={containerRef}
       id="gallery"
       className={containerClass}
       style={{

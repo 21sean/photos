@@ -78,11 +78,12 @@ export function HDRImage({
     width: width || photo.width,
     height: height || photo.height,
     alt: alt || photo.title || '',
-    // Disable lazy loading on iOS Safari to prevent aggressive unloading
-    loading: (priority ? 'eager' : (isIOS ? 'eager' : 'lazy')) as 'eager' | 'lazy',
-    // Use sync decoding on iOS to ensure image is fully decoded before display
-    // This prevents the flash/reload when scrolling back to images
-    decoding: isIOS ? 'sync' : 'async',
+    // Use lazy loading - our cleanup observer manages memory on iOS
+    // Setting eager on iOS was actually causing MORE memory pressure
+    loading: priority ? 'eager' : 'lazy',
+    // Use async decoding to not block main thread
+    // Sync decoding was causing jank during scroll
+    decoding: 'async',
     // Add fetchPriority for better resource prioritization
     fetchPriority: (priority ? 'high' : 'auto') as 'high' | 'auto',
     onLoad: handleImageLoad,
