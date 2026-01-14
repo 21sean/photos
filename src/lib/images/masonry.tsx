@@ -229,7 +229,9 @@ export const Masonry = ({
       className={containerClass}
       style={{
         // iOS-specific optimizations to prevent content reclamation
-        contain: isIOS ? 'layout style' : undefined,
+        // Use transform for GPU layer instead of contain (which triggers reclamation)
+        WebkitTransform: isIOS ? 'translate3d(0, 0, 0)' : undefined,
+        transform: isIOS ? 'translate3d(0, 0, 0)' : undefined,
         ...style,
       }}
     >

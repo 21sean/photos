@@ -80,7 +80,9 @@ export function HDRImage({
     alt: alt || photo.title || '',
     // Disable lazy loading on iOS Safari to prevent aggressive unloading
     loading: (priority ? 'eager' : (isIOS ? 'eager' : 'lazy')) as 'eager' | 'lazy',
-    decoding: 'async',
+    // Use sync decoding on iOS to ensure image is fully decoded before display
+    // This prevents the flash/reload when scrolling back to images
+    decoding: isIOS ? 'sync' : 'async',
     // Add fetchPriority for better resource prioritization
     fetchPriority: (priority ? 'high' : 'auto') as 'high' | 'auto',
     onLoad: handleImageLoad,
@@ -90,14 +92,13 @@ export function HDRImage({
       opacity: isLoading ? 0.3 : 1, // Show faint image while loading instead of invisible
       transition: 'opacity 0.3s ease, filter 0.3s ease',
       // iOS-specific GPU acceleration optimizations to fix image disappearing and lag.
-      // Forces GPU compositing layer for smoother rendering of large images on iOS.
-      WebkitTransform: 'translateZ(0)',
-      transform: 'translateZ(0)',
-      willChange: 'opacity', // Hint for opacity transitions during image loading
+      // Use translate3d for proper hardware acceleration layer
+      WebkitTransform: 'translate3d(0, 0, 0)',
+      transform: 'translate3d(0, 0, 0)',
+      // Keep as persistent compositor layer - prevents iOS from reclaiming
+      willChange: 'transform',
       WebkitBackfaceVisibility: 'hidden',
       backfaceVisibility: 'hidden',
-      // Prevent iOS from aggressively reclaiming image memory
-      contain: 'layout style',
     },
     className: `hdr-image ${isHDR ? 'hdr-enhanced' : ''} ${className}`,
   };
