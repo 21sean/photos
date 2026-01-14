@@ -672,13 +672,14 @@ function Globe({ albums }: { albums: Array<Album> }) {
 
   const { handleGlobeReady } = useGlobeReady(globeEl);
 
-  const isDesktopChrome = React.useMemo(() => {
-    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+  // Detect desktop Chrome after mount to avoid hydration mismatch
+  const [isDesktopChrome, setIsDesktopChrome] = useState(false);
+  useEffect(() => {
+    const ua = navigator.userAgent;
     const isChrome = /Chrome\//.test(ua) && !/Edg\//.test(ua) && !/OPR\//.test(ua);
-    const isDesktop = typeof window !== 'undefined' &&
-      window.matchMedia &&
+    const isDesktop = window.matchMedia &&
       window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    return isChrome && isDesktop;
+    setIsDesktopChrome(isChrome && isDesktop);
   }, []);
 
   const isPinnedRef = useRef(false);
@@ -710,10 +711,14 @@ function Globe({ albums }: { albums: Array<Album> }) {
   const { customLayerData, customThreeObject, customThreeObjectUpdate } =
     useCustomLayer(globeEl);
 
-  const isMac = React.useMemo(() =>
-    navigator.platform.toLowerCase().includes('mac') ||
-    navigator.userAgent.toLowerCase().includes('mac')
-  , []);
+  // Detect Mac after mount to avoid hydration mismatch
+  const [isMac, setIsMac] = useState(false);
+  useEffect(() => {
+    setIsMac(
+      navigator.platform.toLowerCase().includes('mac') ||
+      navigator.userAgent.toLowerCase().includes('mac')
+    );
+  }, []);
 
   const polygonAltitudeCb = React.useCallback(() => theme.polygonAltitude, []);
   const polygonSideColorCb = React.useCallback(() => theme.polygonSideColor, []);
@@ -805,7 +810,13 @@ function Globe({ albums }: { albums: Array<Album> }) {
   }, []);
 
   // Prefer stable height on iOS using --outer-h when available
-  const stableOuterHeight = (typeof window !== 'undefined') ? (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--screen-h')) || parseInt(getComputedStyle(document.documentElement).getPropertyValue('--outer-h')) || undefined) : undefined;
+  // Computed after mount to avoid hydration mismatch
+  const [stableOuterHeight, setStableOuterHeight] = useState<number | undefined>(undefined);
+  useEffect(() => {
+    const screenH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--screen-h'));
+    const outerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--outer-h'));
+    setStableOuterHeight(screenH || outerH || undefined);
+  }, []);
 
   return (
     <section
