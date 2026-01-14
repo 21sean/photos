@@ -10,7 +10,7 @@ import { titleToSlug } from '@/lib/api/slug';
 import Stack from '@mui/material/Stack';
 import WaveBackground from '@/lib/fx/wave-background';
 import ShaderBackground from '@/lib/fx/shader-background';
-import { isChrome } from '@/lib/browser-utils';
+import { isChrome, isIOSSafari } from '@/lib/browser-utils';
 
 type BackgroundType = 
   | "wave-blue" 
@@ -92,9 +92,11 @@ export default function AlbumPageClient({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Check for Chrome on mount
+  // Check for Chrome and iOS Safari on mount
+  const [isIOS, setIsIOS] = useState(false);
   useEffect(() => {
     setIsChromeUser(isChrome());
+    setIsIOS(isIOSSafari());
   }, []);
 
   // Close menu when clicking outside
@@ -122,8 +124,12 @@ export default function AlbumPageClient({
     setIsMenuOpen(false);
   };
 
-  // Render appropriate background
+  // Render appropriate background (disabled on iOS Safari for performance)
   const renderBackground = () => {
+    if (isIOS) {
+      return null;
+    }
+    
     const option = backgroundOptions.find(opt => opt.id === displayedBackground);
     if (!option) {
       return <WaveBackground backdropBlurAmount="md" color="#4A90D9" />;
