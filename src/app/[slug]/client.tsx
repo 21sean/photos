@@ -244,7 +244,7 @@ export default function AlbumPageClient({
               {/* Toggle arrow button */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="flex items-center justify-center w-5 h-10 bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-r-md transition-all duration-200 border border-l-0 border-white/10"
+                className="flex items-center justify-center w-6 h-10 bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-r-md transition-all duration-200 border border-l-0 border-white/10"
                 aria-label="Toggle background menu"
               >
                 <svg

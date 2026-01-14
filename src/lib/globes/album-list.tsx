@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion, useInView } from 'framer-motion';
 import { Album, AlbumTitle } from '@/types/albums';
 
 type Props = {
@@ -12,15 +13,82 @@ type Props = {
   onHideCard: () => void;
 };
 
-const BASE_FONT_SIZE_PX = 24; // 20% smaller than original 30px
-const BASE_LINE_HEIGHT_PX = 35; // 20% smaller than original 44px
+// Chrome desktop animated menu item - styled like album page Nav
+const ChromeMenuItem: React.FC<{
+  children: React.ReactNode;
+  index: number;
+  isActive: boolean;
+  album: Album;
+  onEnter: (album: Album) => void;
+  onLeave: () => void;
+  onSelect: (album: Album) => void;
+}> = ({ children, index, isActive, album, onEnter, onLeave, onSelect }) => {
+  const itemRef = React.useRef<HTMLLIElement>(null);
+  const isInView = useInView(itemRef, { once: true, amount: 0.1 });
+
+  return (
+    <motion.li
+      ref={itemRef}
+      className="max-w-fit"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{
+        opacity: isInView ? 1 : 0,
+        x: isInView ? 0 : -20,
+      }}
+      transition={{ 
+        duration: 0.3, 
+        ease: "easeOut",
+        delay: index * 0.04
+      }}
+      whileHover={{ 
+        x: 4,
+        scale: 1.02,
+        transition: { duration: 0.15 }
+      }}
+    >
+      <span 
+        className={`block py-0.5 cursor-pointer transition-colors duration-200 select-none ${
+          isActive ? 'font-bold' : 'hover:text-gray-400'
+        }`}
+        onMouseEnter={() => onEnter(album)}
+        onMouseLeave={() => onLeave()}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onSelect(album);
+        }}
+      >
+        {children}
+      </span>
+    </motion.li>
+  );
+};
+
+// iOS/non-Chrome implementation (original style)
+const BASE_FONT_SIZE_PX = 24;
+const BASE_LINE_HEIGHT_PX = 35;
 const MIN_SCALE = 0.55;
 
 function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSelect, onHideCard }: Props) {
+  const [isDesktopChrome, setIsDesktopChrome] = React.useState(false);
+  const [shouldAnimate, setShouldAnimate] = React.useState(false);
   const [isSliding, setIsSliding] = React.useState(false);
   const [animatingTitle, setAnimatingTitle] = React.useState<string | null>(null);
   const [typedMap, setTypedMap] = React.useState<Record<string, string>>({});
   const typingTimers = React.useRef<Record<string, number>>({});
+
+  // Detect Chrome desktop after mount
+  React.useEffect(() => {
+    const ua = navigator.userAgent;
+    const isChrome = /Chrome\//.test(ua) && !/Edg\//.test(ua) && !/OPR\//.test(ua);
+    const isDesktop = window.matchMedia &&
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    setIsDesktopChrome(isChrome && isDesktop);
+    // Trigger fade animation after a small delay to ensure mount is complete
+    if (isChrome && isDesktop) {
+      requestAnimationFrame(() => setShouldAnimate(true));
+    }
+  }, []);
 
   const sortedAlbums = React.useMemo(() => {
     return [...albums].sort((a, b) => a.title.localeCompare(b.title));
@@ -35,18 +103,17 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
     fitScaleRef.current = fitScale;
   }, [fitScale]);
 
+  // Chrome desktop: simple click handler that triggers globe interaction
+  const handleChromeSelect = React.useCallback((album: Album) => {
+    (onSelect ?? onEnter)(album);
+  }, [onSelect, onEnter]);
+
+  // iOS/non-Chrome: original click handler with typewriter animation
   const handleAlbumTitleClick = (album: Album, event?: React.MouseEvent | React.TouchEvent) => {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
     }
-
-    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-    const isChrome = /Chrome\//.test(ua) && !/Edg\//.test(ua) && !/OPR\//.test(ua);
-    const isDesktop = typeof window !== 'undefined' &&
-      window.matchMedia &&
-      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    const shouldSlideOnClick = !(isChrome && isDesktop);
 
     // clear any existing timer for this album
     if (typingTimers.current[album.title]) {
@@ -62,7 +129,6 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
     const stepMs = 130;
     const run = (idx: number) => {
       if (idx > full.length) {
-        // done, keep caret visible briefly
         typingTimers.current[full] = window.setTimeout(() => {
           setAnimatingTitle(null);
         }, 850) as unknown as number;
@@ -73,7 +139,7 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
     };
     run(0);
 
-    setIsSliding(shouldSlideOnClick);
+    setIsSliding(true);
     (onSelect ?? onEnter)(album);
   };
 
@@ -82,7 +148,6 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
     const list = listRef.current;
     if (!wrapper || !list) return;
 
-    // Wrapper is inside the flex "content-container"; its height reflects available space.
     const available = wrapper.clientHeight;
     if (!available || available <= 0) return;
 
@@ -90,18 +155,15 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
     const content = list.scrollHeight;
     if (!content || content <= 0) return;
 
-    // Estimate unscaled content height so we can scale back up when space increases.
     const unscaled = content / currentScale;
     const next = Math.max(MIN_SCALE, Math.min(1, available / unscaled));
 
-    // Avoid re-render loops from tiny float jitter.
     if (Math.abs(next - currentScale) >= 0.01) {
       setFitScale(next);
     }
   }, []);
 
   React.useLayoutEffect(() => {
-    // Initial + whenever album count changes (new destinations)
     recomputeFit();
   }, [recomputeFit, albums.length]);
 
@@ -131,11 +193,46 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
   const fontPx = Math.round(BASE_FONT_SIZE_PX * fitScale);
   const linePx = Math.round(BASE_LINE_HEIGHT_PX * fitScale);
 
-  return (
-    <>
-      {/* Mobile-only header at the top */}
-      <div className="album-list-wrapper h-full" ref={wrapperRef}>
+  // Chrome desktop: framer-motion animated list (album page style)
+  if (isDesktopChrome) {
+    return (
+      <motion.div 
+        className="album-list-wrapper h-full" 
+        ref={wrapperRef}
+        animate={{ opacity: shouldAnimate ? 1 : 0 }}
+        transition={{ duration: 3.5, ease: "easeOut" }}
+        style={{ opacity: 0 }}
+      >
+        <motion.ul
+          ref={listRef as React.RefObject<HTMLUListElement>}
+          className="flex flex-col items-start tracking-tight album-list"
+          style={{
+            ['--album-list-font-size' as any]: `${fontPx}px`,
+            ['--album-list-line-height' as any]: `${linePx}px`,
+            ['--album-list-min-height' as any]: `${linePx}px`
+          }}
+        >
+          {sortedAlbums.map((album, index) => (
+            <ChromeMenuItem
+              key={album.title}
+              index={index}
+              isActive={activeAlbumTitle === album.title}
+              album={album}
+              onEnter={onEnter}
+              onLeave={onLeave}
+              onSelect={handleChromeSelect}
+            >
+              {album.title}
+            </ChromeMenuItem>
+          ))}
+        </motion.ul>
+      </motion.div>
+    );
+  }
 
+  // iOS/non-Chrome: original implementation with typewriter animation
+  return (
+    <div className="album-list-wrapper h-full" ref={wrapperRef}>
       <ul
         ref={listRef}
         className={`flex flex-col 
@@ -172,8 +269,7 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
           </li>
         ))}
       </ul>
-      </div>
-    </>
+    </div>
   );
 }
 
