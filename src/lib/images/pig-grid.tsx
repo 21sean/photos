@@ -54,11 +54,20 @@ function MobileImageWithLoading({ item }: { item: Photo }) {
           className={`w-full h-auto transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
           // Disable lazy loading on iOS Safari to prevent aggressive unloading
           loading={isIOS ? 'eager' : 'lazy'}
+          // Use sync decoding on iOS to prevent flash when scrolling back
+          decoding={isIOS ? 'sync' : 'async'}
           style={{
             // iOS-specific optimizations to prevent image unloading
-            contain: isIOS ? 'layout style' : undefined,
-            WebkitTransform: isIOS ? 'translateZ(0)' : undefined,
-            transform: isFlipped ? 'scaleX(-1)' : (isIOS ? 'translateZ(0)' : undefined),
+            // Use translate3d for persistent GPU layer
+            WebkitTransform: isFlipped 
+              ? 'translate3d(0, 0, 0) scaleX(-1)' 
+              : 'translate3d(0, 0, 0)',
+            transform: isFlipped 
+              ? 'translate3d(0, 0, 0) scaleX(-1)' 
+              : 'translate3d(0, 0, 0)',
+            willChange: isIOS ? 'transform' : undefined,
+            WebkitBackfaceVisibility: isIOS ? 'hidden' : undefined,
+            backfaceVisibility: isIOS ? 'hidden' : undefined,
             transition: 'transform 0.3s ease',
           }}
           onLoad={() => {
@@ -153,12 +162,16 @@ function PigGrid({ items }: { items: Array<Photo> }) {
       
       // Set loading attribute based on iOS detection
       img.loading = isIOS ? 'eager' : 'lazy';
+      // Use sync decoding on iOS to prevent flash when scrolling back
+      img.decoding = isIOS ? 'sync' : 'async';
       
-      // Apply iOS optimizations
+      // Apply iOS optimizations - use persistent GPU layer to prevent memory reclamation
       if (isIOS) {
-        img.style.contain = 'layout style';
-        img.style.webkitTransform = 'translateZ(0)';
-        img.style.transform = 'translateZ(0)';
+        img.style.webkitTransform = 'translate3d(0, 0, 0)';
+        img.style.transform = 'translate3d(0, 0, 0)';
+        img.style.willChange = 'transform';
+        img.style.webkitBackfaceVisibility = 'hidden';
+        img.style.backfaceVisibility = 'hidden';
       }
       
       // Apply HDR styles if image is HDR
@@ -224,10 +237,10 @@ function PigGrid({ items }: { items: Array<Photo> }) {
         e.preventDefault();
         e.stopPropagation();
         isFlipped = !isFlipped;
-        img.style.transform = isFlipped ? 'scaleX(-1)' : (isIOS ? 'translateZ(0)' : 'scaleX(1)');
-        if (isIOS && isFlipped) {
-          img.style.transform = 'translateZ(0) scaleX(-1)';
-        }
+        img.style.transform = isFlipped 
+          ? 'translate3d(0, 0, 0) scaleX(-1)' 
+          : 'translate3d(0, 0, 0)';
+        img.style.webkitTransform = img.style.transform;
       });
       
       // Add hover effect to button

@@ -39,8 +39,6 @@ const SingleColumnGallery = dynamic(() => import('@/lib/images/single-column-gal
 
 // Calculate width that fits first image in viewport
 function calculateContentWidth(firstPhoto?: Photo): number {
-  if (typeof window === 'undefined') return 500;
-  
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   
@@ -170,8 +168,13 @@ export default function AlbumPageClient({
     setTimeout(() => setIsAnimating(false), 500);
   }, [isCollapsed, isAnimating]);
 
-  // Calculate content width based on first photo to ensure alignment
-  const contentWidth = useMemo(() => calculateContentWidth(photos[0]), [photos]);
+  // Calculate content width after mount to avoid hydration mismatch
+  // Server doesn't have window, so we defer calculation to client
+  const [contentWidth, setContentWidth] = useState<number | undefined>(undefined);
+  
+  useEffect(() => {
+    setContentWidth(calculateContentWidth(photos[0]));
+  }, [photos]);
 
   return (
     <section className="album-page flex flex-col sm:flex-row sm:mt-4 sm:mb-0 w-full" id="top">
@@ -193,7 +196,7 @@ export default function AlbumPageClient({
       <Stack spacing={2} sx={{ flex: 1, minWidth: 0, alignItems: 'center' }}>
         <div
           className="rounded-lg bg-gray-900/90 px-5 py-4 relative"
-          style={{ width: contentWidth, maxWidth: '100%' }}
+          style={{ width: contentWidth ?? 'auto', maxWidth: '100%' }}
         >
           <div className="flex justify-between items-start mb-4">
             <div>

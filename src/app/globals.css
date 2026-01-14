@@ -1220,25 +1220,36 @@ body:has(.globe-container) .typewriter.nocaret::after {
 @supports (-webkit-touch-callout: none) {
   .masonry-item img,
   .hdr-image {
-    /* Prevent iOS from aggressively reclaiming image memory */
-    contain: layout style;
-    /* Prevent iOS from auto-hiding content */
-    content-visibility: visible;
-    /* Force GPU compositing for better performance */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    /* Force persistent GPU compositor layer - prevents iOS from reclaiming memory */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    /* Keep as compositor layer even after animations complete */
+    will-change: transform;
+    /* Prevent backface rendering issues */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* Ensure content stays visible */
+    content-visibility: visible !important;
   }
   
-  /* Ensure masonry items maintain their space allocation */
+  /* Ensure masonry items maintain their space and don't get reclaimed */
   .masonry-item {
-    contain: layout style;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
   }
   
   /* Mobile image gallery optimization for iOS */
   #pig img {
-    contain: layout style;
-    content-visibility: visible;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    content-visibility: visible !important;
+  }
+  
+  /* Prevent scroll container from triggering image reclamation */
+  .album-page {
+    -webkit-overflow-scrolling: touch;
   }
 }
