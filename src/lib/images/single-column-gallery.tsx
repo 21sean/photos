@@ -7,6 +7,7 @@ import HDRImage from './hdr-image';
 import { FlipIcon } from '../icons';
 import ScrollReveal from '../fx/scroll-reveal';
 import { useLightbox } from '../../hooks/use-lightbox';
+import { setupImageCleanup } from './ios-image-cleanup';
 
 // Format EXIF data for overlay
 function formatExifData(photo: Photo): string | null {
@@ -143,11 +144,26 @@ interface SingleColumnGalleryProps {
 
 export function SingleColumnGallery({ photos, className = '' }: SingleColumnGalleryProps) {
   useLightbox(photos);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  
+  // Setup iOS image memory cleanup
+  React.useEffect(() => {
+    // Small delay to ensure images are rendered
+    const timeoutId = setTimeout(() => {
+      const cleanup = setupImageCleanup(containerRef.current, {
+        rootMargin: '150% 0px', // Keep images loaded within 1.5 viewport heights
+      });
+      return cleanup;
+    }, 200);
+    
+    return () => clearTimeout(timeoutId);
+  }, [photos]);
   
   if (photos.length === 0) return null;
   
   return (
     <Stack 
+      ref={containerRef}
       spacing={4} 
       className={`fade-in-delayed ${className}`}
       sx={{ alignItems: 'center' }}

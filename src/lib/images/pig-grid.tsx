@@ -3,10 +3,11 @@
 import { useLightbox } from '@/hooks/use-lightbox';
 import { useWindowSize } from '@/hooks/use-window-size';
 import { Photo } from '@/types';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { isLikelyHDR, getHDRImageStyles } from '../hdr-utils';
 import { isIOSSafari } from '../browser-utils';
 import { FlipIcon } from '../icons';
+import { createImageCleanupObserver, observeImageForCleanup } from './ios-image-cleanup';
 
 // Format EXIF metadata for display
 function formatExifData(item: Photo): string | null {
@@ -33,9 +34,6 @@ function formatExifData(item: Photo): string | null {
 function MobileImageWithLoading({ item }: { item: Photo }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isFlipped, setIsFlipped] = useState(false);
-
-  // Detect iOS Safari for specific optimizations
-  const isIOS = isIOSSafari();
   
   const exifData = formatExifData(item);
 
@@ -52,22 +50,18 @@ function MobileImageWithLoading({ item }: { item: Photo }) {
           src={item.url} 
           alt={item.title || ""} 
           className={`w-full h-auto transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-          // Disable lazy loading on iOS Safari to prevent aggressive unloading
-          loading={isIOS ? 'eager' : 'lazy'}
-          // Use sync decoding on iOS to prevent flash when scrolling back
-          decoding={isIOS ? 'sync' : 'async'}
+          // Use lazy loading - cleanup observer manages memory on iOS
+          loading="lazy"
+          // Use async decoding to not block main thread
+          decoding="async"
           style={{
-            // iOS-specific optimizations to prevent image unloading
-            // Use translate3d for persistent GPU layer
+            // GPU layer for smooth transforms
             WebkitTransform: isFlipped 
               ? 'translate3d(0, 0, 0) scaleX(-1)' 
               : 'translate3d(0, 0, 0)',
             transform: isFlipped 
               ? 'translate3d(0, 0, 0) scaleX(-1)' 
               : 'translate3d(0, 0, 0)',
-            willChange: isIOS ? 'transform' : undefined,
-            WebkitBackfaceVisibility: isIOS ? 'hidden' : undefined,
-            backfaceVisibility: isIOS ? 'hidden' : undefined,
             transition: 'transform 0.3s ease',
           }}
           onLoad={() => {
@@ -116,14 +110,19 @@ function PigGrid({ items }: { items: Array<Photo> }) {
 
   const { width } = useWindowSize();
   const isMobile = width && width <= 640;
+  
+  // Detect iOS for reduced buffer sizes
+  const isIOS = isIOSSafari();
 
   const options = {
     containerId: 'pig',
     classPrefix: 'pig',
     spaceBetweenImages: 12,
     transitionSpeed: 500,
-    primaryImageBufferHeight: 1000,
-    secondaryImageBufferHeight: 300,
+    // REDUCED buffer heights on iOS to minimize memory pressure
+    // iOS Safari has strict ~500MB per tab limit
+    primaryImageBufferHeight: isIOS ? 300 : 1000,
+    secondaryImageBufferHeight: isIOS ? 100 : 300,
     urlForSize: function (filename: string, size: number) {
       return filename;
     },
@@ -157,22 +156,14 @@ function PigGrid({ items }: { items: Array<Photo> }) {
       img.style.width = '100%';
       img.style.height = 'auto';
       
-      // Detect iOS Safari for specific optimizations
-      const isIOS = isIOSSafari();
+      // Use lazy loading - cleanup observer manages memory on iOS
+      img.loading = 'lazy';
+      // Use async decoding to not block main thread
+      img.decoding = 'async';
       
-      // Set loading attribute based on iOS detection
-      img.loading = isIOS ? 'eager' : 'lazy';
-      // Use sync decoding on iOS to prevent flash when scrolling back
-      img.decoding = isIOS ? 'sync' : 'async';
-      
-      // Apply iOS optimizations - use persistent GPU layer to prevent memory reclamation
-      if (isIOS) {
-        img.style.webkitTransform = 'translate3d(0, 0, 0)';
-        img.style.transform = 'translate3d(0, 0, 0)';
-        img.style.willChange = 'transform';
-        img.style.webkitBackfaceVisibility = 'hidden';
-        img.style.backfaceVisibility = 'hidden';
-      }
+      // GPU layer for smooth transforms
+      img.style.webkitTransform = 'translate3d(0, 0, 0)';
+      img.style.transform = 'translate3d(0, 0, 0)';
       
       // Apply HDR styles if image is HDR
       const isHDR = item.isHDR || isLikelyHDR(item.url);
@@ -329,14 +320,38 @@ function PigGrid({ items }: { items: Array<Photo> }) {
     }
   };
 
+  // Ref to store cleanup observer for iOS memory management
+  const cleanupObserverRef = useRef<IntersectionObserver | null>(null);
+
   useEffect(() => {
+    // Create cleanup observer for iOS (will be null on non-iOS)
+    cleanupObserverRef.current = createImageCleanupObserver('150% 0px');
+    
     const data = items.map(item => {
       return { filename: item.url, aspectRatio: item.width / item.height };
     });
     const pigGrid = new window.Pig(data, options);
     pigGrid.enable();
+    
+    // After Pig renders, observe all images for cleanup
+    if (cleanupObserverRef.current) {
+      setTimeout(() => {
+        const pigElement = document.getElementById('pig');
+        if (pigElement) {
+          const images = pigElement.querySelectorAll('img');
+          images.forEach((img) => {
+            observeImageForCleanup(img as HTMLImageElement, cleanupObserverRef.current!);
+          });
+        }
+      }, 100);
+    }
 
     return () => {
+      // Disconnect cleanup observer
+      if (cleanupObserverRef.current) {
+        cleanupObserverRef.current.disconnect();
+        cleanupObserverRef.current = null;
+      }
       if (pigGrid) pigGrid.disable();
       const pigElement = document.getElementById('pig');
       if (pigElement) pigElement.innerHTML = '';
