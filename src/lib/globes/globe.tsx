@@ -21,7 +21,7 @@ const DARK_MODE = true; // Toggle between dark and light mode
 
 // Set USE_COUNTRY_POLYGONS = true and add the geojson file to use country borders
 
-const USE_COUNTRY_POLYGONS = true; // Set to true to use individual country polygons with borders
+const USE_COUNTRY_POLYGONS = false; // Set to true to use individual country polygons with borders
 
 // Theme colors (adjust these to customize appearance)
 const THEME = {
@@ -100,7 +100,7 @@ const THEME = {
     
     // Points (location markers)
     pointColor: 'rgba(255, 255, 255, 1)', // Light blue
-    pointColorActive: 'rgba(243, 0, 0, 0.95)', // Bright green
+    pointColorActive: 'rgba(0, 200, 0, 0.95)', // Bright green
     
     // Arcs
     arcColors: ['#ff6b6b', '#a855f7'], // Coral red to purple
@@ -241,8 +241,8 @@ function useAlbumInteraction(
 
     const id = setTimeout(() => {
       if (type === types.LOCATION) {
-        // Slightly more zoomed out on mobile devices
-        const altitudeOnFocus = isMobileDevice() ? 1.2 : 1;
+        // Slightly more zoomed out on mobile devices, 30% more zoom when selected
+        const altitudeOnFocus = isMobileDevice() ? 0.84 : 0.7;
         globeEl.current?.pointOfView(
           {
             lat,
@@ -869,7 +869,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
         ringsData={[]}
         arcsData={arcs}
         arcColor={'color'}
-        arcStroke={.2}
+        arcStroke={.16}
         arcDashLength={arcDashLengthCb} // the bigger the ranges, the calmer it looks
         arcDashGap={arcDashGapCb}
         arcDashAnimateTime={arcDashAnimateTimeCb}
