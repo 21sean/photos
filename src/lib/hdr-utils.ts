@@ -1,4 +1,5 @@
 // HDR image detection and handling utilities
+import type React from 'react';
 
 export interface HDRCapabilities {
   supportsHDR: boolean;
@@ -127,17 +128,13 @@ export function isLikelyHDR(url: string): boolean {
  * Generate HDR-aware CSS for images
  * Optimized for iPhone 16 Pro HDR display (1000-1600 nits)
  */
-export function getHDRImageStyles(isHDR: boolean = false, colorSpace?: string) {
-  const optimalColorSpace = getOptimalColorSpace(isHDR, colorSpace);
+export function getHDRImageStyles(isHDR: boolean = false, colorSpace?: string): React.CSSProperties {
   const capabilities = detectHDRCapabilities();
   
-  // Base styles for all images
-  const baseStyles = {
-    colorScheme: isHDR ? 'light dark' : 'light',
+  // Base styles for all images - only valid CSS properties
+  const baseStyles: React.CSSProperties = {
     transition: 'filter 0.2s ease, opacity 0.2s ease', // Faster transitions for better performance
-    colorSpace: optimalColorSpace,
-    imageRendering: 'auto' as const, // Let browser optimize
-    imageOrientation: 'from-image' as const, // Respect EXIF orientation
+    imageRendering: 'auto', // Let browser optimize
   };
   
   if (!isHDR) {
@@ -153,8 +150,6 @@ export function getHDRImageStyles(isHDR: boolean = false, colorSpace?: string) {
     return {
       ...baseStyles,
       filter: 'contrast(1.15) brightness(1.08) saturate(1.05)',
-      // Gain map support hint for modern browsers
-      colorSpace: capabilities.supportsP3 ? 'display-p3' : 'srgb',
     };
   } else if (capabilities.supportsHDR) {
     // General HDR display
