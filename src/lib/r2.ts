@@ -14,11 +14,24 @@ export const R2_BASE_URL = 'https://images.sean.ventures';
 
 /**
  * Generate a full R2 URL for an image
+ * Uses web-optimized AVIF versions from the web/ folder
  * @param album - Album slug (folder name in R2)
  * @param filename - Image filename
- * @returns Full URL to the image
+ * @returns Full URL to the web-optimized image
  */
 export function getImageUrl(album: string, filename: string): string {
+  // Convert to web-optimized AVIF path
+  const baseName = filename.replace(/\.[^.]+$/, ''); // Remove extension
+  return `${R2_BASE_URL}/web/${album}/${baseName}.avif`;
+}
+
+/**
+ * Generate a full R2 URL for the original image (not web-optimized)
+ * @param album - Album slug (folder name in R2)
+ * @param filename - Image filename
+ * @returns Full URL to the original image
+ */
+export function getOriginalImageUrl(album: string, filename: string): string {
   return `${R2_BASE_URL}/${album}/${filename}`;
 }
 

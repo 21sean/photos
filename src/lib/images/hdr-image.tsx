@@ -118,29 +118,8 @@ export function HDRImage({
     }
   }
 
-  return (
-      <picture>
-        {/* Provide fallbacks for different formats */}
-        {isHDR && hdrCapabilities.supportsHDR && (
-          <>
-            {/* AVIF HDR support for modern browsers */}
-            <source 
-              srcSet={photo.url.replace(/\.(jpg|jpeg|png)$/i, '.avif')} 
-              type="image/avif"
-              media="(dynamic-range: high)"
-            />
-            {/* HEIF HDR support for Safari */}
-            <source 
-              srcSet={photo.url.replace(/\.(jpg|jpeg|png)$/i, '.heic')} 
-              type="image/heic"
-              media="(dynamic-range: high)"
-            />
-          </>
-        )}
-        
-        <img {...imageProps} />
-      </picture>
-  );
+  // Since we're serving web-optimized AVIF directly, no need for picture/source fallbacks
+  return <img {...imageProps} />;
 }
 
 export default HDRImage;
