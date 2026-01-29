@@ -126,44 +126,25 @@ export function isLikelyHDR(url: string): boolean {
 
 /**
  * Generate HDR-aware CSS for images
- * Optimized for iPhone 16 Pro HDR display (1000-1600 nits)
+ * 
+ * IMPORTANT: Do NOT apply CSS filters (contrast, brightness, saturate) to HDR images!
+ * Browsers perform native tone mapping for HDR content (AVIF with PQ/HLG transfer functions).
+ * Adding CSS filters on top of browser tone mapping causes "blown out" overexposed images.
+ * 
+ * The browser will:
+ * - On HDR displays: Show the full dynamic range natively
+ * - On SDR displays: Automatically tone map HDR content to SDR
  */
 export function getHDRImageStyles(isHDR: boolean = false, colorSpace?: string): React.CSSProperties {
-  const capabilities = detectHDRCapabilities();
-  
-  // Base styles for all images - only valid CSS properties
+  // Base styles for all images - NO filters for proper HDR rendering
   const baseStyles: React.CSSProperties = {
-    transition: 'filter 0.2s ease, opacity 0.2s ease', // Faster transitions for better performance
+    transition: 'opacity 0.2s ease',
     imageRendering: 'auto', // Let browser optimize
   };
   
-  if (!isHDR) {
-    return {
-      ...baseStyles,
-      filter: 'none',
-    };
-  }
-  
-  // HDR-specific optimizations for iPhone 16 Pro
-  if (capabilities.supportsHDR && capabilities.maxLuminance && capabilities.maxLuminance >= 1000) {
-    // iPhone 16 Pro optimized settings (1000-1600 nits)
-    return {
-      ...baseStyles,
-      filter: 'contrast(1.15) brightness(1.08) saturate(1.05)',
-    };
-  } else if (capabilities.supportsHDR) {
-    // General HDR display
-    return {
-      ...baseStyles,
-      filter: 'contrast(1.1) brightness(1.05) saturate(1.02)',
-    };
-  } else {
-    // Fallback for non-HDR displays
-    return {
-      ...baseStyles,
-      filter: 'none',
-    };
-  }
+  // For HDR images, return clean styles without any filters
+  // Browser handles tone mapping natively - do not interfere
+  return baseStyles;
 }
 
 /**
