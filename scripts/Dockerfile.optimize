@@ -1,0 +1,34 @@
+# Dockerfile for running optimize-web-images.js with full 10-bit AVIF support
+# 
+# Usage:
+#   docker build -f scripts/Dockerfile.optimize -t photos-optimizer .
+#   docker run --rm -v ${PWD}/scripts/.env:/app/scripts/.env photos-optimizer
+#
+# Or use the npm script:
+#   npm run optimize:docker
+
+FROM node:20-bookworm
+
+# Install avifenc/avifdec for 10-bit AVIF encoding (libavif-bin)
+# and imagemagick for format conversion
+RUN apt-get update && apt-get install -y \
+    libavif-bin \
+    imagemagick \
+    && rm -rf /var/lib/apt/lists/*
+
+# Verify avifenc is available and check version
+RUN avifenc --version
+
+WORKDIR /app
+
+# Copy package files first for better caching
+COPY package.json package-lock.json ./
+
+# Install all dependencies
+RUN npm ci
+
+# Copy scripts
+COPY scripts/ ./scripts/
+
+# Default command runs the optimizer with force flag
+CMD ["node", "scripts/optimize-web-images.js", "--force"]
