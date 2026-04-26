@@ -1,5 +1,4 @@
 export * from './albums';
-export * from './folders';
 
 // Photo type definition for mock data
 export type Photo = {
