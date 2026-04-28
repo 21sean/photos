@@ -1176,29 +1176,6 @@ body:has(.globe-container) aside.absolute.z-50 {
   }
 }
 
-/* Album title typewriter caret for globe page */
-body:has(.globe-container) .typewriter {
-  --caret: currentColor;
-}
-
-body:has(.globe-container) .typewriter::after {
-  content: none;
-  border-right: 0;
-  animation: none;
-}
-body:has(.globe-container) .typewriter.thick::after {
-  border-right-width: 1ch;
-}
-body:has(.globe-container) .typewriter.nocaret::after {
-  border-right: 0;
-}
-
-@media (prefers-reduced-motion) {
-  body:has(.globe-container) .typewriter::after {
-    animation: none;
-  }
-}
-
 /* iOS Safari specific image preservation styles */
 @supports (-webkit-touch-callout: none) {
   .masonry-item img,
