@@ -73,9 +73,6 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
   const [isDesktopChrome, setIsDesktopChrome] = React.useState(false);
   const [shouldAnimate, setShouldAnimate] = React.useState(false);
   const [isSliding, setIsSliding] = React.useState(false);
-  const [animatingTitle, setAnimatingTitle] = React.useState<string | null>(null);
-  const [typedMap, setTypedMap] = React.useState<Record<string, string>>({});
-  const typingTimers = React.useRef<Record<string, number>>({});
 
   // Detect Chrome desktop after mount
   React.useEffect(() => {
@@ -108,36 +105,11 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
     (onSelect ?? onEnter)(album);
   }, [onSelect, onEnter]);
 
-  // iOS/non-Chrome: original click handler with typewriter animation
   const handleAlbumTitleClick = (album: Album, event?: React.MouseEvent | React.TouchEvent) => {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
     }
-
-    // clear any existing timer for this album
-    if (typingTimers.current[album.title]) {
-      window.clearTimeout(typingTimers.current[album.title]);
-      delete typingTimers.current[album.title];
-    }
-
-    // start typewriter: progressively reveal the album.title into typedMap
-    const full = album.title;
-    setTypedMap(prev => ({ ...prev, [full]: '' }));
-    setAnimatingTitle(full);
-
-    const stepMs = 130;
-    const run = (idx: number) => {
-      if (idx > full.length) {
-        typingTimers.current[full] = window.setTimeout(() => {
-          setAnimatingTitle(null);
-        }, 850) as unknown as number;
-        return;
-      }
-      setTypedMap(prev => ({ ...prev, [full]: full.slice(0, idx) }));
-      typingTimers.current[full] = window.setTimeout(() => run(idx + 1), stepMs) as unknown as number;
-    };
-    run(0);
 
     setIsSliding(true);
     (onSelect ?? onEnter)(album);
@@ -230,7 +202,7 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
     );
   }
 
-  // iOS/non-Chrome: original implementation with typewriter animation
+  // iOS/non-Chrome: original implementation
   return (
     <div className="album-list-wrapper h-full" ref={wrapperRef}>
       <ul
@@ -251,8 +223,8 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
             key={album.title}
             className="max-w-fit"
           >
-            <span 
-              className={`album-list-item ${activeAlbumTitle === album.title ? 'album-title-active' : ''} cursor-pointer hover:text-gray-500 touch-manipulation select-none ${animatingTitle === album.title ? 'typewriter thick' : ''}`}
+            <span
+              className={`album-list-item ${activeAlbumTitle === album.title ? 'album-title-active' : ''} cursor-pointer hover:text-gray-500 touch-manipulation select-none`}
               onMouseEnter={() => onEnter(album)}
               onMouseLeave={() => onLeave()}
               onClick={(e) => handleAlbumTitleClick(album, e)}
@@ -262,9 +234,7 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
                 handleAlbumTitleClick(album, e);
               }}
             >
-              <span aria-live="polite" aria-atomic="true">
-                {animatingTitle === album.title ? (typedMap[album.title] ?? '') : album.title}
-              </span>
+              <span>{album.title}</span>
             </span>
           </li>
         ))}
