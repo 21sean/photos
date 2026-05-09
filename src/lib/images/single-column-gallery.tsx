@@ -6,7 +6,6 @@ import { Photo } from '@/types';
 import HDRImage from './hdr-image';
 import { FlipIcon } from '../icons';
 import ScrollReveal from '../fx/scroll-reveal';
-import { useLightbox } from '../../hooks/use-lightbox';
 import { setupImageCleanup } from './ios-image-cleanup';
 
 // Format EXIF data for overlay
@@ -143,7 +142,6 @@ interface SingleColumnGalleryProps {
 }
 
 export function SingleColumnGallery({ photos, className = '' }: SingleColumnGalleryProps) {
-  useLightbox(photos);
   const containerRef = React.useRef<HTMLDivElement>(null);
   
   // Setup iOS image memory cleanup
