@@ -85,24 +85,6 @@ export function detectHDRCapabilities(): HDRCapabilities {
 }
 
 /**
- * Get optimal color space for image based on HDR capabilities
- */
-export function getOptimalColorSpace(isHDR: boolean = false, colorSpace?: string): string {
-  const capabilities = detectHDRCapabilities();
-  
-  if (isHDR) {
-    if (colorSpace === 'Rec2020' && capabilities.supportsRec2020) {
-      return 'rec2020';
-    }
-    if (colorSpace === 'P3' && capabilities.supportsP3) {
-      return 'display-p3';
-    }
-  }
-  
-  return 'srgb';
-}
-
-/**
  * Check if an image URL appears to be HDR based on file extension or URL patterns
  */
 export function isLikelyHDR(url: string): boolean {

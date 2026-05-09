@@ -5,43 +5,19 @@
  * Update R2_BASE_URL when your custom domain is configured.
  */
 
-// Base URL for R2 images
-// Once your custom domain is set up, change this to: 'https://images.sean.ventures'
-export const R2_BASE_URL = 'https://images.sean.ventures';
-
-// Fallback to direct R2 endpoint if needed (before custom domain is configured)
-// export const R2_BASE_URL = 'https://pub-XXXXX.r2.dev'; // Your public bucket URL
+// Base URL for the R2 bucket, served through the custom domain.
+const R2_BASE_URL = 'https://images.sean.ventures';
 
 /**
- * Generate a full R2 URL for an image
- * Uses web-optimized AVIF versions from the web/ folder
+ * Generate a full R2 URL for an image.
+ * Resolves to the web-optimized AVIF version stored under the web/ prefix.
  * @param album - Album slug (folder name in R2)
  * @param filename - Image filename
  * @returns Full URL to the web-optimized image
  */
 export function getImageUrl(album: string, filename: string): string {
-  // Convert to web-optimized AVIF path
   const baseName = filename.replace(/\.[^.]+$/, ''); // Remove extension
   return `${R2_BASE_URL}/web/${album}/${baseName}.avif`;
-}
-
-/**
- * Generate a full R2 URL for the original image (not web-optimized)
- * @param album - Album slug (folder name in R2)
- * @param filename - Image filename
- * @returns Full URL to the original image
- */
-export function getOriginalImageUrl(album: string, filename: string): string {
-  return `${R2_BASE_URL}/${album}/${filename}`;
-}
-
-/**
- * Generate R2 URL from just a path
- * @param path - Path relative to bucket root (e.g., "lisbon/photo-1.jpeg")
- * @returns Full URL to the image
- */
-export function getR2Url(path: string): string {
-  return `${R2_BASE_URL}/${path}`;
 }
 
 /**

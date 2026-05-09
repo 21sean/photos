@@ -11,7 +11,7 @@
 import { isIOSSafari } from '../browser-utils';
 
 // Tiny transparent 1x1 GIF - only 43 bytes
-export const EMPTY_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const EMPTY_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
 // Data attribute to store original src
 const ORIGINAL_SRC_ATTR = 'data-original-src';
@@ -22,7 +22,7 @@ let cleanupEnabled: boolean | null = null;
 /**
  * Check if image cleanup should be enabled
  */
-export function isCleanupEnabled(): boolean {
+function isCleanupEnabled(): boolean {
   if (cleanupEnabled === null) {
     cleanupEnabled = isIOSSafari();
   }
@@ -106,67 +106,8 @@ function releaseImage(img: HTMLImageElement): void {
  */
 function restoreImage(img: HTMLImageElement): void {
   const originalSrc = img.getAttribute(ORIGINAL_SRC_ATTR);
-  
+
   if (originalSrc && img.src === EMPTY_GIF) {
     img.src = originalSrc;
   }
-}
-
-/**
- * Hook for React components to setup image cleanup
- */
-export function useIOSImageCleanup(
-  containerRef: React.RefObject<HTMLElement>,
-  deps: React.DependencyList = []
-): void {
-  if (typeof window === 'undefined') return;
-  
-  // This will be called from useEffect in the component
-  // We can't use React hooks here, so this is just the setup function
-}
-
-/**
- * Observe a single image for cleanup (for dynamically created images)
- */
-export function observeImageForCleanup(
-  img: HTMLImageElement,
-  observer: IntersectionObserver
-): void {
-  if (!isCleanupEnabled()) return;
-  
-  // Store original src
-  if (img.src && !img.src.startsWith('data:')) {
-    img.setAttribute(ORIGINAL_SRC_ATTR, img.src);
-  }
-  
-  observer.observe(img);
-}
-
-/**
- * Create a shared observer for a gallery
- * Use this when dynamically adding images
- */
-export function createImageCleanupObserver(
-  rootMargin = '200% 0px'
-): IntersectionObserver | null {
-  if (!isCleanupEnabled()) return null;
-
-  return new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        const img = entry.target as HTMLImageElement;
-        
-        if (entry.isIntersecting) {
-          restoreImage(img);
-        } else {
-          releaseImage(img);
-        }
-      });
-    },
-    {
-      root: null,
-      rootMargin,
-      threshold: 0,
-    }
-  );
 }
