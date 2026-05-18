@@ -6,7 +6,7 @@ import { GlobeIcon } from '@/lib/icons';
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Album, AlbumList } from '@/types/albums';
 import { Photo } from '@/types';
-import { titleToSlug } from '@/lib/api/slug';
+import { titleToSlug } from '@/lib/slug';
 import Stack from '@mui/material/Stack';
 import WaveBackground from '@/lib/fx/wave-background';
 import ShaderBackground from '@/lib/fx/shader-background';

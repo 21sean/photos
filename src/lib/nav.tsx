@@ -5,7 +5,7 @@ import { AlbumList, AlbumTitle } from '../types/albums';
 import React from 'react';
 import { motion, useInView } from 'framer-motion';
 import { GlobeIcon, InfoIcon, SocialIcon } from './icons';
-import { titleToSlug } from './api/slug';
+import { titleToSlug } from './slug';
 
 // Animated menu item component
 const NavMenuItem: React.FC<{
