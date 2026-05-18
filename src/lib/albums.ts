@@ -1,14 +1,14 @@
 /**
- * Album Data for Photography Portfolio
- * 
- * This file defines album metadata (locations, descriptions, etc.)
- * Photos are defined separately in photos.ts and linked via R2.
- * 
+ * Album metadata for the photography portfolio.
+ *
+ * Each entry describes one destination: its title, map coordinates, colour, and
+ * the cities shown on the album page. Photos live separately in photos.ts and
+ * are matched to an album by slug at the bottom of this file.
+ *
  * To add a new album:
- * 1. Add album metadata below
- * 2. Create folder in R2: node scripts/create-r2-folders.js
- * 3. Add photos to photos.ts
- * 4. Upload images: node scripts/migrate-to-r2.js
+ * 1. Add an entry to albumsMeta below.
+ * 2. Upload the images to the matching folder in R2 (scripts/migrate-to-r2.js).
+ * 3. Rebuild the photo manifest (scripts/build-photos-manifest.sh).
  */
 
 import { AlbumTitle } from '../types/albums';
@@ -362,10 +362,10 @@ const albumsMeta: AlbumMeta[] = [
 // =============================================================================
 
 /**
- * Generate full album objects with photos from R2
- * This is what the app consumes
+ * Full album objects with their photos resolved from R2. This is what the app
+ * consumes via the accessors in data.ts.
  */
-export const mockAlbums = albumsMeta.map(album => ({
+export const albums = albumsMeta.map(album => ({
   title: album.title as AlbumTitle,
   color: album.color,
   type: album.type,
@@ -379,18 +379,3 @@ export const mockAlbums = albumsMeta.map(album => ({
   // Photos come from the separate photos.ts file, converted to full URLs
   photos: toPhotos(album.slug, albumPhotos[album.slug] || []),
 }));
-
-// =============================================================================
-// FOLDERS (unchanged)
-// =============================================================================
-
-export const mockFolders = [
-  {
-    title: "Photography" as AlbumTitle,
-    parent_title: "Events" as AlbumTitle,
-    description: "",
-    date: "2024",
-    order: 1,
-    photos: []
-  }
-];

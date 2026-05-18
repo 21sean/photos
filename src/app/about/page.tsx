@@ -1,4 +1,4 @@
-import { getAlbums } from '@/lib/api';
+import { getAlbums } from '@/lib/data';
 import Globe from '@/lib/globes/mini-globe';
 import Nav from '@/lib/nav';
 import Noise from '@/lib/fx/noise';

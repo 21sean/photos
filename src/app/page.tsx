@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import './globals.css';
-import { getAlbums } from '@/lib/api';
+import { getAlbums } from '@/lib/data';
 
 const Globe = dynamic(() => import('@/lib/globes/globe'), {
   ssr: false

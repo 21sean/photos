@@ -1,5 +1,5 @@
-import { getAlbums, getAlbum } from '@/lib/api';
-import { titleToSlug, slugToAlbumTitle } from '@/lib/api/slug';
+import { getAlbums, getAlbum } from '@/lib/data';
+import { titleToSlug } from '@/lib/slug';
 import AlbumPageClient from './client';
 import { notFound } from 'next/navigation';
 

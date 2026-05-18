@@ -9,8 +9,8 @@ import { geoGraticule10 } from 'd3-geo';
 import * as topojson from 'topojson-client';
 import { useWindowSize } from '@/hooks/use-window-size';
 import { Album, AlbumTitle, types } from '@/types/albums';
-import { titleToSlug } from '@/lib/api/slug';
-import { AlbumCard } from './card';
+import { titleToSlug } from '@/lib/slug';
+import { AlbumCard } from './album-card';
 import useHDRSetup from '@/hooks/use-hdr-setup';
 import AlbumList from '@/lib/globes/album-list';
 
