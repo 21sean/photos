@@ -35,3 +35,11 @@ scripts/.env
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# stray local downloads kept in the working tree but not part of the project
+/openrefine-win-with-java-3.9.5/
+/gh7AlpZX1l_hw1/
+/*.zip
+/*.exe
+/*.pdf
+/*.avif
