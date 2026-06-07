@@ -1,157 +1,125 @@
 # Photos
 
-An interactive HDR photography portfolio featuring travel photographs from around the world, presented on an immersive 3D globe interface.
+A travel photography portfolio that lets you browse a collection of photos from around the globe. Click a photo on the rotating 3D globe and you land in a gallery for that destination, with EXIF details on every shot. HDR images lean on the browser's own tone mapping rather than faking it with CSS filters.
 
 ## Features
 
-- **Interactive 3D Globe**: Explore albums by geographic location
-- **HDR-aware pipeline**: EXIF + HDR metadata extracted at build time; P3-aware image styling
-- **Responsive gallery**: Masonry layout with hover EXIF badge (focal/aperture/shutter/ISO)
-- **Location-based albums**: Photos organized by destination
-- **Modern UI**: Tailwind CSS + Next.js App Router
-- **Static export ready**: Ship as a static site or run SSR
+* A 3D globe that spins, with clickable locations
+* HDR capable images, so the browser handles tone mapping instead of CSS filters faking it
+* EXIF badges on hover that show focal length, aperture, shutter speed, and ISO
+* Albums organized geographically and served from a Cloudflare R2 bucket
+* Runs as a static site or with server rendering
 
-## Technology Stack
+## Tech stack
 
-- **Framework**: [Next.js 14](https://nextjs.org/) with App Router
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **3D Visualization**: [React Three Fiber](https://docs.pmnd.rs/react-three-fiber), [Three.js](https://threejs.org/), [Cobe](https://github.com/shuding/cobe)
-- **Layout**: [Masonic](https://github.com/jaredLunde/masonic) for masonry grid layouts
+* Next.js 14 with the App Router
+* TypeScript
+* Tailwind CSS
+* three.js with react-globe.gl for the main globe, and Cobe for the small globe on the about page
+* framer-motion for animation
+* sharp and libavif for the image optimization scripts
 
-## Getting Started
+## Getting started
 
-### Prerequisites
-
-- Node.js 20+ (recommended)
-- npm or compatible package manager
-
-### Installation
-
-1. Clone the repository:
+You need Node.js 20 or newer.
 
 ```sh
 git clone https://github.com/21sean/photos.git
 cd photos
-```
-
-2. Install dependencies:
-
-```sh
 npm install
-```
-
-3. Run the development server:
-
-```sh
 npm run dev
 ```
 
-4. Open http://localhost:3000 in your browser
+Once the dev server is up, open http://localhost:3000 in your browser.
 
-## Development
+## Scripts
 
-### Available Scripts
+* `npm run dev` starts the development server
+* `npm run build` builds the app for production
+* `npm run build:static` produces a static export at `out/`
+* `npm run start` serves a production build
+* `npm run lint` runs ESLint
+* `npm run check` compiles TypeScript without emitting anything
+* `npm run format` and `npm run format:fix` check and fix formatting with Prettier
+* `npm run knip` reports unused files, exports, and dependencies
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run format:fix` - Fix code formatting with Prettier
-- `npm run check` - Run TypeScript type checking
-- `npm run knip` - Find unused dependencies and exports
-- `npm run check:all` - Run all checks (TypeScript, Knip, ESLint, Prettier)
-- `npm run test` - Run Playwright tests
-- `npm run build:static` - Build as static site for export
-- `npm run deploy:static` - Build and deploy static site
-- `npm run sync:photos` - Rebuild `src/lib/photos.json` from R2 (EXIF + HDR)
-
-### Project Structure
+## Project structure
 
 ```
 src/
-├── app/              # Next.js App Router pages
-│   ├── [slug]/       # Dynamic album pages
-│   ├── about/        # About page
-│   ├── folders/      # Folder views
-│   ├── tags/         # Tag-based filtering
-│   └── page.tsx      # Homepage with globe
-├── lib/              # Components, utilities, and data
-│   ├── api/          # Data fetching logic
-│   ├── globes/       # Globe visualization components
-│   ├── images/       # Gallery/masonry/HDR image components
-│   ├── fx/           # Background and scroll effects
-│   ├── icons/        # SVG icon components
-│   ├── mock-data.ts  # Album definitions
-│   └── photos.json   # Generated photo manifest (EXIF + HDR)
-├── types/            # TypeScript type definitions
-├── hooks/            # Custom React hooks
-├── data/             # Static geo data files
-└── fonts/            # Custom fonts
+  app/                Next.js App Router pages
+    [slug]/           album pages (server page plus client view)
+    about/            about page
+    layout.tsx        root layout and metadata
+    page.tsx          home page with the globe
+    globals.css       global styles
+  lib/
+    albums.ts         album metadata (titles, coordinates, cities)
+    photos.ts         loads the generated photos.json manifest
+    data.ts           album accessors used by the pages
+    slug.ts           turns a title into a URL slug
+    r2.ts             builds Cloudflare R2 image URLs
+    nav.tsx           site navigation
+    globes/           main globe, mini globe, album list, album card
+    images/           HDR image, single column gallery, iOS memory cleanup
+    fx/               canvas and shader backgrounds, scroll reveal, noise
+    icons/            small SVG icons
+  hooks/              window size and HDR setup hooks
+  data/               land geometry for the globe
+  types/              shared TypeScript types
+  fonts/              variable font
 ```
 
-## Data Configuration
+## Photo data
 
-Photos are sourced from Cloudflare R2 and materialized into `src/lib/photos.json` (generated). Albums live in `src/lib/mock-data.ts` and reference photos via `src/lib/photos.ts` helpers.
+Your photos live in a Cloudflare R2 bucket. Album metadata is entered by hand in `src/lib/albums.ts`, while the photo list for each album is read from `src/lib/photos.json`, which is generated from the bucket rather than edited directly.
 
-### Photo manifest generation (EXIF + HDR)
-
-Run the sync script to rebuild `src/lib/photos.json` from the R2 bucket and extract EXIF:
+### Rebuilding the manifest
 
 ```sh
-npm run sync:photos      # or: node scripts/sync-photos.js
-# Optional flags:
-#   --dry-run   Preview JSON to stdout
-#   --quick     Skip EXIF extraction (faster)
+npm run sync:photos
 ```
 
-R2 credentials are read from `scripts/.env` (gitignored). See `scripts/test-r2.js`
-to verify connectivity before syncing.
-
-The script pulls width/height, ISO, aperture, shutter, focal length, date, GPS (if present), and tries to capture HDR mastering luminance if available. HDR fields appear under `hdrMetadata` when present.
-
-### AI enrichment (single photo)
-
-`scripts/enrich-photo-ai.js` updates **one** entry in `src/lib/photos.json` with:
-
-- `aiDescriptionHtml`: Wikipedia-style 1–2 sentence overview using HTML links (`<a href="...">…</a>`)
-- `gps`: _only if missing_ in the entry, a best-guess `{ lat, lng, altitude? }`
-
-It is intentionally limited to a single photo so output quality can be validated before running anything in bulk.
-
-#### Run (dry-run)
+This runs `scripts/sync-photos.js`, which lists the bucket, pulls EXIF and HDR metadata (dimensions, ISO, aperture, shutter speed, focal length, date, and GPS when present), and writes `src/lib/photos.json`.
 
 ```sh
-OPENAI_API_KEY="..." node scripts/enrich-photo-ai.js --album mexico --filename IMG_4684.jpeg --dry-run
+node scripts/sync-photos.js --quick    # skip EXIF for speed
+node scripts/sync-photos.js --dry-run  # preview without writing
 ```
 
-#### Run (write)
+There is also `scripts/build-photos-manifest.sh`, which builds the same manifest straight from the bucket with rclone.
+
+### Web optimized images
+
+Original images in the bucket can be heavy, so the optimizer builds size capped AVIF copies under a `web/` prefix and keeps wide gamut and HDR color wherever it can. For full 10 bit AVIF support, a Docker image bundles libavif so the encoder is always available.
 
 ```sh
-OPENAI_API_KEY="..." node scripts/enrich-photo-ai.js --album mexico --filename IMG_4684.jpeg
+npm run optimize:web         # encode and upload
+npm run optimize:web:dry     # preview only
+npm run optimize:web:force   # overwrite what is already there
+npm run optimize:docker:build
+npm run optimize:docker
 ```
 
-Optionally (recommended), pass an image URL so the model can analyze the photo directly:
+### Other scripts
 
-```sh
-OPENAI_API_KEY="..." node scripts/enrich-photo-ai.js --album mexico --filename IMG_4684.jpeg --image-url "https://images.sean.ventures/mexico/IMG_4684.jpeg" --dry-run
-```
+* `scripts/migrate-to-r2.js` uploads source images into the bucket
+* `scripts/enrich-photo-ai.js` writes an AI description and a location guess for a single photo
+* `scripts/update-cache-headers.js` refreshes cache headers on existing objects
+* `scripts/test-r2.js` checks bucket connectivity
+* `scripts/webp.sh` converts images to WebP locally
+
+Every script reads credentials from `scripts/.env` or a root `.env` (CF_URL, Access_Key_ID, Secret_Access_Key).
 
 ## Deployment
 
-### Static Export
-
-The project supports static site generation:
+The site builds to a static export and ships through GitHub Pages. The workflow in `.github/workflows/nextjs.yaml` runs on every push to the main branch.
 
 ```sh
-npm run build:static
+npm run build:static   # writes the static site to out/
 ```
 
-This creates a fully static version in the `out/` directory that can be deployed to any static hosting service (Vercel, Netlify, GitHub Pages, etc.).
-
-### Standard Deployment
-
-For server-side rendering, deploy using Next.js-compatible platforms like Vercel:
+If you would rather run it with a server:
 
 ```sh
 npm run build
@@ -160,8 +128,4 @@ npm run start
 
 ## License
 
-Copyright © 2026 Sean P. All rights reserved.
-
-This is a private portfolio. The source code is provided for reference only,
-and all photographs are protected by copyright and may not be reused without
-written permission. See [LICENSE](./LICENSE) for full terms.
+Copyright 2026 Sean P. All rights reserved. The source is published for reference only, and the photographs may not be reused without written permission. See [LICENSE](./LICENSE) for the full terms.
