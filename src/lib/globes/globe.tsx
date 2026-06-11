@@ -241,8 +241,10 @@ function useAlbumInteraction(
 
     const id = setTimeout(() => {
       if (type === types.LOCATION) {
-        // Slightly more zoomed out on mobile devices, 30% more zoom when selected
-        const altitudeOnFocus = isMobileDevice() ? 0.84 : 0.7;
+        // Slightly more zoomed out on mobile devices, 30% more zoom when selected.
+        // On mobile, the zoom-in is disabled: keep the default mobile altitude so the
+        // camera still pans to the location without zooming in.
+        const altitudeOnFocus = isMobileDevice() ? /* zoom-in disabled: 0.84 */ 2.8 : 0.7;
         globeEl.current?.pointOfView(
           {
             lat,
