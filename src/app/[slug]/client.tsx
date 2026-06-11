@@ -201,7 +201,7 @@ export default function AlbumPageClient({
 
       <Stack spacing={2} sx={{ flex: 1, minWidth: 0, alignItems: 'center' }}>
         <div
-          className="rounded-lg bg-gray-900/90 px-5 py-4 relative"
+          className="album-title-box rounded-lg bg-gray-900/90 px-5 py-4 relative"
           style={{ width: contentWidth ?? 'auto', maxWidth: '100%' }}
         >
           <div className="flex justify-between items-start mb-4">
