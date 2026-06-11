@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier",
-    "format:fix": "prettier --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
     "knip": "knip",
     "knip:fix": "knip --fix",
     "check": "tsc --noEmit",
@@ -16,7 +16,7 @@
     "test": "npx playwright test",
     "build:static": "cross-env NEXT_OUTPUT=export next build",
     "deploy:static": "npm run build:static",
-    "sync-photos": "./scripts/build-photos-manifest.sh"
+    "sync:photos": "node scripts/sync-photos.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.958.0",
@@ -28,13 +28,11 @@
     "classnames": "^2.5.1",
     "cobe": "^0.6.5",
     "d3-geo": "^3.1.1",
-    "dotenv": "^16.4.5",
-    "exiftool-vendored": "^34.2.0",
+    "exiftool-vendored": "^36.0.0",
     "framer-motion": "^12.25.0",
     "masonic": "^4.0.0",
     "next": "^14.2.32",
     "photoswipe": "^5.4.3",
-    "point-in-polygon-hao": "^1.2.4",
     "prettier": "^3.2.5",
     "react": "^18",
     "react-dom": "^18",
@@ -58,6 +56,7 @@
     "typescript": "^5"
   },
   "overrides": {
-    "glob": "10.5.0"
+    "glob": "10.5.0",
+    "minimatch": "^10.0.3"
   }
 }
