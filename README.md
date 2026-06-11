@@ -1,10 +1,10 @@
 # Photos
 
-An interactive HDR photography portfolio featuring travel photos from around the world, displayed on an immersive 3D globe interface.
+An interactive HDR photography portfolio featuring travel photographs from around the world, presented on an immersive 3D globe interface.
 
 ## Features
 
-- **Interactive 3D Globe**: Explore albums by location 
+- **Interactive 3D Globe**: Explore albums by geographic location
 - **HDR-aware pipeline**: EXIF + HDR metadata extracted at build time; P3-aware image styling
 - **Responsive gallery**: Masonry layout with hover EXIF badge (focal/aperture/shutter/ISO)
 - **Location-based albums**: Photos organized by destination
@@ -29,17 +29,20 @@ An interactive HDR photography portfolio featuring travel photos from around the
 ### Installation
 
 1. Clone the repository:
+
 ```sh
 git clone https://github.com/21sean/photos.git
 cd photos
 ```
 
 2. Install dependencies:
+
 ```sh
 npm install
 ```
 
 3. Run the development server:
+
 ```sh
 npm run dev
 ```
@@ -61,6 +64,7 @@ npm run dev
 - `npm run test` - Run Playwright tests
 - `npm run build:static` - Build as static site for export
 - `npm run deploy:static` - Build and deploy static site
+- `npm run sync:photos` - Rebuild `src/lib/photos.json` from R2 (EXIF + HDR)
 
 ### Project Structure
 
@@ -72,14 +76,17 @@ src/
 │   ├── folders/      # Folder views
 │   ├── tags/         # Tag-based filtering
 │   └── page.tsx      # Homepage with globe
-├── components/       # React components
-├── lib/              # Utilities and data
+├── lib/              # Components, utilities, and data
+│   ├── api/          # Data fetching logic
 │   ├── globes/       # Globe visualization components
-│   ├── mock-data.ts  # Album and photo data
-│   └── api.ts        # Data fetching logic
+│   ├── images/       # Gallery/masonry/HDR image components
+│   ├── fx/           # Background and scroll effects
+│   ├── icons/        # SVG icon components
+│   ├── mock-data.ts  # Album definitions
+│   └── photos.json   # Generated photo manifest (EXIF + HDR)
 ├── types/            # TypeScript type definitions
 ├── hooks/            # Custom React hooks
-├── data/             # Static data files
+├── data/             # Static geo data files
 └── fonts/            # Custom fonts
 ```
 
@@ -98,16 +105,20 @@ npm run sync:photos      # or: node scripts/sync-photos.js
 #   --quick     Skip EXIF extraction (faster)
 ```
 
+R2 credentials are read from `scripts/.env` (gitignored). See `scripts/test-r2.js`
+to verify connectivity before syncing.
+
 The script pulls width/height, ISO, aperture, shutter, focal length, date, GPS (if present), and tries to capture HDR mastering luminance if available. HDR fields appear under `hdrMetadata` when present.
 
 ### AI enrichment (single photo)
 
-`script` updates **one** entry in `src/lib/photos.json` with:
+`scripts/enrich-photo-ai.js` updates **one** entry in `src/lib/photos.json` with:
 
 - `aiDescriptionHtml`: Wikipedia-style 1–2 sentence overview using HTML links (`<a href="...">…</a>`)
-- `gps`: *only if missing* in the entry, a best-guess `{ lat, lng, altitude? }`
+- `gps`: _only if missing_ in the entry, a best-guess `{ lat, lng, altitude? }`
 
-It’s intentionally single-photo-only so you can validate output quality before running anything in bulk.
+It is intentionally limited to a single photo so output quality can be validated before running anything in bulk.
+
 #### Run (dry-run)
 
 ```sh
@@ -120,10 +131,10 @@ OPENAI_API_KEY="..." node scripts/enrich-photo-ai.js --album mexico --filename I
 OPENAI_API_KEY="..." node scripts/enrich-photo-ai.js --album mexico --filename IMG_4684.jpeg
 ```
 
-Optional (recommended): pass an image URL so the model can actually see the photo:
+Optionally (recommended), pass an image URL so the model can analyze the photo directly:
 
 ```sh
-OPENAI_API_KEY="..." node scripts/enrich-photo-ai.js --album mexico --filename IMG_4684.jpeg --image-url "jpeg" --dry-run
+OPENAI_API_KEY="..." node scripts/enrich-photo-ai.js --album mexico --filename IMG_4684.jpeg --image-url "https://images.sean.ventures/mexico/IMG_4684.jpeg" --dry-run
 ```
 
 ## Deployment
@@ -149,4 +160,8 @@ npm run start
 
 ## License
 
-Private portfolio project.
+Copyright © 2026 Sean P. All rights reserved.
+
+This is a private portfolio. The source code is provided for reference only,
+and all photographs are protected by copyright and may not be reused without
+written permission. See [LICENSE](./LICENSE) for full terms.
