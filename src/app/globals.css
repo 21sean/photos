@@ -269,7 +269,8 @@ body:has(.globe-container) *:has(.globe-container) {
       width: 50vw !important;
       font-size: 0.8em !important;
       padding: 0.4rem !important;
-      animation: fadeInCard 0.95s ease-out forwards !important;
+      /* Fade-in time increased 50% on mobile (0.95s -> 1.43s) */
+      animation: fadeInCard 1.43s ease-out forwards !important;
     }
     
     /* Improve tap target for click to enter text - ONLY for globe page */
@@ -465,6 +466,23 @@ body:has(.album-page) {
   
   .album-page > .MuiStack-root {
     min-height: auto !important;
+  }
+}
+
+/* Smooth fade-in for the album load page and its title box.
+   Opacity-only so layout space is preserved and there is no shift. */
+.album-page {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+.album-title-box {
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Mobile: title box fade-in time increased 50% (1s -> 1.5s) */
+@media (max-width: 768px) {
+  .album-title-box {
+    animation: fadeIn 1.5s ease-in-out;
   }
 }
 
@@ -676,8 +694,8 @@ aside.absolute.z-50 *::selection {
     width: 50vw !important;
     font-size: 0.7em !important; /* 20% smaller text */
     padding: 0.75rem !important; /* Reduce padding for mobile */
-    /* Preserve the fade-in animation on mobile */
-    animation: fadeInCard 0.65s ease-out forwards !important;
+    /* Preserve the fade-in animation on mobile - time increased 50% (0.65s -> 0.98s) */
+    animation: fadeInCard 0.98s ease-out forwards !important;
   }
   
   /* Album card text adjustments for mobile */
@@ -708,8 +726,8 @@ aside.absolute.z-50 *::selection {
       width: 50vw !important;
       font-size: 0.5em !important;
       padding: 0.75rem !important;
-      /* Preserve the fade-in animation on mobile */
-      animation: fadeInCard 1.65s ease-out forwards !important;
+      /* Preserve the fade-in animation on mobile - time increased 50% (1.65s -> 2.48s) */
+      animation: fadeInCard 2.48s ease-out forwards !important;
     }
   }
 }
