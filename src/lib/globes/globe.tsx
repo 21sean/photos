@@ -302,7 +302,7 @@ function generateArcs(albums: Array<Album>) {
   //   3) Cap number of outgoing arcs per origin point
 
   // Tuning: keep the globe readable when many points share an origin.
-  const MAX_OUTGOING_PER_ORIGIN = 12;
+  const MAX_OUTGOING_PER_ORIGIN = 6;
 
   // Dedupe precision (degrees). 4 decimals is ~11m lat, good enough to merge identical dots.
   const key = (p: LatLng) => coordKey(p.lat, p.lng);
