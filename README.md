@@ -12,10 +12,6 @@ An album page with the photo gallery:
 
 ![Lisbon album page with a single column photo gallery](docs/screenshots/album.png)
 
-The about page:
-
-![About page with the small spinning globe](docs/screenshots/about.png)
-
 ## Features
 
 * A 3D globe that spins, with clickable locations

@@ -60,7 +60,7 @@ export const Nav: React.FC<{
         <h1 className="mb-10 max-sm:flex max-sm:justify-center">
           <Link
             href="/"
-            className={`hover:text-red-600 font-bold flex items-center gap-2 leading-none tracking-tight duration-200 ease-in-out transition-colors`}
+            className={`text-gray-200 hover:text-red-600 font-bold flex items-center gap-2 leading-none tracking-tight duration-200 ease-in-out transition-colors`}
           >
             <GlobeIcon />
             <span className="sm:hidden">Home</span>
@@ -91,7 +91,7 @@ export const Nav: React.FC<{
               <Link
                 href={`/${titleToSlug(album.title)}`}
                 className={`block py-0.5 transition-colors duration-200 ${
-                  isActive ? 'font-bold' : 'hover:text-gray-400'
+                  isActive ? 'font-bold text-white' : 'text-gray-300 hover:text-white'
                 }`}
                 prefetch={false}
               >
@@ -106,7 +106,7 @@ export const Nav: React.FC<{
               <Link
                 href="/about"
                 prefetch={false}
-                className="flex gap-1 items-center text-2xl sm:leading-5 sm:text-[15px] text-gray-400 hover:text-gray-500"
+                className="flex gap-1 items-center text-2xl sm:leading-5 sm:text-[15px] text-gray-300 hover:text-white"
               >
                 <InfoIcon />
                 About
@@ -116,7 +116,7 @@ export const Nav: React.FC<{
               <Link
                 href="/about"
                 prefetch={false}
-                className="flex gap-1 items-center text-2xl sm:leading-5 sm:text-[15px] text-gray-400 hover:text-gray-500"
+                className="flex gap-1 items-center text-2xl sm:leading-5 sm:text-[15px] text-gray-300 hover:text-white"
               >
                 <SocialIcon />
                 Socials
