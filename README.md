@@ -2,6 +2,20 @@
 
 A travel photography portfolio that lets you browse a collection of photos from around the globe. Click a photo on the rotating 3D globe and you land in a gallery for that destination, with EXIF details on every shot. HDR images lean on the browser's own tone mapping rather than faking it with CSS filters.
 
+## Screenshots
+
+Home page with the interactive globe:
+
+![Home page showing the rotating globe and album list](docs/screenshots/home.png)
+
+An album page with the photo gallery:
+
+![Lisbon album page with a single column photo gallery](docs/screenshots/album.png)
+
+The about page:
+
+![About page with the small spinning globe](docs/screenshots/about.png)
+
 ## Features
 
 * A 3D globe that spins, with clickable locations
