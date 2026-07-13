@@ -300,14 +300,13 @@ function usePoints(albums: Array<Album>) {
     const locations = albums.filter(album => album.type === types.LOCATION);
     for (const album of locations) {
       // Prefer the bigger "album" dot when there is overlap.
-      pushUnique({ ...album, radius: 0.19, label: album.title });
+      pushUnique({ ...album, radius: 0.19 });
       for (const location of album.locations) {
         pushUnique({
           ...album,
           lat: location.lat,
           lng: location.lng,
-          radius: 0.135,
-          label: location.description || album.title
+          radius: 0.135
         });
       }
     }
@@ -320,23 +319,16 @@ function usePoints(albums: Array<Album>) {
   };
 }
 
-type ActiveMarker = { lat: number; lng: number; label: string };
-
 function useAlbumInteraction(
   globeEl: GlobeEl,
   setPointAltitude: React.Dispatch<React.SetStateAction<number>>,
   isPinnedRef?: React.MutableRefObject<boolean>
 ) {
   const [activeAlbumTitle, setActiveAlbumTitle] = useState<AlbumTitle>();
-  const [activeMarker, setActiveMarker] = useState<ActiveMarker | null>(null);
 
   const [enterTimeoutId, setEnterTimeoutId] = useState<NodeJS.Timeout>();
-  function handleMouseEnter({ lat, lng, title, type, label }: Album & { label?: string }) {
+  function handleMouseEnter({ lat, lng, title, type }: Album) {
     setActiveAlbumTitle(title);
-    if (type === types.LOCATION) {
-      // Anchor for the pop-up city tooltip: the exact point that was picked
-      setActiveMarker({ lat, lng, label: label ?? title });
-    }
 
     clearTimeout(enterTimeoutId);
 
@@ -373,7 +365,6 @@ function useAlbumInteraction(
     }
     setPointAltitude(BASE_POINT_ALTITUDE);
     setActiveAlbumTitle(undefined);
-    setActiveMarker(null);
 
     const defaultAltitude = isMobileDevice() ? 2.8 : 2;
     globeEl.current?.pointOfView(
@@ -399,7 +390,6 @@ function useAlbumInteraction(
 
   return {
     activeAlbumTitle,
-    activeMarker,
     handleMouseEnter,
     handleMouseLeave
   };
@@ -832,32 +822,9 @@ function Globe({ albums }: { albums: Array<Album> }) {
   const {
     handleMouseEnter,
     handleMouseLeave,
-    activeAlbumTitle,
-    activeMarker
+    activeAlbumTitle
   } = useAlbumInteraction(globeEl, setPointAltitude, isPinnedRef);
   const activeAlbum = albums.find(album => album.title === activeAlbumTitle);
-
-  // Pop-up city tooltip pinned to the selected point (CSS2D layer).
-  // A fresh data object per selection recreates the element, replaying the
-  // pop animation each time a new city is picked.
-  const tooltipData = React.useMemo(
-    () => (activeMarker ? [activeMarker] : []),
-    [activeMarker]
-  );
-  const tooltipElementCb = React.useCallback((d: object) => {
-    const root = document.createElement('div');
-    root.className = 'globe-tooltip';
-    root.style.pointerEvents = 'none';
-    const bubble = document.createElement('div');
-    bubble.className = 'globe-tooltip-bubble';
-    bubble.textContent = (d as ActiveMarker).label;
-    root.appendChild(bubble);
-    return root;
-  }, []);
-  const tooltipVisibilityCb = React.useCallback((el: HTMLElement, isVisible: boolean) => {
-    // Hide the tooltip while its anchor is on the far side of the globe
-    el.style.visibility = isVisible ? 'visible' : 'hidden';
-  }, []);
 
   // arcs animation
   const { arcs } = useArcs(albums);
@@ -1035,13 +1002,6 @@ function Globe({ albums }: { albums: Array<Album> }) {
         customLayerData={customLayerData}
         customThreeObject={customThreeObject}
         customThreeObjectUpdate={customThreeObjectUpdate}
-        htmlElementsData={tooltipData}
-        htmlLat="lat"
-        htmlLng="lng"
-        htmlAltitude={0.012}
-        htmlElement={tooltipElementCb}
-        htmlElementVisibilityModifier={tooltipVisibilityCb}
-        htmlTransitionDuration={0}
       />
 
       <section className={`content-container text-2xl ${isDesktopChrome ? 'fixed left-6 top-24 w-fit' : ''}`}>
