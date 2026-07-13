@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Album, AlbumTitle } from '@/types/albums';
+import ScrambleText from '@/lib/fx/scramble-text';
 
 type Props = {
   albums: Array<Album>;
@@ -71,8 +72,15 @@ const MIN_SCALE = 0.55;
 
 function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSelect, onHideCard }: Props) {
   const [isDesktopChrome, setIsDesktopChrome] = React.useState(false);
+  const [isDesktopPointer, setIsDesktopPointer] = React.useState(false);
   const [shouldAnimate, setShouldAnimate] = React.useState(false);
   const [isSliding, setIsSliding] = React.useState(false);
+
+  // Per-title counters that replay the scramble effect on desktop select
+  const [scrambleKeys, setScrambleKeys] = React.useState<Record<string, number>>({});
+  const replayScramble = React.useCallback((title: string) => {
+    setScrambleKeys(keys => ({ ...keys, [title]: (keys[title] ?? 0) + 1 }));
+  }, []);
 
   // Detect Chrome desktop after mount
   React.useEffect(() => {
@@ -81,6 +89,7 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
     const isDesktop = window.matchMedia &&
       window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     setIsDesktopChrome(isChrome && isDesktop);
+    setIsDesktopPointer(!!isDesktop);
     // Trigger fade animation after a small delay to ensure mount is complete
     if (isChrome && isDesktop) {
       requestAnimationFrame(() => setShouldAnimate(true));
@@ -102,8 +111,9 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
 
   // Chrome desktop: simple click handler that triggers globe interaction
   const handleChromeSelect = React.useCallback((album: Album) => {
+    replayScramble(album.title);
     (onSelect ?? onEnter)(album);
-  }, [onSelect, onEnter]);
+  }, [onSelect, onEnter, replayScramble]);
 
   const handleAlbumTitleClick = (album: Album, event?: React.MouseEvent | React.TouchEvent) => {
     if (event) {
@@ -111,6 +121,10 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
       event.stopPropagation();
     }
 
+    // Desktop-only text effect; mobile keeps its slide-to-the-side behavior untouched
+    if (isDesktopPointer) {
+      replayScramble(album.title);
+    }
     setIsSliding(true);
     (onSelect ?? onEnter)(album);
   };
@@ -172,7 +186,7 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
         className="album-list-wrapper h-full" 
         ref={wrapperRef}
         animate={{ opacity: shouldAnimate ? 1 : 0 }}
-        transition={{ duration: 3.5, ease: "easeOut" }}
+        transition={{ duration: 1, ease: "easeOut" }}
         style={{ opacity: 0 }}
       >
         <motion.ul
@@ -194,7 +208,11 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
               onLeave={onLeave}
               onSelect={handleChromeSelect}
             >
-              {album.title}
+              <ScrambleText
+                text={album.title}
+                mountDelay={250 + index * 45}
+                playKey={scrambleKeys[album.title] ?? 0}
+              />
             </ChromeMenuItem>
           ))}
         </motion.ul>
@@ -218,7 +236,7 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
           ['--album-list-min-height' as any]: `${linePx}px`
         }}
       >
-        {sortedAlbums.map(album => (
+        {sortedAlbums.map((album, index) => (
           <li
             key={album.title}
             className="max-w-fit"
@@ -234,7 +252,11 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
                 handleAlbumTitleClick(album, e);
               }}
             >
-              <span>{album.title}</span>
+              <ScrambleText
+                text={album.title}
+                mountDelay={250 + index * 45}
+                playKey={scrambleKeys[album.title] ?? 0}
+              />
             </span>
           </li>
         ))}
