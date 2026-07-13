@@ -45,7 +45,11 @@ const THEME = {
     polygonStrokeColor: 'black',
     polygonStrokeColorAlt: 'darkslategray', // For non-Mac platforms
     polygonAltitude: 0,
-    
+
+    // Country boundaries (merged single-draw-call line layer)
+    countryBordersColor: '#475569', // Slate-600
+    countryBordersOpacity: 0.45,
+
     // Graticules (lat/lng grid)
     graticulesColor: 'lightgrey',
     graticulesOpacity: 0.47,
@@ -85,7 +89,12 @@ const THEME = {
     polygonStrokeColor: '#f0000000', // Gray-600
     polygonStrokeColorAlt: '#ffffffff', // Gray-700
     polygonAltitude: 0.004, // Land floats just above the ocean sphere surface
-    
+
+    // Country boundaries (merged single-draw-call line layer): steel blue
+    // that echoes the atmosphere without outshining the location dots
+    countryBordersColor: '#7286ad',
+    countryBordersOpacity: 0.5,
+
     // Graticules (lat/lng grid)
     graticulesColor: '#2d3748',
     graticulesOpacity: 0.4,
@@ -217,6 +226,18 @@ const ZOOM_OUT_REDUCTION = 0.6;
 // Intro flight: how long the camera takes to glide in from deep space on load
 const INTRO_FLIGHT_MS = 2400;
 
+// Focus flight: how long the camera takes to fly to a selected location
+const FOCUS_FLIGHT_MS = 1000;
+
+// Mobile zoom-in altitude when a city is selected
+const MOBILE_FOCUS_ALTITUDE = 0.84;
+
+// After the zoom-in lands on mobile, the camera keeps hovering gently along
+// the east-west axis around the city so the shot stays alive without ever
+// losing focus on the selection
+const FOCUS_SWAY_DEG = 0.6;
+const FOCUS_SWAY_PERIOD_MS = 7000;
+
 type Ref = CustomGlobeMethods | undefined; // Reference to globe instance
 type GlobeEl = React.MutableRefObject<Ref>; // React `ref` passed to globe element
 
@@ -326,11 +347,42 @@ function useAlbumInteraction(
 ) {
   const [activeAlbumTitle, setActiveAlbumTitle] = useState<AlbumTitle>();
 
+  // Mobile focus hover: the RAF loop plus the timeout that starts it once
+  // the zoom-in flight has landed
+  const swayRafRef = useRef(0);
+  const swayStartTimeoutRef = useRef<NodeJS.Timeout>();
+
+  const stopFocusSway = React.useCallback(() => {
+    clearTimeout(swayStartTimeoutRef.current);
+    cancelAnimationFrame(swayRafRef.current);
+    swayRafRef.current = 0;
+  }, []);
+  useEffect(() => stopFocusSway, [stopFocusSway]);
+
+  function startFocusSway(lat: number, lng: number) {
+    const prefersReducedMotion =
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    if (prefersReducedMotion) return;
+
+    const start = performance.now();
+    const tick = (now: number) => {
+      const phase = ((now - start) / FOCUS_SWAY_PERIOD_MS) * Math.PI * 2;
+      // Only lat/lng are set: altitude is left alone so pinch-zoom still works
+      globeEl.current?.pointOfView({
+        lat,
+        lng: lng + Math.sin(phase) * FOCUS_SWAY_DEG
+      });
+      swayRafRef.current = requestAnimationFrame(tick);
+    };
+    swayRafRef.current = requestAnimationFrame(tick);
+  }
+
   const [enterTimeoutId, setEnterTimeoutId] = useState<NodeJS.Timeout>();
   function handleMouseEnter({ lat, lng, title, type }: Album) {
     setActiveAlbumTitle(title);
 
     clearTimeout(enterTimeoutId);
+    stopFocusSway();
 
     // Stop auto-rotation when hovering over any location
     if (globeEl.current && globeEl.current.controls) {
@@ -341,18 +393,24 @@ function useAlbumInteraction(
 
     const id = setTimeout(() => {
       if (type === types.LOCATION) {
-        // Slightly more zoomed out on mobile devices, 30% more zoom when selected.
-        // On mobile, the zoom-in is disabled: keep the default mobile altitude so the
-        // camera still pans to the location without zooming in.
-        const altitudeOnFocus = isMobileDevice() ? /* zoom-in disabled: 0.84 */ 2.8 : 0.7;
+        // Slightly more zoomed out on mobile devices, 30% more zoom when selected
+        const isMobile = isMobileDevice();
+        const altitudeOnFocus = isMobile ? MOBILE_FOCUS_ALTITUDE : 0.7;
         globeEl.current?.pointOfView(
           {
             lat,
             lng,
             altitude: altitudeOnFocus
           },
-          1000
+          FOCUS_FLIGHT_MS
         );
+        if (isMobile) {
+          // Begin the gentle hover once the zoom-in flight has landed
+          swayStartTimeoutRef.current = setTimeout(
+            () => startFocusSway(lat, lng),
+            FOCUS_FLIGHT_MS + 100
+          );
+        }
       } else if (type === types.CUSTOM) {
         setPointAltitude(2);
       }
@@ -363,6 +421,7 @@ function useAlbumInteraction(
     if (!force && isPinnedRef?.current) {
       return;
     }
+    stopFocusSway();
     setPointAltitude(BASE_POINT_ALTITUDE);
     setActiveAlbumTitle(undefined);
 
@@ -781,6 +840,59 @@ function useScene(globeElRef: Ref, enabled: boolean) {
   }, [globeElRef, enabled]);
 }
 
+// Country boundary lines sit between the land caps (theme.polygonAltitude)
+// and the location dots (BASE_POINT_ALTITUDE) so they drape over land
+// without occluding markers or z-fighting the caps.
+const COUNTRY_BORDERS_ALTITUDE = 0.005;
+
+// Country boundaries as ONE merged THREE.LineSegments. topojson.mesh dedupes
+// arcs shared by two countries so every border is a single line, and the
+// whole layer is a single draw call — unlike the per-country polygon-stroke
+// path (USE_COUNTRY_POLYGONS), whose per-feature meshes were the perf and
+// jagged-edge deal breaker. Interior borders only: coastlines are already
+// drawn by the land silhouette caps. Renderer MSAA + the devicePixelRatio
+// supersampling + a soft transparent color keep the lines from stair-stepping.
+function useCountryBorders(globeElRef: Ref, enabled: boolean) {
+  useEffect(() => {
+    if (!globeElRef || !enabled) return;
+
+    const scene = globeElRef.scene();
+    let cancelled = false;
+    let borders: any;
+
+    (async () => {
+      const countriesTopo = (await import('../../data/countries-110m.json')) as any;
+      if (cancelled) return;
+
+      const borderLines = topojson.mesh(
+        countriesTopo,
+        countriesTopo.objects.countries,
+        (a: any, b: any) => a !== b
+      );
+
+      const radius = globeElRef.getGlobeRadius() * (1 + COUNTRY_BORDERS_ALTITUDE);
+      borders = new THREE.LineSegments(
+        new GeoJsonGeometry(borderLines, radius, 2),
+        new THREE.LineBasicMaterial({
+          color: theme.countryBordersColor,
+          transparent: true,
+          opacity: theme.countryBordersOpacity
+        })
+      );
+      scene.add(borders);
+    })();
+
+    return () => {
+      cancelled = true;
+      if (borders) {
+        scene.remove(borders);
+        borders.geometry.dispose?.();
+        borders.material.dispose?.();
+      }
+    };
+  }, [globeElRef, enabled]);
+}
+
 const DEFAULT_AUTOROTATE_SPEED = .32; // Reduced by 30% from 1.75
 
 function Globe({ albums }: { albums: Array<Album> }) {
@@ -808,6 +920,9 @@ function Globe({ albums }: { albums: Array<Album> }) {
 
   // scene config (the current look relies on scene decorations)
   useScene(globeElRef, true);
+
+  // country boundary lines draped over the land caps
+  useCountryBorders(globeElRef, true);
 
   // land shapes
   const { landPolygons, polygonMaterial } = useLandPolygons();
