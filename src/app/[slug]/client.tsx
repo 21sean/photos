@@ -201,9 +201,11 @@ export default function AlbumPageClient({
 
       <Stack spacing={2} sx={{ flex: 1, minWidth: 0, alignItems: 'center' }}>
         <div
-          className="album-title-box rounded-lg bg-gray-900/90 px-5 py-4 relative"
+          className="album-title-box rounded-lg px-5 py-4 relative"
           style={{ width: contentWidth ?? 'auto', maxWidth: '100%' }}
         >
+          {/* One-time light sweep across the glass surface on load */}
+          <div className="glass-shine" aria-hidden="true" />
           <div className="flex justify-between items-start mb-4">
             <div>
               <h1 className="font-normal text-2xl text-gray-100 min-w-32">
