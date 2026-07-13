@@ -70,9 +70,10 @@ function calculateImageWidth(photo: Photo): number {
 
 interface GalleryItemProps {
   photo: Photo;
+  priority?: boolean;
 }
 
-function GalleryItem({ photo }: GalleryItemProps) {
+function GalleryItem({ photo, priority = false }: GalleryItemProps) {
   const [isFlipped, setIsFlipped] = React.useState(false);
   
   const width = React.useMemo(() => calculateImageWidth(photo), [photo]);
@@ -95,6 +96,7 @@ function GalleryItem({ photo }: GalleryItemProps) {
             width={width}
             height={height}
             className="w-full h-auto block"
+            priority={priority}
           />
         </div>
 
@@ -167,7 +169,8 @@ export function SingleColumnGallery({ photos, className = '' }: SingleColumnGall
       sx={{ alignItems: 'center' }}
     >
       {photos.map((photo, index) => (
-        <GalleryItem key={photo.url || index} photo={photo} />
+        // Fetch the first photos eagerly at high priority; lazy-load the rest
+        <GalleryItem key={photo.url || index} photo={photo} priority={index < 2} />
       ))}
     </Stack>
   );
