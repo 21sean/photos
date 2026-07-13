@@ -75,6 +75,9 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
   const [isDesktopPointer, setIsDesktopPointer] = React.useState(false);
   const [shouldAnimate, setShouldAnimate] = React.useState(false);
   const [isSliding, setIsSliding] = React.useState(false);
+  // Mobile: once the initial select has slid the list aside, later selects
+  // mark the active title with an animated italic (see .album-title-italic)
+  const [italicSelect, setItalicSelect] = React.useState(false);
 
   // Per-title counters that replay the scramble effect on desktop select
   const [scrambleKeys, setScrambleKeys] = React.useState<Record<string, number>>({});
@@ -124,6 +127,9 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
     // Desktop-only text effect; mobile keeps its slide-to-the-side behavior untouched
     if (isDesktopPointer) {
       replayScramble(album.title);
+    } else if (isSliding) {
+      // The initial select is done: from now on the active title goes italic
+      setItalicSelect(true);
     }
     setIsSliding(true);
     (onSelect ?? onEnter)(album);
@@ -242,7 +248,7 @@ function AlbumListComponent({ albums, activeAlbumTitle, onEnter, onLeave, onSele
             className="max-w-fit"
           >
             <span
-              className={`album-list-item ${activeAlbumTitle === album.title ? 'album-title-active' : ''} cursor-pointer hover:text-gray-500 touch-manipulation select-none`}
+              className={`album-list-item ${activeAlbumTitle === album.title ? 'album-title-active' : ''} ${italicSelect && activeAlbumTitle === album.title ? 'album-title-italic' : ''} cursor-pointer hover:text-gray-500 touch-manipulation select-none`}
               onMouseEnter={() => onEnter(album)}
               onMouseLeave={() => onLeave()}
               onClick={(e) => handleAlbumTitleClick(album, e)}
