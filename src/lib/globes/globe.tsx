@@ -67,24 +67,24 @@ const THEME = {
   },
   dark: {
     // Background
-    backgroundColor: '#2b2b2bff', // Default react-globe.gl dark background
-    
-    // Globe surface
-    showGlobe: false,
+    backgroundColor: '#1a1a1fff', // Match the page background so the canvas blends seamlessly
+
+    // Globe surface (animated gradient ocean shader, see useOceanMaterial)
+    showGlobe: true,
     globeColor: 0x1a1a2e,
-    
+
     // Atmosphere
     showAtmosphere: true,
-    atmosphereColor: 'rgba(218, 224, 240, 1)', // Royal blue glow
+    atmosphereColor: '#9db8ff', // Cool blue halo to match the ocean
     atmosphereAltitude: 0.2,
-    
+
     // Polygons (land/countries)
-    polygonCapColor: 0x1a1a20, // Dark navy blue
-    polygonCapOpacity: 0.93,
+    polygonCapColor: 0x15161d, // Near-black silhouette over the ocean gradient
+    polygonCapOpacity: 0.97,
     polygonSideColor: 'rgba(21, 21, 21, 0.95)',
     polygonStrokeColor: '#f0000000', // Gray-600
     polygonStrokeColorAlt: '#ffffffff', // Gray-700
-    polygonAltitude: -0.0018,
+    polygonAltitude: 0.004, // Land floats just above the ocean sphere surface
     
     // Graticules (lat/lng grid)
     graticulesColor: '#2d3748',
@@ -112,6 +112,103 @@ const theme = DARK_MODE ? THEME.dark : THEME.light;
 
 // Flying lines (arc dash) speed: 1 = current speed, smaller = slower, larger = faster
 const FLYING_LINES_SPEED = 0.3;
+
+// Idle altitude for location dots; must clear the raised land caps
+// (theme.polygonAltitude) so dots stay visible above the ocean sphere.
+const BASE_POINT_ALTITUDE = 0.006;
+
+// ============================================
+// ANIMATED OCEAN (globe surface shader)
+// ============================================
+const OCEAN_VERTEX_SHADER = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vViewPosition;
+  varying vec3 vUnit;
+
+  void main() {
+    vNormal = normalize(normalMatrix * normal);
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    vViewPosition = -mvPosition.xyz;
+    vUnit = normalize(position);
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`;
+
+const OCEAN_FRAGMENT_SHADER = /* glsl */ `
+  uniform float uTime;
+  varying vec3 vNormal;
+  varying vec3 vViewPosition;
+  varying vec3 vUnit;
+
+  // Layered sines stand in for noise: cheap enough for mobile GPUs and
+  // seam-free because every longitude multiplier is an integer.
+  float flowPattern(vec2 p, float t) {
+    float w = 0.0;
+    w += sin(p.x * 3.0 + t * 0.30 + sin(p.y * 4.0 - t * 0.20) * 1.2);
+    w += 0.6 * sin(p.y * 7.0 - t * 0.24 + sin(p.x * 5.0 + t * 0.17));
+    w += 0.4 * sin(p.x * 6.0 + p.y * 9.0 + t * 0.40);
+    return w * 0.5;
+  }
+
+  void main() {
+    vec3 n = normalize(vNormal);
+    vec3 viewDir = normalize(vViewPosition);
+
+    float lat = asin(clamp(vUnit.y, -1.0, 1.0));
+    float lng = atan(vUnit.z, vUnit.x);
+    float flow = flowPattern(vec2(lng, lat), uTime);
+
+    vec3 deep   = vec3(0.016, 0.043, 0.106); // abyssal navy
+    vec3 indigo = vec3(0.075, 0.153, 0.373); // mid-ocean indigo
+    vec3 teal   = vec3(0.031, 0.302, 0.365); // tropical teal accent
+
+    // North-south gradient, slowly warped by the flow field
+    float g = smoothstep(-1.35, 1.35, vUnit.y + 0.45 * flow);
+    vec3 col = mix(deep, indigo, g);
+    col = mix(col, teal, 0.4 * smoothstep(0.25, 1.0, flow));
+
+    // Slow sheen band drifting across the longitudes
+    float band = 0.5 + 0.5 * sin(lng * 2.0 - uTime * 0.12 + sin(lat * 3.0) * 0.8);
+    col += vec3(0.018, 0.045, 0.085) * band;
+
+    // Fresnel rim lifts the silhouette against the dark backdrop
+    float fresnel = pow(1.0 - clamp(dot(n, viewDir), 0.0, 1.0), 2.6);
+    col += fresnel * vec3(0.16, 0.27, 0.55);
+
+    gl_FragColor = vec4(col, 1.0);
+  }
+`;
+
+function useOceanMaterial() {
+  const material = React.useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: { uTime: { value: 8.0 } },
+        vertexShader: OCEAN_VERTEX_SHADER,
+        fragmentShader: OCEAN_FRAGMENT_SHADER
+      }),
+    []
+  );
+
+  useEffect(() => {
+    const prefersReducedMotion =
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    if (prefersReducedMotion) return; // keep the static gradient frame
+
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      material.uniforms.uTime.value = 8.0 + (now - start) / 1000;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [material]);
+
+  useEffect(() => () => material.dispose(), [material]);
+
+  return material;
+}
 
 // Zoom tuning: allow 30% more zoom-in and 50% less zoom-out
 const ZOOM_IN_EXTRA = 0.6;
@@ -187,7 +284,7 @@ function useLandPolygons() {
 }
 
 function usePoints(albums: Array<Album>) {
-  const [altitude, setAltitude] = useState(0.002);
+  const [altitude, setAltitude] = useState(BASE_POINT_ALTITUDE);
   const points = React.useMemo(() => {
     const pts: Array<any> = [];
 
@@ -203,13 +300,14 @@ function usePoints(albums: Array<Album>) {
     const locations = albums.filter(album => album.type === types.LOCATION);
     for (const album of locations) {
       // Prefer the bigger "album" dot when there is overlap.
-      pushUnique({ ...album, radius: 0.19 });
+      pushUnique({ ...album, radius: 0.19, label: album.title });
       for (const location of album.locations) {
         pushUnique({
           ...album,
           lat: location.lat,
           lng: location.lng,
-          radius: 0.135
+          radius: 0.135,
+          label: location.description || album.title
         });
       }
     }
@@ -222,16 +320,23 @@ function usePoints(albums: Array<Album>) {
   };
 }
 
+type ActiveMarker = { lat: number; lng: number; label: string };
+
 function useAlbumInteraction(
   globeEl: GlobeEl,
   setPointAltitude: React.Dispatch<React.SetStateAction<number>>,
   isPinnedRef?: React.MutableRefObject<boolean>
 ) {
   const [activeAlbumTitle, setActiveAlbumTitle] = useState<AlbumTitle>();
+  const [activeMarker, setActiveMarker] = useState<ActiveMarker | null>(null);
 
   const [enterTimeoutId, setEnterTimeoutId] = useState<NodeJS.Timeout>();
-  function handleMouseEnter({ lat, lng, title, type }: Album) {
+  function handleMouseEnter({ lat, lng, title, type, label }: Album & { label?: string }) {
     setActiveAlbumTitle(title);
+    if (type === types.LOCATION) {
+      // Anchor for the pop-up city tooltip: the exact point that was picked
+      setActiveMarker({ lat, lng, label: label ?? title });
+    }
 
     clearTimeout(enterTimeoutId);
 
@@ -266,8 +371,9 @@ function useAlbumInteraction(
     if (!force && isPinnedRef?.current) {
       return;
     }
-    setPointAltitude(0.002);
+    setPointAltitude(BASE_POINT_ALTITUDE);
     setActiveAlbumTitle(undefined);
+    setActiveMarker(null);
 
     const defaultAltitude = isMobileDevice() ? 2.8 : 2;
     globeEl.current?.pointOfView(
@@ -293,6 +399,7 @@ function useAlbumInteraction(
 
   return {
     activeAlbumTitle,
+    activeMarker,
     handleMouseEnter,
     handleMouseLeave
   };
@@ -715,6 +822,9 @@ function Globe({ albums }: { albums: Array<Album> }) {
   // land shapes
   const { landPolygons, polygonMaterial } = useLandPolygons();
 
+  // animated gradient ocean surface
+  const oceanMaterial = useOceanMaterial();
+
   // `albums` map points
   const { points, pointAltitude, setPointAltitude } = usePoints(albums);
 
@@ -722,9 +832,32 @@ function Globe({ albums }: { albums: Array<Album> }) {
   const {
     handleMouseEnter,
     handleMouseLeave,
-    activeAlbumTitle
+    activeAlbumTitle,
+    activeMarker
   } = useAlbumInteraction(globeEl, setPointAltitude, isPinnedRef);
   const activeAlbum = albums.find(album => album.title === activeAlbumTitle);
+
+  // Pop-up city tooltip pinned to the selected point (CSS2D layer).
+  // A fresh data object per selection recreates the element, replaying the
+  // pop animation each time a new city is picked.
+  const tooltipData = React.useMemo(
+    () => (activeMarker ? [activeMarker] : []),
+    [activeMarker]
+  );
+  const tooltipElementCb = React.useCallback((d: object) => {
+    const root = document.createElement('div');
+    root.className = 'globe-tooltip';
+    root.style.pointerEvents = 'none';
+    const bubble = document.createElement('div');
+    bubble.className = 'globe-tooltip-bubble';
+    bubble.textContent = (d as ActiveMarker).label;
+    root.appendChild(bubble);
+    return root;
+  }, []);
+  const tooltipVisibilityCb = React.useCallback((el: HTMLElement, isVisible: boolean) => {
+    // Hide the tooltip while its anchor is on the far side of the globe
+    el.style.visibility = isVisible ? 'visible' : 'hidden';
+  }, []);
 
   // arcs animation
   const { arcs } = useArcs(albums);
@@ -872,6 +1005,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
         animateIn={false}
         backgroundColor={theme.backgroundColor}
         backgroundImageUrl={null}
+        globeMaterial={oceanMaterial}
         atmosphereColor={theme.atmosphereColor}
         atmosphereAltitude={theme.atmosphereAltitude}
         showGlobe={theme.showGlobe}
@@ -901,6 +1035,13 @@ function Globe({ albums }: { albums: Array<Album> }) {
         customLayerData={customLayerData}
         customThreeObject={customThreeObject}
         customThreeObjectUpdate={customThreeObjectUpdate}
+        htmlElementsData={tooltipData}
+        htmlLat="lat"
+        htmlLng="lng"
+        htmlAltitude={0.012}
+        htmlElement={tooltipElementCb}
+        htmlElementVisibilityModifier={tooltipVisibilityCb}
+        htmlTransitionDuration={0}
       />
 
       <section className={`content-container text-2xl ${isDesktopChrome ? 'fixed left-6 top-24 w-fit' : ''}`}>
