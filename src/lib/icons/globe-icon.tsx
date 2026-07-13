@@ -7,7 +7,7 @@ export const GlobeIcon: React.FC = props => {
       aria-label="Globe icon"
       strokeWidth={1.25}
       stroke="currentColor"
-      className="size-6"
+      className="size-6 globe-icon-spin"
       {...props}
     >
       <path
