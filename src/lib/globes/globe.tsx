@@ -117,6 +117,9 @@ const FLYING_LINES_SPEED = 0.3;
 const ZOOM_IN_EXTRA = 0.6;
 const ZOOM_OUT_REDUCTION = 0.6;
 
+// Intro flight: how long the camera takes to glide in from deep space on load
+const INTRO_FLIGHT_MS = 2400;
+
 type Ref = CustomGlobeMethods | undefined; // Reference to globe instance
 type GlobeEl = React.MutableRefObject<Ref>; // React `ref` passed to globe element
 
@@ -523,7 +526,19 @@ function useGlobeReady(globeEl: GlobeEl) {
     controls.autoRotateUserPaused = false; // Initialize the user pause flag
 
     const initialAltitude = isMobileDevice() ? 2.8 : 2;
-    globeEl.current.pointOfView({ lat: 30, lng: -30, altitude: initialAltitude });
+    const prefersReducedMotion =
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    if (prefersReducedMotion) {
+      globeEl.current.pointOfView({ lat: 30, lng: -30, altitude: initialAltitude });
+    } else {
+      // Cinematic arrival: start far out over the Pacific, then glide east and
+      // settle while the canvas sharpens (globeEnter animation in globals.css)
+      globeEl.current.pointOfView({ lat: 2, lng: -110, altitude: initialAltitude * 2.75 });
+      globeEl.current.pointOfView(
+        { lat: 30, lng: -30, altitude: initialAltitude },
+        INTRO_FLIGHT_MS
+      );
+    }
 
     // Start the dynamic rotation speed
     autoRotateSpeed();
@@ -580,26 +595,34 @@ function useGlobeReady(globeEl: GlobeEl) {
     };
   }, [globeEl, globeReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Zoom constraints update
+  // Zoom constraints update (deferred until the intro flight lands so the
+  // far-out starting camera isn't clamped by maxDistance mid-animation)
   useEffect(() => {
     if (!globeReady || !globeEl.current) return;
 
-    const controls = globeEl.current.controls();
-    const isMobile = isMobileDevice();
+    const applyZoomConstraints = () => {
+      if (!globeEl.current) return;
 
-    // Clamp zoom range (OrbitControls distances are in world units)
-    const globeRadius = globeEl.current.getGlobeRadius?.() ?? 100;
-    const distanceForAltitude = (altitude: number) => globeRadius * (1 + altitude);
+      const controls = globeEl.current.controls();
+      const isMobile = isMobileDevice();
 
-    const baselineMinAltitude = isMobile ? 1.2 : 1;
-    const baselineMaxAltitude = isMobile ? 6 : 4;
+      // Clamp zoom range (OrbitControls distances are in world units)
+      const globeRadius = globeEl.current.getGlobeRadius?.() ?? 100;
+      const distanceForAltitude = (altitude: number) => globeRadius * (1 + altitude);
 
-    const minAltitude = baselineMinAltitude * (1 - ZOOM_IN_EXTRA);
-    const maxAltitude = baselineMaxAltitude * (1 - ZOOM_OUT_REDUCTION);
+      const baselineMinAltitude = isMobile ? 1.2 : 1;
+      const baselineMaxAltitude = isMobile ? 6 : 4;
 
-    controls.minDistance = distanceForAltitude(minAltitude);
-    controls.maxDistance = distanceForAltitude(Math.max(maxAltitude, (isMobile ? 2.8 : 2)));
-    controls.update?.();
+      const minAltitude = baselineMinAltitude * (1 - ZOOM_IN_EXTRA);
+      const maxAltitude = baselineMaxAltitude * (1 - ZOOM_OUT_REDUCTION);
+
+      controls.minDistance = distanceForAltitude(minAltitude);
+      controls.maxDistance = distanceForAltitude(Math.max(maxAltitude, (isMobile ? 2.8 : 2)));
+      controls.update?.();
+    };
+
+    const id = setTimeout(applyZoomConstraints, INTRO_FLIGHT_MS + 200);
+    return () => clearTimeout(id);
   }, [globeEl, globeReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Supersampling for better antialiasing - biggest visual improvement for polygon edges
