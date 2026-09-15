@@ -6,6 +6,7 @@ import { Photo } from '@/types';
 import HDRImage from './hdr-image';
 import { FlipIcon } from '../icons';
 import ScrollReveal from '../fx/scroll-reveal';
+import LoadingOrb from '../fx/loading-orb';
 import { setupImageCleanup } from './ios-image-cleanup';
 
 // Format EXIF data for overlay
@@ -75,6 +76,7 @@ interface GalleryItemProps {
 
 function GalleryItem({ photo, priority = false }: GalleryItemProps) {
   const [isFlipped, setIsFlipped] = React.useState(false);
+  const [isPhotoLoading, setIsPhotoLoading] = React.useState(true);
   
   const width = React.useMemo(() => calculateImageWidth(photo), [photo]);
   const aspectRatio = photo.width / photo.height;
@@ -97,8 +99,12 @@ function GalleryItem({ photo, priority = false }: GalleryItemProps) {
             height={height}
             className="w-full h-auto block"
             priority={priority}
+            onLoadingChange={setIsPhotoLoading}
           />
         </div>
+
+        {/* Sits outside the flip wrapper so a flipped photo doesn't mirror it */}
+        <LoadingOrb active={isPhotoLoading} className="absolute inset-0" />
 
         <button
           onClick={() => setIsFlipped(!isFlipped)}

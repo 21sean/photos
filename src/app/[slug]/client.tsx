@@ -11,6 +11,7 @@ import Stack from '@mui/material/Stack';
 import WaveBackground from '@/lib/fx/wave-background';
 import ShaderBackground from '@/lib/fx/shader-background';
 import { isChrome, isIOSSafari } from '@/lib/browser-utils';
+import LoadingOrb from '@/lib/fx/loading-orb';
 
 type BackgroundType = 
   | "wave-blue" 
@@ -34,7 +35,9 @@ const backgroundOptions: { id: BackgroundType; label: string; color: string; typ
 ];
 
 const SingleColumnGallery = dynamic(() => import('@/lib/images/single-column-gallery'), {
-  ssr: false
+  ssr: false,
+  // Covers the gap before the gallery chunk arrives and the photos start loading
+  loading: () => <LoadingOrb className="py-16" />
 });
 
 // Calculate width that fits first image in viewport
