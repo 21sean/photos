@@ -12,6 +12,8 @@ interface HDRImageProps {
   className?: string;
   alt?: string;
   priority?: boolean;
+  /** Notified whenever the photo starts or finishes loading. */
+  onLoadingChange?: (isLoading: boolean) => void;
 }
 
 export function HDRImage({ 
@@ -20,7 +22,8 @@ export function HDRImage({
   height, 
   className = '', 
   alt = '',
-  priority = false 
+  priority = false,
+  onLoadingChange
 }: HDRImageProps) {
   const [hdrCapabilities, setHdrCapabilities] = useState({
     supportsHDR: false,
@@ -61,13 +64,15 @@ export function HDRImage({
   
   const handleImageLoad = useCallback(() => {
     setIsLoading(false);
-  }, []);
+    onLoadingChange?.(false);
+  }, [onLoadingChange]);
 
   // Handle image error - still show something
   const handleImageError = useCallback(() => {
     console.error('Failed to load image:', photo.url);
     setIsLoading(false);
-  }, [photo.url]);
+    onLoadingChange?.(false);
+  }, [photo.url, onLoadingChange]);
 
   // Detect iOS Safari to apply specific optimizations
   const isIOS = isIOSSafari();
