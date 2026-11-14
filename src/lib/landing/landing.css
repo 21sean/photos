@@ -1,0 +1,1152 @@
+/* ==========================================================================
+   Landing page: the globe and the list of places.
+
+   Two layouts, chosen by viewport shape alone (never by browser):
+     stack  phones and other narrow, upright screens. Globe on top, a deck of
+            place cards to swipe through underneath.
+     side   anything wide enough for a column. The list runs down the left
+            and the globe sits right of centre, with a callout on its marker.
+
+   The globe is WebGL, but where it sits and how big it is are decided here:
+   `.globe-frame` is an ordinary box, and the canvas reads its position, its
+   size and the two `--globe-*` settings below, then points the camera to
+   match. Move the box and the globe follows.
+
+   Type is one family throughout, in sentence case. Hierarchy comes from
+   size, weight and the width axis, never from capitals or a second face.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Page frame
+   -------------------------------------------------------------------------- */
+
+html:has(.landing),
+body:has(.landing) {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Gestures here belong to the globe and the deck, not to page zoom */
+body:has(.landing) {
+  touch-action: none;
+}
+
+.landing {
+  --gutter: clamp(1.125rem, 3vw, 2.5rem);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Stack layout: the globe takes whatever the header and deck leave over.
+     --deck-height is measured from the real deck once the page is live. */
+  --deck-height: calc(var(--safe-bottom) + 15rem);
+  --stage-top: calc(var(--safe-top) + 4rem);
+  --stage-bottom: calc(var(--deck-height) + 1.75rem);
+  --stage-height: calc(100dvh - var(--stage-top) - var(--stage-bottom));
+  --globe-x: 50vw;
+  --globe-y: calc(var(--stage-top) + var(--stage-height) / 2);
+  --globe-size: min(92vw, var(--stage-height));
+  /* Camera height over a focused place, in globe radii */
+  --globe-focus-altitude: 1.2;
+  /* 1: keep drifting gently around a focused place */
+  --globe-sway: 1;
+
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Side layout */
+@media (min-width: 900px), (orientation: landscape) and (min-width: 640px) {
+  .landing {
+    --globe-x: 62vw;
+    --globe-y: 52dvh;
+    --globe-size: min(80dvh, 56vw);
+    --globe-focus-altitude: 0.78;
+    --globe-sway: 0;
+  }
+}
+
+/* Small text: 13px at medium weight, sentence case, numbers that line up */
+.landing-nav,
+.index__label,
+.index__num,
+.index__meta,
+.deck__eyebrow,
+.deck__footer,
+.callout__eyebrow,
+.callout__coords,
+.callout__places,
+.callout__footer,
+.hud,
+.sheet__close {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Display text: regular weight, set tight and a touch narrow */
+.wordmark,
+.index__item,
+.deck__title,
+.deck__headline,
+.callout__title {
+  font-weight: 400;
+  font-stretch: 96%;
+  letter-spacing: -0.032em;
+}
+
+/* --------------------------------------------------------------------------
+   Controls: one filled button, one glass capsule
+   -------------------------------------------------------------------------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: 2.75rem;
+  padding: 0 1.1rem;
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: #050a0c;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition:
+    translate 0.2s var(--ease-out),
+    scale 0.12s ease;
+}
+
+.button:hover {
+  translate: 0 -1px;
+}
+
+.button:active {
+  scale: 0.97;
+}
+
+/* --------------------------------------------------------------------------
+   Glass
+   Panels marked data-glass are painted by the globe itself, which refracts
+   the scene under them (lib/globe/glass.ts). Until that is running, and if
+   WebGL is not available at all, they fall back to a plain frosted panel.
+   -------------------------------------------------------------------------- */
+
+[data-glass] {
+  border: 1px solid rgb(255 255 255 / 0.16);
+  background: rgb(8 16 18 / 0.62);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+}
+
+.landing[data-glass-live='true'] [data-glass] {
+  /* The rim, the tint and the blur are all in the WebGL pass now */
+  border-color: transparent;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* --------------------------------------------------------------------------
+   Globe
+   -------------------------------------------------------------------------- */
+
+.globe-frame {
+  position: fixed;
+  z-index: 0;
+  left: var(--globe-x);
+  top: var(--globe-y);
+  width: var(--globe-size);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+/* Stand-in planet, shown until the WebGL globe has rendered */
+.globe-frame__orb {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 34% 30%,
+    #17616a 0%,
+    #0a3138 40%,
+    #04161a 74%,
+    #020b0d 100%
+  );
+  box-shadow:
+    0 0 0 1px rgb(127 223 233 / 0.14),
+    0 0 5rem 0.6rem rgb(60 190 205 / 0.2),
+    inset -2rem -2.5rem 5rem rgb(0 0 0 / 0.55);
+  opacity: 0.85;
+  transition: opacity 1.2s ease;
+  animation: orb-breathe 2.6s ease-in-out infinite;
+}
+
+.landing[data-ready='true'] .globe-frame__orb {
+  opacity: 0;
+  animation: none;
+}
+
+@keyframes orb-breathe {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.globe-canvas {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* The tallest the viewport gets, so the scene carries on underneath
+     translucent browser chrome instead of stopping at its edge */
+  height: 100lvh;
+  opacity: 0;
+  cursor: grab;
+  touch-action: none;
+}
+
+.globe-canvas:active {
+  cursor: grabbing;
+}
+
+.globe-canvas canvas {
+  display: block;
+}
+
+/* Arrival: sharpen while the camera flies in from deep space. No fill mode,
+   so the filter is gone for good once the animation ends rather than
+   leaving the canvas compositing through an identity filter. And no
+   transform: the glass panels are drawn in canvas coordinates. */
+.landing[data-ready='true'] .globe-canvas {
+  opacity: 1;
+  animation: globe-enter 2.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes globe-enter {
+  0% {
+    opacity: 0;
+    filter: blur(12px) brightness(1.4);
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) brightness(1);
+  }
+}
+
+/* Darkens the areas text sits on directly, so it stays readable once the
+   globe is zoomed in and fills the screen */
+.landing-scrim {
+  position: fixed;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(5 10 12 / 0.85) 0, rgb(5 10 12 / 0) 7rem),
+    linear-gradient(
+      0deg,
+      rgb(5 10 12 / 0.9) 0,
+      rgb(5 10 12 / 0) calc(var(--safe-bottom) + 6rem)
+    );
+}
+
+/* --------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+
+.landing-header {
+  position: fixed;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: calc(var(--safe-top) + 0.6rem)
+    calc(var(--gutter) + var(--safe-right)) 0
+    calc(var(--gutter) + var(--safe-left));
+  pointer-events: none;
+  animation: fade-rise 0.9s var(--ease-out) both;
+}
+
+.landing-header > * {
+  pointer-events: auto;
+}
+
+.wordmark {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.landing-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--ink-dim);
+}
+
+.landing-nav a,
+.landing-nav button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.7rem;
+  transition: color 0.2s ease;
+}
+
+.landing-nav a:hover {
+  color: var(--ink);
+}
+
+/* Links underline themselves from the left on hover */
+.landing-nav a {
+  background: linear-gradient(currentColor 0 0) 0.7rem calc(50% + 0.75em) / 0
+    1px no-repeat;
+  transition:
+    color 0.2s ease,
+    background-size 0.3s var(--ease-out);
+}
+
+.landing-nav a:hover {
+  background-size: calc(100% - 1.4rem) 1px;
+}
+
+.landing-nav .landing-nav__index {
+  margin-right: 0.35rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  color: var(--ink);
+}
+
+/* The header has room for one link beside the button on a phone */
+.landing-nav__external {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   The list of places
+   -------------------------------------------------------------------------- */
+
+.index {
+  display: none;
+}
+
+.index__label {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 0.5rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-dim);
+}
+
+.index__label span:last-child {
+  color: var(--ink-faint);
+}
+
+.index__list {
+  /* Every place fits on screen: rows share the available height, between a
+     legible minimum (then the list scrolls) and a comfortable cap */
+  --row: clamp(1.625rem, calc((100dvh - 14.5rem) / var(--rows)), 3rem);
+
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.index__list li {
+  animation: fade-rise 0.8s var(--ease-out) both;
+  animation-delay: calc(var(--i) * 28ms + 150ms);
+}
+
+.index__item {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  width: 100%;
+  height: var(--row);
+  padding: 0;
+  font-size: calc(var(--row) * 0.7);
+  line-height: var(--row);
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    opacity 0.35s ease,
+    font-weight 0.3s ease;
+}
+
+.index__num {
+  flex: none;
+  width: 1.5rem;
+  letter-spacing: 0;
+  color: var(--ink-faint);
+  transition: color 0.3s ease;
+}
+
+.index__name {
+  white-space: nowrap;
+  transition: translate 0.45s var(--ease-out);
+}
+
+.index__meta {
+  margin-left: auto;
+  letter-spacing: 0;
+  white-space: nowrap;
+  color: var(--ink-dim);
+  opacity: 0;
+  translate: -0.4rem 0;
+  transition:
+    opacity 0.3s ease,
+    translate 0.4s var(--ease-out);
+}
+
+/* Albums without photos yet are listed, but quietly */
+.index__item:not([data-active='true']):is(button) .index__name {
+  color: var(--ink-faint);
+}
+
+/* One place in focus: it gains weight and steps forward, the rest recede.
+   The weight change is a real axis of the font, so it animates. */
+.index__list[data-has-active='true'] .index__item:not([data-active='true']) {
+  opacity: 0.34;
+}
+
+.index__item[data-active='true'] {
+  font-weight: 600;
+}
+
+.index__item[data-active='true'] .index__num {
+  color: var(--accent);
+}
+
+.index__item[data-active='true'] .index__name {
+  translate: 0.3em 0;
+}
+
+.index__item[data-active='true'] .index__meta {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* --------------------------------------------------------------------------
+   Callout: annotation on the focused marker (side layout)
+   -------------------------------------------------------------------------- */
+
+.callout-anchor {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Deck: swipeable place cards (stack layout)
+   -------------------------------------------------------------------------- */
+
+.deck {
+  position: fixed;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-bottom: calc(var(--safe-bottom) + 0.25rem);
+  animation: fade-rise 1s var(--ease-out) 0.2s both;
+}
+
+.deck__track {
+  --card-width: min(84vw, 22rem);
+  --card-gap: 0.75rem;
+
+  display: flex;
+  gap: var(--card-gap);
+  padding-block: 0.5rem 0.5rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  touch-action: pan-x;
+}
+
+.deck__track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Spacers, so the first and last cards can reach the middle */
+.deck__track::before,
+.deck__track::after {
+  content: '';
+  flex: none;
+  width: calc((100% - var(--card-width)) / 2 - var(--card-gap));
+}
+
+.deck__card {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: var(--card-width);
+  min-height: 11.25rem;
+  padding: 1rem 1.15rem 1.05rem;
+  border-radius: var(--r-lg);
+  color: var(--ink);
+  text-align: left;
+  scroll-snap-align: center;
+  opacity: 0.55;
+  scale: 0.965;
+  transition:
+    opacity 0.35s ease,
+    scale 0.45s var(--ease-out);
+}
+
+.deck__card[data-current='true'] {
+  opacity: 1;
+  scale: 1;
+}
+
+.deck__eyebrow {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ink-dim);
+}
+
+.deck__title,
+.deck__headline {
+  margin: 0.3rem 0 0.25rem;
+  font-size: 2.5rem;
+  line-height: 1.05;
+}
+
+.deck__headline {
+  margin-top: 0;
+  font-size: 1.875rem;
+  line-height: 1.1;
+}
+
+.deck__card[data-current='true'] .deck__title {
+  font-weight: 500;
+}
+
+.deck__text {
+  margin: 0;
+  color: var(--ink-dim);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.deck__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  color: var(--ink-dim);
+}
+
+.deck__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.deck__card[data-empty='true'] .deck__cta {
+  font-weight: 500;
+  color: var(--ink-dim);
+}
+
+.deck__start {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.deck__start svg {
+  animation: nudge 1.8s ease-in-out infinite;
+}
+
+@keyframes nudge {
+  50% {
+    translate: 0.25em 0;
+  }
+}
+
+/* A ruler with one tick per place */
+.deck__ruler {
+  display: flex;
+  justify-content: center;
+  height: 2.75rem;
+  padding-inline: var(--gutter);
+}
+
+.deck__tick {
+  flex: 0 1 1rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.deck__tick::before {
+  content: '';
+  width: 1px;
+  height: 0.45rem;
+  background: var(--ink-faint);
+  transition:
+    height 0.3s var(--ease-out),
+    background-color 0.3s ease;
+}
+
+.deck__tick--intro::before {
+  height: 0.75rem;
+}
+
+.deck__tick[data-current='true']::before {
+  width: 2px;
+  height: 1.1rem;
+  background: var(--accent);
+}
+
+/* Short phones: drop the descriptions to keep the globe a decent size */
+@media (max-height: 620px) {
+  .landing {
+    --deck-height: calc(var(--safe-bottom) + 12.25rem);
+  }
+
+  .deck__card {
+    min-height: 8.5rem;
+  }
+
+  .deck__text {
+    display: none;
+  }
+
+  .deck__headline {
+    font-size: 1.375rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Readouts
+   -------------------------------------------------------------------------- */
+
+.hud {
+  position: fixed;
+  z-index: 4;
+  margin: 0;
+  white-space: pre;
+  color: var(--ink-faint);
+  pointer-events: none;
+  animation: fade-rise 1s var(--ease-out) 0.5s both;
+}
+
+.hud--readout {
+  left: 0;
+  right: 0;
+  bottom: calc(var(--deck-height) + 0.35rem);
+  text-align: center;
+  color: var(--ink-dim);
+}
+
+.hud--credit {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Sheet: the whole list at once, for the stack layout
+   -------------------------------------------------------------------------- */
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: calc(var(--safe-top) + 0.6rem)
+    calc(var(--gutter) + var(--safe-right)) calc(var(--safe-bottom) + 1.5rem)
+    calc(var(--gutter) + var(--safe-left));
+  border: 0;
+  background: rgb(5 10 12 / 0.88);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  backdrop-filter: blur(22px) saturate(1.4);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+.sheet[open] {
+  animation: sheet-in 0.35s var(--ease-out);
+}
+
+.sheet::backdrop {
+  background: transparent;
+}
+
+.sheet__header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.sheet__header .index__label {
+  flex: 1;
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.sheet__close {
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.06);
+}
+
+/* Two columns, read top to bottom then across */
+.index__list--sheet {
+  --row: clamp(2.75rem, calc((100dvh - 9rem) / (var(--rows) / 2 + 1)), 3.5rem);
+
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(calc((var(--rows) + 1) / 2), auto);
+  column-gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+@supports not (grid-template-rows: repeat(calc(3 / 2), auto)) {
+  .index__list--sheet {
+    display: block;
+    columns: 2;
+  }
+}
+
+.index__list--sheet li {
+  animation-delay: calc(var(--i) * 16ms);
+}
+
+.index__list--sheet .index__item {
+  font-size: calc(var(--row) * 0.52);
+  gap: 0.5rem;
+}
+
+.index__list--sheet .index__meta {
+  display: none;
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Leaving: dive into the place, then fade to the album
+   -------------------------------------------------------------------------- */
+
+.landing-veil {
+  position: fixed;
+  z-index: 9;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease-in 0.17s;
+}
+
+.landing[data-leaving='true'] .landing-veil {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.landing[data-leaving='true']
+  :is(.landing-header, .index, .callout-anchor, .deck, .hud, .landing-scrim) {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* --------------------------------------------------------------------------
+   Shared motion
+   -------------------------------------------------------------------------- */
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.6rem;
+  }
+}
+
+/* ==========================================================================
+   Side layout
+   ========================================================================== */
+
+@media (min-width: 900px), (orientation: landscape) and (min-width: 640px) {
+  .landing-scrim {
+    background:
+      linear-gradient(180deg, rgb(5 10 12 / 0.8) 0, rgb(5 10 12 / 0) 7rem),
+      linear-gradient(0deg, rgb(5 10 12 / 0.8) 0, rgb(5 10 12 / 0) 5.5rem),
+      linear-gradient(
+        90deg,
+        rgb(5 10 12 / 0.94) 0,
+        rgb(5 10 12 / 0.78) 17rem,
+        rgb(5 10 12 / 0) 34rem
+      );
+  }
+
+  .landing-header {
+    padding-top: calc(var(--safe-top) + 1.1rem);
+  }
+
+  .wordmark {
+    font-size: 1.5rem;
+  }
+
+  .landing-nav .landing-nav__index {
+    display: none;
+  }
+
+  .landing-nav__external {
+    display: inline-flex !important;
+  }
+
+  .deck {
+    display: none;
+  }
+
+  /* --- list ------------------------------------------------------------- */
+
+  .index {
+    position: fixed;
+    z-index: 4;
+    top: calc(var(--safe-top) + 6rem);
+    bottom: 4.25rem;
+    left: calc(var(--gutter) + var(--safe-left));
+    display: flex;
+    flex-direction: column;
+    width: min(22rem, 36vw);
+  }
+
+  .index__label {
+    flex: none;
+    animation: fade-rise 0.8s var(--ease-out) 0.1s both;
+  }
+
+  .index > .index__list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    touch-action: pan-y;
+  }
+
+  .index > .index__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* --- readouts --------------------------------------------------------- */
+
+  .hud {
+    bottom: calc(var(--safe-bottom) + 1.5rem);
+  }
+
+  .hud--readout {
+    left: calc(var(--gutter) + var(--safe-left));
+    right: auto;
+    text-align: left;
+    color: var(--ink-faint);
+  }
+
+  .hud--credit {
+    right: calc(var(--gutter) + var(--safe-right));
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  /* --- callout ---------------------------------------------------------- */
+
+  /* A zero-size point that the globe moves onto the marker; everything
+     else hangs off it */
+  .callout-anchor {
+    position: fixed;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    will-change: transform;
+  }
+
+  .landing[data-active='true'] .callout-anchor[data-visible='true'] {
+    opacity: 1;
+    transition-delay: 0.2s;
+  }
+
+  .callout__reticle {
+    position: absolute;
+    top: -17px;
+    left: -17px;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgb(255 244 200 / 0.8);
+    border-radius: 50%;
+  }
+
+  /* Leader line from the reticle's edge up to the card's corner */
+  .callout__leader {
+    position: absolute;
+    top: -13px;
+    left: 13px;
+    width: 62px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgb(255 244 200 / 0.8),
+      rgb(255 255 255 / 0.3)
+    );
+    transform-origin: 0 50%;
+    rotate: -40deg;
+  }
+
+  .callout {
+    position: absolute;
+    /* Where the leader line ends: 62px at -40 degrees from (13, -13) */
+    left: 60px;
+    bottom: 53px;
+    display: flex;
+    flex-direction: column;
+    width: min(19.5rem, calc(38vw - 5.5rem));
+    padding: 1.1rem 1.25rem 1.15rem;
+    border-radius: var(--r-lg);
+    color: var(--ink);
+    animation: callout-in 0.5s var(--ease-out) both;
+  }
+
+  /* Only a pinned callout takes clicks: a hover preview follows the pointer
+     around the list, so it could never be reached anyway */
+  .callout-anchor[data-pinned='true'] .callout {
+    pointer-events: auto;
+  }
+
+  /* A strip of the album's first photo. Only on tall windows: the card
+     hangs above its marker and has to stay clear of the header. */
+  .callout__preview {
+    display: none;
+    margin: -0.35rem -0.5rem 0.85rem;
+    height: 5.5rem;
+    overflow: hidden;
+    border-radius: var(--r-md);
+    background: rgb(255 255 255 / 0.05) center / cover no-repeat;
+  }
+
+  .callout__preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale 0.5s var(--ease-out);
+  }
+
+  .callout:hover .callout__preview img {
+    scale: 1.03;
+  }
+
+  @media (min-height: 960px) {
+    .callout__preview {
+      display: block;
+    }
+  }
+
+  .callout__eyebrow,
+  .callout__footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    white-space: nowrap;
+    color: var(--ink-dim);
+  }
+
+  .callout__title {
+    margin: 0.3rem 0 0.2rem;
+    font-size: 2.75rem;
+    font-weight: 500;
+    line-height: 1.02;
+  }
+
+  .callout__coords {
+    color: var(--ink-dim);
+  }
+
+  .callout__text {
+    margin-top: 0.75rem;
+    color: var(--ink);
+  }
+
+  .callout__places {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.8rem;
+    color: var(--ink);
+  }
+
+  .callout__places span {
+    padding: 0.28rem 0.6rem;
+    border: 1px solid rgb(255 255 255 / 0.22);
+    border-radius: var(--r-sm);
+  }
+
+  .callout__footer {
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid rgb(255 255 255 / 0.18);
+  }
+
+  .callout__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .callout__cta svg {
+    transition: translate 0.3s var(--ease-out);
+  }
+
+  .callout:hover .callout__cta svg {
+    translate: 0.25em 0;
+  }
+
+  @keyframes callout-in {
+    from {
+      opacity: 0;
+      translate: -0.5rem 0.5rem;
+    }
+  }
+}
+
+/* Short and wide (a phone on its side, a squat laptop window): slimmer
+   chrome and a callout that only names the place */
+@media (orientation: landscape) and (max-height: 560px) {
+  .landing-header {
+    padding-top: calc(var(--safe-top) + 0.4rem);
+  }
+
+  .index {
+    top: calc(var(--safe-top) + 3.75rem);
+    bottom: 2.75rem;
+  }
+
+  .index__list {
+    --row: clamp(1.75rem, calc((100dvh - 9rem) / var(--rows)), 3rem);
+  }
+
+  .hud {
+    bottom: calc(var(--safe-bottom) + 0.9rem);
+  }
+
+  .callout__text,
+  .callout__places,
+  .callout__preview,
+  .callout__footer > span:last-child:not(:first-child) {
+    display: none;
+  }
+
+  /* No room above the marker: the card sits level with it instead */
+  .callout__leader {
+    top: 0;
+    left: 17px;
+    width: 43px;
+    rotate: 0deg;
+  }
+
+  .callout {
+    top: 0;
+    bottom: auto;
+    translate: 0 -50%;
+    padding: 0.8rem 1rem 0.85rem;
+  }
+
+  .callout__title {
+    font-size: 2rem;
+  }
+
+  .callout__footer {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+  }
+
+  @keyframes callout-in {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .landing[data-ready='true'] .globe-canvas {
+    animation: fade-in-plain 1.2s ease;
+  }
+
+  .landing-header,
+  .index__label,
+  .index__list li,
+  .deck,
+  .hud,
+  .callout,
+  .sheet[open],
+  .globe-frame__orb,
+  .deck__start svg {
+    animation: none;
+  }
+
+  .index__item,
+  .index__name,
+  .deck__card,
+  .button {
+    transition: none;
+  }
+
+  @keyframes fade-in-plain {
+    from {
+      opacity: 0;
+    }
+  }
+}

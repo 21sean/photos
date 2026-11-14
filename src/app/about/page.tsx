@@ -1,13 +1,8 @@
 import { getAlbums } from '@/lib/data';
-import Globe from '@/lib/globes/mini-globe';
+import Globe from '@/lib/globe/mini-globe';
 import Nav from '@/lib/nav';
 import Noise from '@/lib/fx/noise';
 import { ExternalLink } from '@/lib/external-link';
-
-export async function generateStaticParams() {
-  const albums = await getAlbums();
-  return albums.map(album => ({ slug: album.title.toLowerCase() }));
-}
 
 function Contact() {
   return (
@@ -39,7 +34,7 @@ async function AboutPage() {
     >
       <div
         className={`
-           mx-auto sm:mx-0 sm:pt-24 sm:pl-20 sm:pr-30 space-y-1
+           mx-auto sm:mx-0 sm:pt-24 sm:pl-20 space-y-1
            w-[320px]`}
       >
         <Nav albums={albums} />

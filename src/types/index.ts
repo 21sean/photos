@@ -1,9 +1,15 @@
 export * from './albums';
 
-// Photo type definition for mock data
 export type Photo = {
   size: number;
+  /** Default image URL (`src`). */
   url: string;
+  /** Responsive candidates, when downscaled variants exist. */
+  srcSet?: string;
+  /** Smallest variant, for previews. Absent until variants are published. */
+  thumbnailUrl?: string;
+  /** Tiny blurred preview (data URI) shown while the photo loads. */
+  lqip?: string;
   width: number;
   height: number;
   title?: string;
@@ -19,6 +25,7 @@ export type Photo = {
     minLuminance?: number;
     colorGamut?: string;
   };
+
   // EXIF metadata
   iso?: number;
   aperture?: number;

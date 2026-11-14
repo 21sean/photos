@@ -5,9 +5,9 @@
  * 
  * To update photos:
  * 1. Upload images to R2
- * 2. Run: ./scripts/build-photos-manifest.sh
+ * 2. Run: npm run sync:photos
  * 
- * The manifest is generated from R2 using rclone.
+ * The manifest is generated from the bucket by scripts/sync-photos.js.
  */
 
 import photosData from './photos.json';

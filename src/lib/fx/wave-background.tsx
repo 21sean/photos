@@ -38,7 +38,7 @@ void main() {
 }
 `;
 
-export type BlurSize = "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+type BlurSize = "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 
 interface WaveBackgroundProps {
   backdropBlurAmount?: BlurSize;
@@ -48,7 +48,7 @@ interface WaveBackgroundProps {
 
 const blurClassMap: Record<BlurSize, string> = {
   none: "backdrop-blur-none",
-  sm: "backdrop-blur-sm",
+  sm: "backdrop-blur-xs",
   md: "backdrop-blur-md",
   lg: "backdrop-blur-lg",
   xl: "backdrop-blur-xl",
@@ -69,7 +69,7 @@ function WaveBackground({
   backdropBlurAmount = "sm",
   color, // undefined means use default blue gradient
   className = "",
-}: WaveBackgroundProps): JSX.Element {
+}: WaveBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const colorRef = useRef(color);

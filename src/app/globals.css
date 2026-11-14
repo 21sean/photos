@@ -1,9 +1,141 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme inline {
+  --font-sans:
+    var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+}
 
 /* ========================================
-   Custom Scrollbar Styling for Album Pages
+   Design tokens
+   ======================================== */
+
+:root {
+  /* Near-black with a little petrol in it. Keep in sync with
+     GLOBE_THEME.background. */
+  --bg: #050a0c;
+  --ink: #f3f6f6;
+  --ink-dim: #b4c1c4;
+  --ink-faint: #74858a;
+  --line: rgb(255 255 255 / 0.14);
+  /* The pink of the globe's land: the page's one accent */
+  --accent: #ff5c93;
+
+  /* One radius family: controls, panels, cards */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 20px;
+
+  color-scheme: dark;
+}
+
+/* ========================================
+   Base
+   ======================================== */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+html {
+  /* Painted behind every page, so nothing flashes white while a route loads
+     and iOS safe areas blend in */
+  background: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* No rubber-banding past the ends of a page */
+  overscroll-behavior-y: none;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgb(255 92 147 / 0.4);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ========================================
+   Shared animations
+   ======================================== */
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.fade-in {
+  animation: fadeIn 2.5s ease-in-out;
+}
+
+@keyframes fadeInDelayed {
+  0% {
+    opacity: 0;
+  }
+  75% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.fade-in-delayed {
+  animation: fadeInDelayed 2.33s ease-in-out;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+.animate-fadeInUp {
+  animation: fadeInUp 0.4s ease-out forwards;
+  backface-visibility: hidden;
+}
+
+/* Spinning globe icon. CSS beats a gif here: stays crisp at any size,
+   inherits currentColor (so hover tints still work) and costs no bytes. */
+@keyframes globeIconSpin {
+  from {
+    transform: perspective(160px) rotateY(0deg);
+  }
+  to {
+    transform: perspective(160px) rotateY(360deg);
+  }
+}
+.globe-icon-spin {
+  animation: globeIconSpin 5s linear infinite;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .globe-icon-spin {
+    animation: none;
+  }
+}
+
+/* ========================================
+   Album pages
    ======================================== */
 
 /* Album page scrollbar - thin and modern */
@@ -50,13 +182,21 @@ html:has(.album-page)::-webkit-scrollbar-track {
 }
 
 html:has(.album-page)::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(75, 85, 99, 0.8) 0%, rgba(107, 114, 128, 0.6) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(75, 85, 99, 0.8) 0%,
+    rgba(107, 114, 128, 0.6) 100%
+  );
   border-radius: 5px;
   border: 2px solid rgba(17, 24, 39, 0.8);
 }
 
 html:has(.album-page)::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(107, 114, 128, 0.9) 0%, rgba(156, 163, 175, 0.8) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(107, 114, 128, 0.9) 0%,
+    rgba(156, 163, 175, 0.8) 100%
+  );
 }
 
 /* Firefox scrollbar for album pages */
@@ -65,363 +205,6 @@ html:has(.album-page) {
   scrollbar-color: rgba(107, 114, 128, 0.7) rgba(17, 24, 39, 0.8);
 }
 
-/* ========================================
-   iOS Safari Safe-Area & Viewport Fixes
-   ======================================== */
-
-/* Base full-height layout */
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: transparent; /* Allow wave background to show through */
-}
-
-body {
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
-  margin: 0;
-  padding: 0;
-}
-
-/* App wrapper with safe-area support - only on body level */
-body.app {
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
-  background: inherit;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
-/* Full-screen pages that need to fill viewport exactly */
-.fullpage {
-  display: flex;
-  flex-direction: column;
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
-}
-
-/* Globe page: fill entire screen edge-to-edge including safe areas */
-.fullpage:has(.globe-container) {
-  height: 100lvh;
-  min-height: 100lvh;
-  max-height: 100lvh;
-  padding: 0 !important;
-  margin: 0;
-  overflow: hidden;
-  background: #1a1a1f;
-  position: relative;
-}
-
-/* Gradient overlays for iOS safe areas - blend seamlessly with globe atmosphere */
-.fullpage:has(.globe-container)::before,
-.fullpage:has(.globe-container)::after {
-  content: '';
-  position: fixed;
-  left: 0;
-  right: 0;
-  z-index: 5;
-  pointer-events: none;
-}
-
-/* Top gradient - smooth blend from safe area into globe */
-.fullpage:has(.globe-container)::before {
-  top: 0;
-  height: calc(env(safe-area-inset-top, 0px) + 40px);
-  background: linear-gradient(
-    to bottom,
-    #1a1a1f 0%,
-    rgba(26, 26, 31, 0.85) 40%,
-    rgba(30, 30, 38, 0.5) 70%,
-    transparent 100%
-  );
-}
-
-/* Bottom gradient - matches the globe's dark atmosphere glow */
-.fullpage:has(.globe-container)::after {
-  bottom: 0;
-  height: calc(env(safe-area-inset-bottom, 0px) + 25px);
-  background: linear-gradient(
-    to top,
-    #1a1a1f 0%,
-    rgba(26, 26, 31, 0.8) 40%,
-    rgba(30, 30, 35, 0.4) 70%,
-    transparent 100%
-  );
-}
-
-/* ========================================
-   End iOS Safari Safe-Area Fixes
-   ======================================== */
-
-/* Temporarily neutralize containing-block creators on the strict ancestor chain only */
-html:has(.globe-container),
-body:has(.globe-container),
-body:has(.globe-container) *:has(.globe-container) {
-  transform: none !important;
-  filter: none !important;
-  perspective: none !important;
-  backdrop-filter: none !important;
-  will-change: auto !important;
-  contain: none !important;
-}
-
-/* iOS Safari specific fixes - PORTRAIT MODE ONLY - GLOBE PAGE ONLY */
-@supports (-webkit-touch-callout: none) {
-  @media (orientation: portrait) {
-    /* Disable page zoom on iOS Safari, but allow globe interaction */
-    body:has(.globe-container) {
-      touch-action: none !important;
-      -webkit-user-scalable: none !important;
-    }
-    
-    /* Target iOS Safari specifically in portrait - ONLY for globe page */
-    body:has(.globe-container) .globe-container {
-      /* Use stable full height for iOS fixed canvas, include safe areas */
-      height: 100lvh !important; 
-      min-height: 100lvh !important;
-      width: 100% !important;
-      inset: 0 !important;
-      position: relative !important;
-      /* Allow globe zoom/pan */
-      touch-action: pan-x pan-y pinch-zoom !important;
-    }
-    
-    /* Album list: disable scroll, left-align text */
-    body:has(.globe-container) .album-list-wrapper {
-      overflow: hidden !important;
-      max-height: none !important;
-    }
-
-    /* Center-to-left animation */
-    /* Initial state: centered in middle of screen */
-    /* On sliding (click): animate to left side */
-    body:has(.globe-container) .album-list {
-      gap: 0 !important;
-      align-items: center !important;
-      -webkit-transform: translateX(0%) !important;
-      transform: translateX(0%) !important;
-      -webkit-transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-
-    body:has(.globe-container) .album-list li {
-      -webkit-transform: translateX(0) !important;
-      transform: translateX(0) !important;
-      -webkit-transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-
-    /* On click - animate to left side */
-    /* IMPORTANT: Do NOT change align-items here - it's not animatable and causes teleporting */
-    /* Keep align-items: center from base state, only animate transform */
-    /* Animate the list container AND each li to create left-align effect */
-    body:has(.globe-container) .album-list.album-list-sliding {
-      -webkit-transform: translateX(-37vw) !important;
-      transform: translateX(-37vw) !important;
-    }
-
-    body:has(.globe-container) .album-list.album-list-sliding li {
-      -webkit-transform: translateX(50%) !important;
-      transform: translateX(50%) !important;
-    }
-
-    body:has(.globe-container) .album-list li {
-      line-height: 1.15 !important; /* tighter spacing */
-      margin-bottom: -0.1rem !important; /* reduce vertical gap */
-    }
-
-    body:has(.globe-container) .album-list.album-list-sliding li {
-      text-align: left !important;
-    }
-
-    body:has(.globe-container) .album-list li span {
-      font-size: 0.665rem !important; /* 30% smaller than 0.95rem */
-      line-height: 1.2 !important; /* tighter spacing */
-      min-height: auto !important;
-    }
-
-    body:has(.globe-container) .album-list.album-list-sliding li span {
-      text-align: left !important;
-    }
-
-    /* Position copyright BOTTOM right - ONLY for globe page */
-    body:has(.globe-container) footer {
-      position: fixed !important;
-      bottom: calc(env(safe-area-inset-bottom) + 12px) !important;
-      right: 1rem !important;
-      left: auto !important;
-      top: auto !important;
-      z-index: 20 !important;
-      background: transparent !important;
-      padding-bottom: 0 !important;
-      padding-right: env(safe-area-inset-right) !important;
-    }
-    
-    /* Move album card up and improve positioning - ONLY for globe page */
-    body:has(.globe-container) aside.absolute.z-50 {
-      left: 40vw !important;
-      top: 12vh !important;
-      bottom: auto !important;
-      max-width: 50vw !important;
-      width: 50vw !important;
-      font-size: 0.8em !important;
-      padding: 0.4rem !important;
-      /* Fade-in time increased 50% on mobile (0.95s -> 1.43s) */
-      animation: fadeInCard 1.43s ease-out forwards !important;
-    }
-    
-    /* Improve tap target for click to enter text - ONLY for globe page */
-    body:has(.globe-container) aside.absolute.z-50 > span:last-child {
-      padding: 0.75rem 0.5rem !important;
-      margin: -0.25rem -0.5rem 0 -0.5rem !important;
-      border-radius: 4px !important;
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
-      transform: none;
-      -webkit-transform: none;
-    }
-
-    /* Move scrolling text (marquee) a bit higher */
-    body:has(.globe-container) aside.absolute.z-50 .marquee {
-      transform: translateY(-15%);
-      -webkit-transform: translateY(-15%);
-    }
-  }
-}
-/* No page scroll - dark gray background for safe areas */
-html:has(.globe-underlay),
-body:has(.globe-underlay) {
-  height: 100%;
-  overflow: hidden;
-  background: #1a1a1f !important;
-}
-
-/* Underlay fills largest viewport under iOS bars */
-.globe-underlay {
-  position: fixed;
-  inset: 0;
-  height: 100lvh;
-  width: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* UI layer above underlay; can respect safe areas */
-.globe-ui {
-  position: relative;
-  z-index: 1;
-  min-height: 100dvh;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* Fallback: transparent background for wave effect */
-html:has(.globe-container),
-body:has(.globe-container) {
-  height: 100%;
-  overflow: hidden;
-  background: #1a1a1f !important;
-}
-
-
-/* Globe page override - extend into safe areas */
-body.app:has(.globe-container) {
-  padding: 0;
-  background: #1a1a1f !important;
-  height: 100lvh;
-  min-height: 100lvh;
-}
-
-/* Improve touch handling for iOS */
-* {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-}
-
-/* Smooth scrolling for iOS */
-body {
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none; /* Prevent rubber band scrolling */
-}
-
-/* Portrait-only orientation lock */
-@media screen and (orientation: landscape) and (max-height: 768px) {
-  body::before {
-    content: "Please rotate your device to portrait mode for the best viewing experience";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 1);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-size: 1.2rem;
-    z-index: 9999;
-    padding: 2rem;
-    backdrop-filter: blur(10px);
-  }
-  
-  /* Hide main content in landscape */
-  main {
-    display: none;
-  }
-}
-
-/* Text highlighting */
-::selection {
-  background: #04e635;
-}
-
-/* `Globe` components */
-.globe-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100lvh;
-  min-height: 100lvh;
-}
-.globe-container > div:first-child {
-  position: fixed;
-  inset: 0;
-  height: 100dvh;
-  width: 100%;
-  z-index: 0;
-  pointer-events: auto;
-  touch-action: none;
-  /* Arrival: sharpen + settle while the camera flies in from deep space.
-     No fill mode: the filter/transform must fully revert once it finishes
-     so the WebGL canvas isn't left compositing through an identity filter. */
-  animation: globeEnter 4.6s cubic-bezier(0.23, 1, 0.32, 1);
-  background-color: #1a1a1f; /* Blends with globe atmosphere */
-}
-
-@keyframes globeEnter {
-  0% {
-    opacity: 0;
-    transform: scale(1.06);
-    filter: blur(14px) brightness(1.5);
-  }
-  45% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    filter: blur(0px) brightness(1);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .globe-container > div:first-child {
-    animation: fadeIn 1.2s ease-in-out;
-  }
-}
 .album-page {
   background-color: transparent !important;
   margin-top: 0 !important;
@@ -449,14 +232,22 @@ body:has(.album-page) {
   pointer-events: none;
 }
 
-/* Album page navigation container - transparent, sticky on scroll */
+/* Album page navigation column: sticky beside the photos. Only from the
+   width at which the nav is shown: below that the column is empty, and a
+   full-height empty column pushed the whole album one screen down on
+   Android phones. */
 .album-page > div:nth-child(2) {
   background-color: transparent !important;
-  min-height: 100vh;
-  position: sticky;
-  top: 0;
-  align-self: flex-start;
-  z-index: 10;
+}
+
+@media (min-width: 640px) {
+  .album-page > div:nth-child(2) {
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    z-index: 10;
+  }
 }
 
 /* Nav collapse animation on scroll */
@@ -465,7 +256,7 @@ body:has(.album-page) {
 }
 
 /* Album page photos container */
-.album-page > .MuiStack-root {
+.album-page > .album-content {
   background-color: transparent !important;
   min-height: 100vh;
   position: relative;
@@ -478,18 +269,18 @@ body:has(.album-page) {
     margin-top: 0 !important;
     padding-top: 0 !important;
   }
-  
-  .album-page > .MuiStack-root {
+
+  .album-page > .album-content {
     margin-top: 0 !important;
     padding-top: 0 !important;
   }
-  
+
   /* Remove min-height that causes extra space on iOS */
   .album-page > div:nth-child(2) {
     min-height: auto !important;
   }
-  
-  .album-page > .MuiStack-root {
+
+  .album-page > .album-content {
     min-height: auto !important;
   }
 }
@@ -581,564 +372,59 @@ body:has(.album-page) {
   }
 }
 
-/* Ensure the WebGL canvas fills the container exactly */
-.globe-container > canvas,
-.globe-container canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-  touch-action: none;
-}
-.content-container {
-  z-index: 10;
-  pointer-events: none;
+/* The header and every photo are sized from the photo's proportions
+   (--ratio, set inline): as wide as the column allows, but never so tall
+   that it runs off the screen. Kept in step with lib/images/sizes.ts. */
+.album-title-box,
+.gallery-item {
+  --cap-width: 700px;
+  --cap-height: calc(100dvh - 190px);
+
+  width: min(100%, var(--cap-width), calc(var(--cap-height) * var(--ratio)));
 }
 
-/* Allow the map mode dropdown to be interactive/visible within content-container */
-.map-mode-select {
-  pointer-events: auto;
-  background: rgba(255, 255, 255, 0.9);
-  color: #000;
-  border: 1px solid rgba(0, 0, 0, 0.35);
-  border-radius: 4px;
+.gallery-item[data-orientation='landscape'] {
+  --cap-width: 1100px;
+  --cap-height: 65dvh;
 }
 
-/* Let the globe receive drag/zoom except on the actual album title text */
-.album-list-wrapper,
-.album-list {
-  pointer-events: none;
-}
-
-/* Touch devices (iOS Safari et al.): allow scrolling the album list and cap height so all destinations stay visible */
-@media (hover: none) and (pointer: coarse) {
-  body:has(.globe-container) .content-container {
-    pointer-events: auto;
-  }
-
-  body:has(.globe-container) .album-list-wrapper {
-    pointer-events: auto;
-    max-height: min(80dvh, calc(100dvh - 10rem));
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-right: 0.35rem; /* give a little room for the scrollbar */
-    transform: translateY(2svh);
-    -webkit-transform: translateY(4svh);
-
-  }
-
-  body:has(.globe-container) .album-list {
-    pointer-events: auto;
+@media (max-width: 640px) {
+  .album-title-box,
+  .gallery-item {
+    width: calc(100vw - 16px);
   }
 }
 
-.album-list-item {
-  pointer-events: auto;
+/* The frame holds the photo's place (and its blurred preview, when the
+   manifest has one) until the real thing arrives */
+.gallery-item__frame {
+  aspect-ratio: var(--ratio);
+  background: rgb(255 255 255 / 0.04) center / cover no-repeat;
 }
 
-/* Ensure mobile header stacks above globe layers */
-@media (max-width: 768px) {
-  .album-list-wrapper {
-    position: relative;
-    z-index: 30;
-  }
+.album-empty {
+  padding: 3rem 1rem;
+  color: var(--ink-dim);
 }
 
-/* Animations */
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-.fade-in {
-  animation: fadeIn 2.5s ease-in-out;
+.album-empty a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
-/* Spinning globe icon. CSS beats a gif here: stays crisp at any size,
-   inherits currentColor (so hover tints still work) and costs no bytes. */
-@keyframes globeIconSpin {
-  from {
-    transform: perspective(160px) rotateY(0deg);
-  }
-  to {
-    transform: perspective(160px) rotateY(360deg);
-  }
-}
-.globe-icon-spin {
-  animation: globeIconSpin 5s linear infinite;
-  transform-origin: center;
-}
-@media (prefers-reduced-motion: reduce) {
-  .globe-icon-spin {
-    animation: none;
-  }
-}
+/* ========================================
+   Photos
+   ======================================== */
 
-/* Album list slide animation */
-.album-list {
-  will-change: transform;
-  -webkit-transition: all 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transition: all 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  text-align: left;
-}
-
-/* Desktop and large-screen default keeps left alignment */
-@media (min-width: 769px) {
-  .album-list {
-    align-items: flex-start;
-  }
-}
-
-/* Desktop Chrome-only: nudge the album card lower */
-@media (hover: hover) and (pointer: fine) {
-  body:has(.globe-container.chrome-desktop) aside.absolute.z-50 {
-    top: 6rem !important; /* align with chrome desktop album list (top-24) */
-  }
-
-  /* Desktop Chrome-only: pin copyright centered bottom */
-  body:has(.globe-container.chrome-desktop) footer {
-    position: absolute !important;
-    top: calc(env(safe-area-inset-top) + 12px) !important;
-    right: calc(1rem + env(safe-area-inset-right)) !important;
-    left: auto !important;
-    bottom: auto !important;
-    transform: none !important;
-    width: auto !important;
-    z-index: 40 !important;
-    background: transparent !important;
-    pointer-events: none !important;
-  }
-  body:has(.globe-container.chrome-desktop) footer .text-3xl {
-    text-align: right !important;
-  }
-}
-
-/* Album titles default to black; hover stays black; active becomes dark gray */
-.album-list li span {
-  color: #000000 !important;
-  font-size: var(--album-list-font-size, 1.25rem);
-  line-height: var(--album-list-line-height, 1.75rem);
-  min-height: var(--album-list-min-height, 1.75rem);
-  display: inline-block;
-}
-.album-list li span:hover {
-  color: #000000 !important;
-}
-.album-list li span.album-title-active {
-  color: #4b5563 !important; /* gray-600 */
-}
-
-/* Dark mode: white text for album list */
-.globe-container.dark-mode .album-list li span {
-  color: #ffffff !important;
-}
-.globe-container.dark-mode .album-list li span:hover {
-  color: #e5e7eb !important; /* gray-200 */
-}
-.globe-container.dark-mode .album-list li span.album-title-active {
-  color: #9ca3af !important; /* gray-400 */
-}
-
-/* Mobile: after the initial select, the active album title leans into an
-   animated italic (skew, since font-style can't animate) so the current
-   album is obvious at a glance */
-@media (hover: none) and (pointer: coarse), (max-width: 768px) and (orientation: portrait) {
-  .album-list li span.album-title-italic {
-    animation:
-      albumTitleItalicIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-      albumTitleWave 3.6s linear infinite;
-  }
-}
-
-/* The active (italic) album title fills with blue waves rolling horizontally
-   through the letters. Only background-position animates — the skew settles
-   after the entrance instead of swaying forever, since an infinite transform
-   on background-clip:text re-rasterizes the glyphs every frame */
-.album-list li span.album-title-active.album-title-italic,
-.globe-container.dark-mode .album-list li span.album-title-active.album-title-italic {
-  background-image: linear-gradient(
-    90deg,
-    #2f6bff 0%,
-    #6ea8ff 12.5%,
-    #b9dcff 25%,
-    #6ea8ff 37.5%,
-    #2f6bff 50%,
-    #6ea8ff 62.5%,
-    #b9dcff 75%,
-    #6ea8ff 87.5%,
-    #2f6bff 100%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent !important;
-}
-
-@keyframes albumTitleItalicIn {
-  0% {
-    transform: skewX(0deg);
-  }
-  55% {
-    transform: skewX(-14deg);
-  }
-  100% {
-    transform: skewX(-9deg);
-  }
-}
-
-/* Blue waves: the gradient is periodic (matching end stops), so sliding it
-   one full tile per cycle wraps without a visible seam; crests roll through
-   the text left to right */
-@keyframes albumTitleWave {
-  0% {
-    background-position: 200% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .album-list li span.album-title-italic {
-    animation: none;
-    transform: skewX(-9deg);
-  }
-}
-
-/* On text selection, use dark gray text for these elements */
-.album-list li span::selection,
-.globe-container footer *::selection,
-aside.absolute.z-50 *::selection {
-  color: #4b5563;
-}
-
-/* Footer/copyright text should always be black */
-.globe-container footer,
-.globe-container footer * {
-  color: #000000 !important;
-}
-
-/* Dark mode: white footer text */
-.globe-container.dark-mode footer,
-.globe-container.dark-mode footer * {
-  color: #ffffff !important;
-}
-
-/* Dark mode: album card styling - 70% transparent */
-.globe-container.dark-mode aside.absolute.z-50 {
-  background-color: rgba(15, 15, 25, 0.3) !important;
-  border-color: #374151 !important; /* gray-700 */
-  color: #ffffff !important;
-}
-.globe-container.dark-mode aside.absolute.z-50 * {
-  color: #ffffff !important;
-}
-.globe-container.dark-mode aside.absolute.z-50 span:last-child:hover {
-  background-color: rgba(78, 88, 105, 0.8) !important; /* gray-700 */
-}
-
-/* Non-iOS Safari sliding animation */
-@supports not (-webkit-touch-callout: none) {
-  .album-list-sliding {
-    transform: translateX(-25vw);
-    text-align: left;
-  }
-}
-
-/* Mobile-specific adjustments - Updated for iOS Safari */
-/* Use multiple strategies to detect mobile devices - PORTRAIT MODE ONLY */
-@media (max-width: 768px) and (orientation: portrait), 
-       (hover: none) and (pointer: coarse) and (orientation: portrait),
-       (max-device-width: 1024px) and (orientation: portrait) {
-
-  /* Default mobile: push album list down; Safari override reduces it above */
-  .album-list-wrapper {
-    transform: translateY(15svh);
-    -webkit-transform: translateY(30svh);
-  }
-
-  /* Non-iOS Safari mobile sliding - iOS uses keyframe animation instead */
-  @supports not (-webkit-touch-callout: none) {
-    .album-list-sliding {
-      transform: translateX(-31vw);
-    }
-  }
-  
-  /* Album card positioning for mobile - aligned with bottom of album list */
-  aside.absolute.z-50 {
-    left: 40vw !important;
-    top: 12vh !important; /* Moved up from 16vh */
-    bottom: 60.6vh !important; /* Slightly taller to prevent bottom clipping */
-    max-width: 50vw !important;
-    width: 50vw !important;
-    font-size: 0.7em !important; /* 20% smaller text */
-    padding: 0.75rem !important; /* Reduce padding for mobile */
-    /* Preserve the fade-in animation on mobile - time increased 50% (0.65s -> 0.98s) */
-    animation: fadeInCard 0.98s ease-out forwards !important;
-  }
-  
-  /* Album card text adjustments for mobile */
-  aside.absolute.z-50 .marquee {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-    margin-bottom: 0.5rem !important; /* Add margin between marquee and click text */
-  }
-  
- 
-}
-
-/* Force mobile behavior for iOS Safari regardless of reported viewport width - PORTRAIT ONLY - GLOBE PAGE ONLY */
-@supports (-webkit-touch-callout: none) {
-  @media (max-device-width: 1024px) and (orientation: portrait) {
-    /* Override album list sliding for iOS Safari - animate to left side */
-    /* Do NOT change align-items - it's not animatable and causes teleporting */
-    body:has(.globe-container) .album-list.album-list-sliding {
-      -webkit-transform: translateX(-47vw) !important;
-      transform: translateX(-47vw) !important;
-    }
-
-    body:has(.globe-container) aside.absolute.z-50 {
-      left: 36vw !important;
-      top:5.6vh !important; /* 20% higher than 12vh */
-      bottom: auto !important; /* allow free top positioning */
-      max-width: 50vw !important;
-      width: 50vw !important;
-      font-size: 0.5em !important;
-      padding: 0.75rem !important;
-      /* Preserve the fade-in animation on mobile - time increased 50% (1.65s -> 2.48s) */
-      animation: fadeInCard 2.48s ease-out forwards !important;
-    }
-  }
-}
-
-/* iOS Performance Optimizations for Dropdown */
-@supports (-webkit-touch-callout: none) {
-  /* Hardware acceleration for dropdown on iOS */
-  .sm\\:hidden.overflow-hidden.will-change-transform {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-perspective: 1000px;
-    perspective: 1000px;
-  }
-  
-  /* Optimize transforms for iOS */
-  .sm\\:hidden.overflow-hidden.will-change-transform * {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-/* Hide album navigation on mobile when in album page */
-@media (max-width: 620px) {
-  .album-nav-mobile-hidden {
-    display: none !important;
-  }
-}
-
-/* Mobile page length optimizations */
-@media (max-width: 768px) {
-  /* Reduce excessive margins on mobile for all pages */
-  section {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
-  
-  /* Reduce heading margins on mobile */
-  h1.text-4xl {
-    margin-bottom: 1.5rem !important;
-  }
-
-  /* Reduce album page white box spacing */
-  .bg-gray-100 {
-    margin-bottom: 1rem;
-  }
-  
-  /* Fix viewport height issues on mobile browsers */
-  html, body {
-    min-height: 100svh;
-    min-height: -webkit-fill-available;
-  }
-  
-  /* Prevent excessive height on mobile pages */
-  main {
-    min-height: auto !important;
-  }
-  
-  /* Optimize mobile viewport for non-globe pages */
-  body:not(:has(.globe-container)) {
-    height: auto !important;
-    min-height: 100vh !important;
-    overflow-y: auto !important;
-  }
-}
-
-/* Album card background - 70% transparent */
-aside.absolute.z-50 {
-  background-color: rgba(0, 0, 0, 0.3) !important;
-  backdrop-filter: blur(2px);
-  /* Fade-in animation - 30% slower */
-  animation: fadeInCard 0.95s ease-out forwards;
-  /* Start with opacity 0 for proper fade-in */
+/* Fade in over the placeholder once loaded */
+.hdr-image[data-settled='false'] {
   opacity: 0;
 }
 
-/* Album card text should always be black */
-aside.absolute.z-50,
-aside.absolute.z-50 * {
-  color: #000000 !important;
-}
-
-/* "Click to enter" text is the last span in the album card */
-aside.absolute.z-50 > span:last-child {
-  font-style: italic !important;
-}
-
-/* Album card fade-out when disappearing */
-aside.absolute.z-50.fade-out {
-  animation: fadeOutCard 0.65s ease-in forwards;
-}
-
-/* Album card fade-in animation */
-@keyframes fadeInCard {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-    -webkit-transform: scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    -webkit-transform: scale(1);
-  }
-}
-
-/* Album card fade-out animation */
-@keyframes fadeOutCard {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-    -webkit-transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.95);
-    -webkit-transform: scale(0.95);
-  }
-}
-
-/* Desktop positioning - only apply on larger screens */
-@media (min-width: 769px) {
-  aside.absolute.z-50 {
-    left: 60% !important;
-    top: 40% !important;
-  }
-}
-
-@keyframes fadeInDelayed {
-  0% {
-    opacity: 0;
-  }
-  75% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-.fade-in-delayed {
-  animation: fadeInDelayed 2.33s ease-in-out;
-}
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 10px, 0);
-    -webkit-transform: translate3d(0, 10px, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-    -webkit-transform: translate3d(0, 0, 0);
-  }
-}
-.animate-fadeInUp {
-  animation: fadeInUp 0.4s ease-out forwards;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-}
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
-}
-.blink {
-  animation: blink 1s step-start infinite;
-  pointer-events: none;
-}
-@keyframes scaleIn {
-  0%,
-  100% {
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transform-origin: center center;
-  }
-
-  0% {
-    opacity: 0;
-    transform: matrix(0.92, 0, 0, 0.92, 0, 0);
-  }
-
-  100% {
-    opacity: 1;
-    transform: matrix(1, 0, 0, 1, 0, 0);
-  }
-}
-.scale-in {
-  animation-name: scaleIn;
-  animation-duration: 650ms;
-  animation-fill-mode: both;
-  animation-iteration-count: 1;
-  animation-delay: 150ms;
-}
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-    -webkit-transform: translateX(0);
-  }
-  to {
-    transform: translateX(calc(-100% - 1rem));
-    -webkit-transform: translateX(calc(-100% - 1rem));
-  }
-}
-.marquee {
-  position: relative;
-  display: flex;
-  overflow-x: hidden;
-  overflow-y: visible; /* prevent clipping on iOS */
-  user-select: none;
-  -webkit-user-select: none; /* iOS Safari fallback */
-  gap: 1rem;
-}
-.marquee-content {
-  display: flex;
-  justify-content: space-around;
-  flex-shrink: 0;
-  gap: 1rem;
-  min-width: 100%;
-  line-height: 1.2; /* reduce vertical clipping */
-  animation: marquee 19s linear infinite; /* 30% slower */
-  -webkit-animation: marquee 19s linear infinite;
-}
-
-
-
 /* HDR Image Support with Gain Maps */
 .hdr-image {
-  /* Smooth transitions for HDR adjustments */
-  transition: filter 0.3s ease, opacity 0.3s ease;
+  transition: opacity 0.4s ease;
   /* Preserve color profile and HDR metadata */
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
@@ -1160,7 +446,7 @@ aside.absolute.z-50.fade-out {
     will-change: transform;
     transform: translateZ(0); /* Force GPU compositing */
   }
-  
+
   /* Enhanced HDR image handling with gain map support */
   .hdr-image {
     /* Allow full dynamic range utilization */
@@ -1180,7 +466,7 @@ aside.absolute.z-50.fade-out {
   .hdr-enhanced {
     /* No filter needed - browser handles HDR natively */
   }
-  
+
   /* Enhanced gain map support for high-brightness displays */
   .hdr-image[data-gain-map] {
     /* Let the browser handle gain map processing */
@@ -1195,12 +481,6 @@ aside.absolute.z-50.fade-out {
   }
 }
 
-/* Loading states for HDR images */
-.hdr-image[data-loading="true"] {
-  opacity: 0.7;
-  filter: blur(0px);
-}
-
 /* Modern HDR format support */
 .hdr-image {
   /* Support for JPEG XL and AVIF with gain maps */
@@ -1209,7 +489,7 @@ aside.absolute.z-50.fade-out {
 
 /* HDR metadata tooltips */
 .hdr-image[data-max-luminance]:hover::after {
-  content: "HDR: " attr(data-max-luminance) " nits • ~3 stops";
+  content: 'HDR: ' attr(data-max-luminance) ' nits • ~3 stops';
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -1232,18 +512,19 @@ aside.absolute.z-50.fade-out {
     /* Enable ISO 21496-1 gain map processing */
     image-orientation: from-image;
   }
-  
+
   /* iPhone 16 Pro HDR - let Safari handle native HDR rendering */
   .hdr-enhanced {
     /* No filter - Safari on iOS handles HDR/gain map images natively */
   }
-  
+
   /* Disable zoom on input fields to prevent Safari auto-zoom lag */
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     font-size: 16px !important;
     transform: translateZ(0); /* Hardware acceleration */
   }
-  
 }
 
 /* Target iPhone 16 Pro specifically */
@@ -1258,66 +539,12 @@ aside.absolute.z-50.fade-out {
   }
 }
 
-/* Safari-specific fixes for album navigation - GLOBE PAGE ONLY */
-body:has(.globe-container) .album-list li {
-  /* Prevent any Safari-specific navigation behavior */
-  -webkit-touch-callout: none !important;
-  -webkit-user-select: none !important;
-  user-select: none !important;
-}
-
-body:has(.globe-container) .album-list li span {
-  /* Ensure spans don't trigger navigation in Safari */
-  -webkit-touch-callout: none !important;
-  -webkit-user-select: none !important;
-  user-select: none !important;
-  pointer-events: auto !important;
-  /* Improve touch responsiveness */
-  -webkit-tap-highlight-color: rgba(52, 234, 204, 0.1) !important;
-}
-
-/* Improve album card touch handling on mobile */
-body:has(.globe-container) aside.absolute.z-50 {
-  /* Ensure touch events work properly */
-  -webkit-touch-callout: none !important;
-  -webkit-user-select: none !important;
-  user-select: none !important;
-  pointer-events: auto !important;
-}
-
 /* Additional iOS Safari improvements */
 @media screen and (-webkit-min-device-pixel-ratio: 2) {
   /* Target high DPI displays (Retina) */
   .hdr-image {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
-  }
-}
-
-/* iOS Safari scroll fix - GLOBE PAGE ONLY */
-@supports (-webkit-appearance: none) {
- 
-  /* Prevent zoom on input focus for iOS */
-  input, textarea, select {
-    font-size: 12px;
-  }
-  
-  /* Safari/WebKit only: album list font-size 30% smaller for tighter layout */
-  body:has(.globe-container) .album-list li span {
-    font-size: 85% !important;
-    line-height: .3 !important;
-  }
-  /* Safari/WebKit only: move marquee a bit higher */
-  body:has(.globe-container) aside.absolute.z-50 .marquee {
-    transform: translateY(-15%);
-    -webkit-transform: translateY(-15%);
-  }
-  
-  /* Fix for iOS Safari viewport units - GLOBE PAGE ONLY */
-  @media screen and (max-height: 1000px) {
-    body:has(.globe-container) .globe-container {
-      height: 100vh !important;
-    }
   }
 }
 
@@ -1335,7 +562,7 @@ body:has(.globe-container) aside.absolute.z-50 {
     /* Ensure content stays visible */
     content-visibility: visible !important;
   }
-  
+
   /* Prevent scroll container from triggering image reclamation */
   .album-page {
     -webkit-overflow-scrolling: touch;

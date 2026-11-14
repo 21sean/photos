@@ -4,19 +4,10 @@ const isExport = process.env.NEXT_OUTPUT === 'export';
 const nextConfig = {
   output: isExport ? 'export' : undefined,
   trailingSlash: true,
-  // Remove basePath if deploying to root domain
-  // basePath: '/photos',
-  // assetPrefix: '/photos',
   images: {
-    unoptimized: true,
-    domains: ['picsum.photos', 'cdn.myportfolio.com', 'images.sean.ventures'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.sean.ventures',
-        pathname: '/**',
-      },
-    ],
+    // Photos are pre-encoded AVIFs served straight from R2, so the Next.js
+    // image optimizer is never involved.
+    unoptimized: true
   }
 };
 

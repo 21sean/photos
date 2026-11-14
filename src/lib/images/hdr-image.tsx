@@ -1,130 +1,73 @@
 'use client';
 
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Photo } from '@/types';
-import { detectHDRCapabilities, getHDRImageStyles, isLikelyHDR } from '../hdr-utils';
-import { isIOSSafari } from '../browser-utils';
+import { isLikelyHDR } from '../hdr-utils';
+import { gallerySizes } from './sizes';
 
 interface HDRImageProps {
   photo: Photo;
-  width?: number;
-  height?: number;
   className?: string;
   alt?: string;
+  /** Fetch now and at high priority (photos at the top of a gallery). */
   priority?: boolean;
-  /** Notified whenever the photo starts or finishes loading. */
-  onLoadingChange?: (isLoading: boolean) => void;
+  /** Called once the photo has loaded, or failed to. */
+  onSettled?: () => void;
 }
 
-export function HDRImage({ 
-  photo, 
-  width, 
-  height, 
-  className = '', 
-  alt = '',
+/**
+ * A gallery photo. It deliberately does nothing to the pixels: HDR and
+ * wide-gamut AVIFs are left to the browser's own tone mapping, and CSS
+ * filters on top of that are what blow photos out.
+ *
+ * The markup is complete on the server, so the browser's preload scanner
+ * finds the photo before any script runs. When the manifest lists smaller
+ * variants they are offered through `srcset`.
+ */
+function HDRImage({
+  photo,
+  className = '',
+  alt,
   priority = false,
-  onLoadingChange
+  onSettled
 }: HDRImageProps) {
-  const [hdrCapabilities, setHdrCapabilities] = useState({
-    supportsHDR: false,
-    supportsP3: false,
-    supportsRec2020: false
-  });
-  
-  const [isLoading, setIsLoading] = useState(true);
+  const [settled, setSettled] = useState(false);
 
-  useEffect(() => {
-    // Detect HDR capabilities on client side - cached for performance
-    try {
-      const capabilities = detectHDRCapabilities();
-      setHdrCapabilities(capabilities);
-    } catch (error) {
-      console.warn('HDR detection failed, using fallback:', error);
-      // Use safe fallback values
-      setHdrCapabilities({
-        supportsHDR: false,
-        supportsP3: false,
-        supportsRec2020: false
-      });
-    }
-  }, []);
+  const settle = useCallback(() => {
+    setSettled(true);
+    onSettled?.();
+  }, [onSettled]);
 
-  // Determine if this image should be treated as HDR
-  const isHDR = photo.isHDR || isLikelyHDR(photo.url);
-  
-  // Get HDR-aware styles - memoized for performance with error handling
-  const hdrStyles = useMemo(() => {
-    try {
-      return getHDRImageStyles(isHDR, photo.colorSpace);
-    } catch (error) {
-      console.warn('HDR styles failed, using fallback:', error);
-      return {}; // Return empty styles as fallback
-    }
-  }, [isHDR, photo.colorSpace]);
-  
-  const handleImageLoad = useCallback(() => {
-    setIsLoading(false);
-    onLoadingChange?.(false);
-  }, [onLoadingChange]);
-
-  // Handle image error - still show something
-  const handleImageError = useCallback(() => {
-    console.error('Failed to load image:', photo.url);
-    setIsLoading(false);
-    onLoadingChange?.(false);
-  }, [photo.url, onLoadingChange]);
-
-  // Detect iOS Safari to apply specific optimizations
-  const isIOS = isIOSSafari();
-
-  // Determine optimal image attributes
-  const imageProps: React.ImgHTMLAttributes<HTMLImageElement> = {
-    src: photo.url,
-    width: width || photo.width,
-    height: height || photo.height,
-    alt: alt || photo.title || '',
-    // Use lazy loading - our cleanup observer manages memory on iOS
-    // Setting eager on iOS was actually causing MORE memory pressure
-    loading: priority ? 'eager' : 'lazy',
-    // Use async decoding to not block main thread
-    // Sync decoding was causing jank during scroll
-    decoding: 'async',
-    // Add fetchPriority for better resource prioritization
-    fetchPriority: (priority ? 'high' : 'auto') as 'high' | 'auto',
-    onLoad: handleImageLoad,
-    onError: handleImageError,
-    style: {
-      ...hdrStyles,
-      opacity: isLoading ? 0.3 : 1, // Show faint image while loading instead of invisible
-      transition: 'opacity 0.3s ease',
-      // iOS-specific GPU acceleration optimizations to fix image disappearing and lag.
-      // Use translate3d for proper hardware acceleration layer
-      WebkitTransform: 'translate3d(0, 0, 0)',
-      transform: 'translate3d(0, 0, 0)',
-      // Keep as persistent compositor layer - prevents iOS from reclaiming
-      willChange: 'transform',
-      WebkitBackfaceVisibility: 'hidden',
-      backfaceVisibility: 'hidden',
+  // A server-rendered photo can finish loading before React attaches
+  // `onLoad`, in which case that event never reaches us: check on mount
+  const checkComplete = useCallback(
+    (image: HTMLImageElement | null) => {
+      if (image?.complete && image.naturalWidth > 0) settle();
     },
-    className: `hdr-image ${isHDR ? 'hdr-enhanced' : ''} ${className}`,
-  };
+    [settle]
+  );
 
-  // Add HDR-specific data attributes
-  if (isHDR && hdrCapabilities.supportsP3 && photo.colorSpace) {
-    (imageProps as any)['data-color-space'] = photo.colorSpace;
-  }
-  
-  if (isHDR && photo.hdrMetadata) {
-    if (photo.hdrMetadata.maxLuminance) {
-      (imageProps as any)['data-max-luminance'] = photo.hdrMetadata.maxLuminance;
-    }
-    if (photo.hdrMetadata.minLuminance) {
-      (imageProps as any)['data-min-luminance'] = photo.hdrMetadata.minLuminance;
-    }
-  }
+  const isHDR = photo.isHDR || isLikelyHDR(photo.url);
 
-  // Since we're serving web-optimized AVIF directly, no need for picture/source fallbacks
-  return <img {...imageProps} />;
+  return (
+    <img
+      ref={checkComplete}
+      src={photo.url}
+      srcSet={photo.srcSet}
+      sizes={photo.srcSet ? gallerySizes(photo) : undefined}
+      width={photo.width}
+      height={photo.height}
+      alt={alt ?? photo.title ?? ''}
+      loading={priority ? 'eager' : 'lazy'}
+      fetchPriority={priority ? 'high' : 'auto'}
+      decoding="async"
+      onLoad={settle}
+      onError={settle}
+      data-settled={settled}
+      data-color-space={photo.colorSpace}
+      className={`hdr-image ${isHDR ? 'hdr-enhanced' : ''} ${className}`}
+    />
+  );
 }
 
 export default HDRImage;

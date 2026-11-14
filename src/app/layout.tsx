@@ -1,25 +1,45 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
+import { IMAGE_ORIGIN } from '@/lib/r2';
 import './globals.css';
 
-const sansSerifFont = localFont({
-  src: '../fonts/TASAOrbiterVF.woff2',
+// One typeface, Instrument Sans, in a single variable file: its weight and
+// width axes do the work a second and third family would otherwise do.
+const sans = localFont({
+  src: '../fonts/InstrumentSans-Variable.woff2',
+  weight: '400 700',
   display: 'swap',
-  variable: '--font-sans'
+  variable: '--font-instrument-sans',
+  declarations: [{ prop: 'font-stretch', value: '75% 100%' }]
 });
+
+const description =
+  'Travel photographs from around the world, shot in HDR. Spin the globe and pick a destination.';
 
 export const metadata: Metadata = {
   title: 'sean.photo',
-  description: 'HDR Photography Portfolio',
+  description,
   openGraph: {
     title: 'sean.photo',
-    description: 'HDR Photography Portfolio',
-    url: 'https://sean.ventures', // Updated to match current deployment
-    siteName: "sean.photo",
+    description,
+    url: 'https://sean.ventures',
+    siteName: 'sean.photo',
     locale: 'en_US',
     type: 'website'
-  }
- 
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent'
+  },
+  formatDetection: { telephone: false }
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  colorScheme: 'dark',
+  themeColor: '#050a0c'
 };
 
 export default function RootLayout({
@@ -28,29 +48,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sansSerifFont.variable} font-sans`}>
+    <html lang="en" className={`${sans.variable} font-sans`}>
       <head>
-        <meta name="color-scheme" content="light dark" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-touch-fullscreen" content="yes" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="HandheldFriendly" content="true" />
-        <meta name="MobileOptimized" content="width" />
-        <meta name="screen-orientation" content="portrait" />
-        <meta name="x5-orientation" content="portrait" />
-        <meta name="full-screen" content="yes" />
-        <meta name="x5-fullscreen" content="true" />
-        <meta name="browsermode" content="application" />
-        <meta name="x5-page-mode" content="app" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+        {/* Every photo comes from the image bucket: open the connection early */}
+        <link rel="preconnect" href={IMAGE_ORIGIN} />
       </head>
-      <body>
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

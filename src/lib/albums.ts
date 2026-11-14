@@ -8,7 +8,7 @@
  * To add a new album:
  * 1. Add an entry to albumsMeta below.
  * 2. Upload the images to the matching folder in R2 (scripts/migrate-to-r2.js).
- * 3. Rebuild the photo manifest (scripts/build-photos-manifest.sh).
+ * 3. Rebuild the photo manifest (npm run sync:photos).
  */
 
 import { AlbumTitle } from '../types/albums';
@@ -367,6 +367,7 @@ const albumsMeta: AlbumMeta[] = [
  */
 export const albums = albumsMeta.map(album => ({
   title: album.title as AlbumTitle,
+  slug: album.slug,
   color: album.color,
   type: album.type,
   description: album.description,

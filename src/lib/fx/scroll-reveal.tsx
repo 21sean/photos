@@ -49,7 +49,7 @@ const variantClasses: Record<Variant, string> = {
   primary: 'text-white',
 };
 
-export function ScrollReveal({
+function ScrollReveal({
   children,
   size = 'lg',
   align = 'left',
@@ -80,7 +80,7 @@ export function ScrollReveal({
       if (typeof node === 'string') return node;
       if (typeof node === 'number') return String(node);
       if (Array.isArray(node)) return node.map(extractText).join('');
-      if (React.isValidElement(node) && node.props.children) {
+      if (React.isValidElement<{ children?: React.ReactNode }>(node) && node.props.children) {
         return extractText(node.props.children);
       }
       return '';

@@ -1,113 +1,77 @@
 /**
- * iOS Safari Image Memory Cleanup Utility
- * 
- * iOS Safari aggressively manages memory and has a ~500MB per tab limit.
- * When images scroll far out of view, we release their memory by replacing
- * the src with a tiny placeholder. When they scroll back, we restore them.
- * 
- * This prevents the "disappearing content" and lag issues on iOS.
+ * iOS Safari image memory cleanup.
+ *
+ * iOS Safari keeps a tight per-tab memory budget. When photos scroll far
+ * out of view their decoded bitmaps are released by swapping the source for
+ * a tiny placeholder; scrolling back restores them. This prevents the
+ * "disappearing content" and lag that long galleries otherwise hit on iOS.
  */
 
 import { isIOSSafari } from '../browser-utils';
 
-// Tiny transparent 1x1 GIF - only 43 bytes
-const EMPTY_GIF = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+// Transparent 1x1 GIF
+const EMPTY_GIF =
+  'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
-// Data attribute to store original src
-const ORIGINAL_SRC_ATTR = 'data-original-src';
-
-// Track if cleanup is enabled (only on iOS Safari)
-let cleanupEnabled: boolean | null = null;
+const ORIGINAL_SRC = 'data-original-src';
+const ORIGINAL_SRCSET = 'data-original-srcset';
 
 /**
- * Check if image cleanup should be enabled
- */
-function isCleanupEnabled(): boolean {
-  if (cleanupEnabled === null) {
-    cleanupEnabled = isIOSSafari();
-  }
-  return cleanupEnabled;
-}
-
-/**
- * Setup IntersectionObserver for image memory cleanup
- * Returns cleanup function to disconnect observer
+ * Watch the images inside `container` and release the ones far off screen.
+ * Returns a function that stops watching and restores every image.
+ * Does nothing outside iOS Safari.
  */
 export function setupImageCleanup(
   container: HTMLElement | null,
   options?: {
-    rootMargin?: string;  // How far outside viewport to keep images loaded
+    /** How far outside the viewport images stay loaded. */
+    rootMargin?: string;
   }
 ): () => void {
-  if (!container || !isCleanupEnabled()) {
-    return () => {}; // No-op on non-iOS
-  }
-
-  // Keep images loaded within 2 viewport heights (reduced from default)
-  const rootMargin = options?.rootMargin ?? '200% 0px';
+  if (!container || !isIOSSafari()) return () => {};
 
   const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        const img = entry.target as HTMLImageElement;
-        
-        if (entry.isIntersecting) {
-          // Image entering viewport area - restore original src
-          restoreImage(img);
-        } else {
-          // Image leaving viewport area - release memory
-          releaseImage(img);
-        }
-      });
+    entries => {
+      for (const entry of entries) {
+        const image = entry.target as HTMLImageElement;
+        if (entry.isIntersecting) restoreImage(image);
+        else releaseImage(image);
+      }
     },
-    {
-      root: null, // viewport
-      rootMargin,
-      threshold: 0,
-    }
+    { rootMargin: options?.rootMargin ?? '200% 0px', threshold: 0 }
   );
 
-  // Observe all images in container
-  const images = container.querySelectorAll('img');
-  images.forEach((img) => {
-    // Store original src before observing
-    if (img.src && !img.src.startsWith('data:')) {
-      img.setAttribute(ORIGINAL_SRC_ATTR, img.src);
-    }
-    observer.observe(img);
-  });
+  const images = Array.from(container.querySelectorAll('img'));
+  for (const image of images) observer.observe(image);
 
-  // Return cleanup function
   return () => {
     observer.disconnect();
-    // Restore all images when unmounting
-    images.forEach((img) => restoreImage(img as HTMLImageElement));
+    for (const image of images) restoreImage(image);
   };
 }
 
-/**
- * Release image memory by replacing src with placeholder
- */
-function releaseImage(img: HTMLImageElement): void {
-  // Don't release if already released or no original stored
-  if (img.src === EMPTY_GIF) return;
-  
-  // Store original src if not already stored
-  if (!img.hasAttribute(ORIGINAL_SRC_ATTR) && img.src && !img.src.startsWith('data:')) {
-    img.setAttribute(ORIGINAL_SRC_ATTR, img.src);
+/** Drop the decoded bitmap by pointing the image at a placeholder. */
+function releaseImage(image: HTMLImageElement): void {
+  if (image.hasAttribute(ORIGINAL_SRC)) return; // already released
+  if (!image.src || image.src.startsWith('data:')) return;
+
+  image.setAttribute(ORIGINAL_SRC, image.src);
+  // `srcset` wins over `src`, so it has to go too or nothing is released
+  const srcset = image.getAttribute('srcset');
+  if (srcset) {
+    image.setAttribute(ORIGINAL_SRCSET, srcset);
+    image.removeAttribute('srcset');
   }
-  
-  // Replace with empty placeholder to release decoded image memory
-  img.src = EMPTY_GIF;
+  image.src = EMPTY_GIF;
 }
 
-/**
- * Restore image from placeholder
- */
-function restoreImage(img: HTMLImageElement): void {
-  const originalSrc = img.getAttribute(ORIGINAL_SRC_ATTR);
+function restoreImage(image: HTMLImageElement): void {
+  const src = image.getAttribute(ORIGINAL_SRC);
+  if (!src) return;
 
-  if (originalSrc && img.src === EMPTY_GIF) {
-    img.src = originalSrc;
-  }
+  const srcset = image.getAttribute(ORIGINAL_SRCSET);
+  if (srcset) image.setAttribute('srcset', srcset);
+  image.src = src;
+  image.removeAttribute(ORIGINAL_SRC);
+  image.removeAttribute(ORIGINAL_SRCSET);
 }

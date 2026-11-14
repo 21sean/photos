@@ -20,7 +20,7 @@ interface LoadingOrbProps {
  * The album pages are dark whatever the OS prefers, so the theme is pinned
  * rather than left on `auto`.
  */
-export function LoadingOrb({
+function LoadingOrb({
   active = true,
   size = 64,
   className = ''
