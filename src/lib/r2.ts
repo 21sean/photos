@@ -53,11 +53,7 @@ function baseName(filename: string): string {
  * URL of a photo. Without `width` this is the full-size web master; with it,
  * the downscaled variant of that width.
  */
-export function getImageUrl(
-  album: string,
-  filename: string,
-  width?: number
-): string {
+function getImageUrl(album: string, filename: string, width?: number): string {
   const suffix = width ? `-${width}w` : '';
   return `${IMAGE_ORIGIN}/web/${album}/${baseName(filename)}${suffix}.avif`;
 }
@@ -71,7 +67,7 @@ function pickDefaultVariant(variants: number[]): number {
 }
 
 /** Turn a manifest entry into the `Photo` the app renders. */
-export function toPhoto(album: string, photo: R2Photo): Photo {
+function toPhoto(album: string, photo: R2Photo): Photo {
   const variants = [...(photo.variants ?? [])].sort((a, b) => a - b);
   const hasVariants = variants.length > 0;
 
@@ -81,7 +77,9 @@ export function toPhoto(album: string, photo: R2Photo): Photo {
       : getImageUrl(album, photo.filename),
     srcSet: hasVariants
       ? variants
-          .map(width => `${getImageUrl(album, photo.filename, width)} ${width}w`)
+          .map(
+            width => `${getImageUrl(album, photo.filename, width)} ${width}w`
+          )
           .join(', ')
       : undefined,
     thumbnailUrl: hasVariants

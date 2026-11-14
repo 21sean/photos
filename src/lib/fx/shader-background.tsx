@@ -45,7 +45,7 @@ void main() {
 }
 `;
 
-export type BlurSize = "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+type BlurSize = "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 
 interface ShaderBackgroundProps {
   backdropBlurAmount?: BlurSize;

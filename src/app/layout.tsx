@@ -48,10 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${sans.variable} font-sans`}
-    >
+    <html lang="en" className={`${sans.variable} font-sans`}>
       <head>
         {/* Every photo comes from the image bucket: open the connection early */}
         <link rel="preconnect" href={IMAGE_ORIGIN} />

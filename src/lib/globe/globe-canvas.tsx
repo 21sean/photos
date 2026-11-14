@@ -204,7 +204,11 @@ export default function GlobeCanvas({
 
   // --- mutable state shared with the frame loop ----------------------------
 
-  const view = useRef<View>({ idleAltitude: 2, focusAltitude: 0.8, sway: false });
+  const view = useRef<View>({
+    idleAltitude: 2,
+    focusAltitude: 0.8,
+    sway: false
+  });
   const activeRef = useRef(active);
   const divingRef = useRef(diving);
   const introDone = useRef(false);
@@ -349,7 +353,8 @@ export default function GlobeCanvas({
     // its own multisampling to keep coastlines and borders smooth.
     const composer = globe.postProcessingComposer();
     const glass = createGlassPass();
-    const root = containerRef.current?.closest<HTMLElement>('[data-glass-root]');
+    const root =
+      containerRef.current?.closest<HTMLElement>('[data-glass-root]');
     let glassOn = false;
     if (root && renderer.capabilities.isWebGL2) {
       const drawingSize = renderer.getDrawingBufferSize(new THREE.Vector2());
@@ -390,7 +395,10 @@ export default function GlobeCanvas({
         ...INTRO_FROM,
         altitude: Math.min(idleAltitude * 2.6, idleAltitude + 5)
       });
-      globe.pointOfView({ ...INTRO_TO, altitude: idleAltitude }, INTRO_FLIGHT_MS);
+      globe.pointOfView(
+        { ...INTRO_TO, altitude: idleAltitude },
+        INTRO_FLIGHT_MS
+      );
       introTimer = setTimeout(finishIntro, INTRO_FLIGHT_MS + 100);
     }
 

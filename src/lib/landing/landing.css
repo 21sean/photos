@@ -320,8 +320,8 @@ body:has(.landing) {
 
 /* Links underline themselves from the left on hover */
 .landing-nav a {
-  background: linear-gradient(currentColor 0 0) 0.7rem calc(50% + 0.75em) / 0 1px
-    no-repeat;
+  background: linear-gradient(currentColor 0 0) 0.7rem calc(50% + 0.75em) / 0
+    1px no-repeat;
   transition:
     color 0.2s ease,
     background-size 0.3s var(--ease-out);
@@ -684,8 +684,9 @@ body:has(.landing) {
   max-width: none;
   max-height: none;
   margin: 0;
-  padding: calc(var(--safe-top) + 0.6rem) calc(var(--gutter) + var(--safe-right))
-    calc(var(--safe-bottom) + 1.5rem) calc(var(--gutter) + var(--safe-left));
+  padding: calc(var(--safe-top) + 0.6rem)
+    calc(var(--gutter) + var(--safe-right)) calc(var(--safe-bottom) + 1.5rem)
+    calc(var(--gutter) + var(--safe-left));
   border: 0;
   background: rgb(5 10 12 / 0.88);
   -webkit-backdrop-filter: blur(22px) saturate(1.4);
@@ -959,10 +960,12 @@ body:has(.landing) {
     pointer-events: auto;
   }
 
+  /* A strip of the album's first photo. Only on tall windows: the card
+     hangs above its marker and has to stay clear of the header. */
   .callout__preview {
-    display: block;
+    display: none;
     margin: -0.35rem -0.5rem 0.85rem;
-    aspect-ratio: 16 / 9;
+    height: 5.5rem;
     overflow: hidden;
     border-radius: var(--r-md);
     background: rgb(255 255 255 / 0.05) center / cover no-repeat;
@@ -977,6 +980,12 @@ body:has(.landing) {
 
   .callout:hover .callout__preview img {
     scale: 1.03;
+  }
+
+  @media (min-height: 960px) {
+    .callout__preview {
+      display: block;
+    }
   }
 
   .callout__eyebrow,

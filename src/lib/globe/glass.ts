@@ -25,7 +25,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
  */
 
 /** How many panels can be glass at once. */
-export const MAX_PANES = 6;
+const MAX_PANES = 6;
 
 const VERTEX_SHADER = /* glsl */ `
   varying vec2 vUv;
@@ -188,7 +188,12 @@ export function createGlassPass(): GlassPass {
       uniforms.uCount.value = count;
       for (let i = 0; i < count; i++) {
         const pane = panes[i];
-        uniforms.uPanes.value[i].set(pane.left, pane.top, pane.width, pane.height);
+        uniforms.uPanes.value[i].set(
+          pane.left,
+          pane.top,
+          pane.width,
+          pane.height
+        );
         uniforms.uShape.value[i].set(pane.radius, pane.presence);
       }
     }

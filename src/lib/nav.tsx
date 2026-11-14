@@ -42,7 +42,7 @@ const NavMenuItem: React.FC<{
   );
 };
 
-export const Nav: React.FC<{
+const Nav: React.FC<{
   title?: AlbumTitle;
   albums: AlbumList;
   isCollapsed?: boolean;

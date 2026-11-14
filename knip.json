@@ -4,6 +4,11 @@
     "src/app/**/{page,layout,error,not-found}.tsx",
     "scripts/*.{js,sh}"
   ],
-  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.js"],
-  "ignoreBinaries": ["knip", "playwright"]
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "scripts/**/*.js"
+  ],
+  "ignoreDependencies": [
+    "tailwindcss"
+  ]
 }

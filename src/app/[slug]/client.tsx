@@ -1,16 +1,23 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import Nav from '@/lib/nav';
 import { GlobeIcon } from '@/lib/icons';
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useSyncExternalStore,
+  type CSSProperties
+} from 'react';
 import { Album, AlbumList } from '@/types/albums';
 import { Photo } from '@/types';
 import { titleToSlug } from '@/lib/slug';
 import WaveBackground from '@/lib/fx/wave-background';
 import ShaderBackground from '@/lib/fx/shader-background';
 import { isChrome, isIOSSafari } from '@/lib/browser-utils';
-import LoadingOrb from '@/lib/fx/loading-orb';
+import SingleColumnGallery from '@/lib/images/single-column-gallery';
 
 type BackgroundType = 
   | "wave-blue" 
@@ -33,40 +40,7 @@ const backgroundOptions: { id: BackgroundType; label: string; color: string; typ
   { id: "shader-green", label: "Glow Green", color: "#00FF00", type: "shader" },
 ];
 
-const SingleColumnGallery = dynamic(() => import('@/lib/images/single-column-gallery'), {
-  ssr: false,
-  // Covers the gap before the gallery chunk arrives and the photos start loading
-  loading: () => <LoadingOrb className="py-16" />
-});
-
-// Calculate width that fits first image in viewport
-function calculateContentWidth(firstPhoto?: Photo): number {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  
-  // Account for left nav and padding
-  const navWidth = vw > 640 ? 160 : 0;
-  const horizontalPadding = 32;
-  const availableWidth = vw - navWidth - horizontalPadding;
-  
-  // Header + margin at top, some margin at bottom
-  const headerHeight = 110;
-  const bottomMargin = 80;
-  const availableHeight = vh - headerHeight - bottomMargin;
-  
-  if (vw <= 640) {
-    return vw - 16;
-  }
-  
-  if (firstPhoto) {
-    const aspectRatio = firstPhoto.width / firstPhoto.height;
-    const widthForHeight = availableHeight * aspectRatio;
-    return Math.min(availableWidth, widthForHeight, 700);
-  }
-  
-  // Fallback for portrait
-  return Math.min(availableWidth, availableHeight * 0.67, 600);
-}
+const noSubscription = () => () => {};
 
 interface AlbumPageClientProps {
   albums: AlbumList;
@@ -84,22 +58,21 @@ export default function AlbumPageClient({
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
-  const sortedAlbums = [...albums].sort((a, b) => a.title.localeCompare(b.title));
+  const sortedAlbums = [...albums].sort((a, b) =>
+    a.title.localeCompare(b.title)
+  );
+
+  // Browser checks can only be answered in the browser. Reading them this
+  // way keeps the server's HTML and the first client render in agreement.
+  const isChromeUser = useSyncExternalStore(noSubscription, isChrome, () => false);
+  const isIOS = useSyncExternalStore(noSubscription, isIOSSafari, () => false);
 
   // Background switcher state
-  const [isChromeUser, setIsChromeUser] = useState(false);
   const [currentBackground, setCurrentBackground] = useState<BackgroundType>("wave-blue");
   const [transitioning, setTransitioning] = useState(false);
   const [displayedBackground, setDisplayedBackground] = useState<BackgroundType>("wave-blue");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  // Check for Chrome and iOS Safari on mount
-  const [isIOS, setIsIOS] = useState(false);
-  useEffect(() => {
-    setIsChromeUser(isChrome());
-    setIsIOS(isIOSSafari());
-  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -176,13 +149,9 @@ export default function AlbumPageClient({
     setTimeout(() => setIsAnimating(false), 500);
   }, [isCollapsed, isAnimating]);
 
-  // Calculate content width after mount to avoid hydration mismatch
-  // Server doesn't have window, so we defer calculation to client
-  const [contentWidth, setContentWidth] = useState<number | undefined>(undefined);
-  
-  useEffect(() => {
-    setContentWidth(calculateContentWidth(photos[0]));
-  }, [photos]);
+  // The header is as wide as the first photo, which is sized in CSS from
+  // its proportions (see .album-title-box)
+  const leadRatio = photos[0] ? photos[0].width / photos[0].height : 0.67;
 
   return (
     <section className="album-page flex flex-col sm:flex-row sm:mt-4 sm:mb-0 w-full" id="top">
@@ -204,7 +173,7 @@ export default function AlbumPageClient({
       <div className="album-content flex min-w-0 flex-1 flex-col items-center gap-4">
         <div
           className="album-title-box rounded-lg px-5 py-4 relative"
-          style={{ width: contentWidth ?? 'auto', maxWidth: '100%' }}
+          style={{ '--ratio': leadRatio } as CSSProperties}
         >
           {/* One-time light sweep across the glass surface on load */}
           <div className="glass-shine" aria-hidden="true" />
@@ -230,20 +199,23 @@ export default function AlbumPageClient({
                 </div>
               )}
             </div>
-            <a 
+            <Link
               href="/"
-              className="flex items-center gap-1.5 text-gray-300 hover:text-red-400 transition-colors duration-200 font-normal text-lg leading-none tracking-tight"
+              className="flex items-center gap-1.5 text-gray-300 hover:text-white transition-colors duration-200 font-normal text-lg leading-none tracking-tight"
             >
               <GlobeIcon />
               <span>Home</span>
-            </a>
+            </Link>
           </div>
 
-          {/* Chrome-only background switcher arrow */}
+          {/* Chrome-only background switcher arrow. It hangs off the right
+              edge of the header, which on a phone is the edge of the screen:
+              there it made the whole page scroll sideways, so it is desktop
+              only. */}
           {isChromeUser && (
             <div
               ref={menuRef}
-              className="absolute -right-6 top-1/2 -translate-y-1/2 z-50"
+              className="absolute -right-6 top-1/2 -translate-y-1/2 z-50 max-sm:hidden"
             >
               {/* Toggle arrow button */}
               <button
@@ -365,10 +337,14 @@ export default function AlbumPageClient({
           </div>
         </div>
 
-        <SingleColumnGallery 
-          className="pb-8" 
-          photos={photos}
-        />
+        {photos.length > 0 ? (
+          <SingleColumnGallery className="pb-8" photos={photos} />
+        ) : (
+          <p className="album-empty">
+            Photos from {album.title} are on their way.{' '}
+            <Link href="/">Back to the globe</Link>
+          </p>
+        )}
       </div>
     </section>
   );

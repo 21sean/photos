@@ -1,14 +1,23 @@
 'use client';
 
-import * as React from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties
+} from 'react';
 import { Photo } from '@/types';
 import HDRImage from './hdr-image';
 import { FlipIcon } from '../icons';
 import ScrollReveal from '../fx/scroll-reveal';
 import LoadingOrb from '../fx/loading-orb';
 import { setupImageCleanup } from './ios-image-cleanup';
+import { orientationOf } from './sizes';
 
-// Format EXIF data for overlay
+/** The first photos are fetched eagerly at high priority; the rest are lazy. */
+const PRIORITY_COUNT = 2;
+
 function formatExifData(photo: Photo): string | null {
   const parts: string[] = [];
   if (photo.focalLength) parts.push(photo.focalLength.replace(' mm', 'mm'));
@@ -18,7 +27,6 @@ function formatExifData(photo: Photo): string | null {
   return parts.length ? parts.join('  •  ') : null;
 }
 
-// Extract plain text from HTML
 function stripHtml(html: string): string {
   return html
     .replace(/<[^>]*>/g, '')
@@ -36,86 +44,81 @@ function getDescriptionText(photo: Photo): string | null {
   return null;
 }
 
-// Calculate optimal width for each image based on its aspect ratio
-function calculateImageWidth(photo: Photo): number {
-  if (typeof window === 'undefined') return 600;
-  
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const aspectRatio = photo.width / photo.height;
-  const isLandscape = aspectRatio > 1;
-  
-  const navWidth = vw > 640 ? 160 : 0;
-  const horizontalPadding = 48;
-  const availableWidth = vw - navWidth - horizontalPadding;
-  
-  if (vw <= 640) {
-    return vw - 16;
-  }
-  
-  if (isLandscape) {
-    // Landscape: wider, but height limited to 65% of viewport
-    const maxHeight = vh * 0.65;
-    const widthForHeight = maxHeight * aspectRatio;
-    return Math.min(availableWidth, widthForHeight, 1100);
-  } else {
-    // Portrait: fit in viewport height
-    const headerHeight = 110;
-    const bottomMargin = 80;
-    const availableHeight = vh - headerHeight - bottomMargin;
-    const widthForHeight = availableHeight * aspectRatio;
-    return Math.min(availableWidth, widthForHeight, 700);
-  }
+/**
+ * True once the element is on screen or about to be. Photos further down
+ * have not started loading yet, so there is nothing to show an orb for.
+ */
+function useNearViewport<T extends Element>() {
+  const ref = useRef<T>(null);
+  const [near, setNear] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setNear(entry.isIntersecting),
+      { rootMargin: '50% 0px' }
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, near] as const;
 }
 
-interface GalleryItemProps {
-  photo: Photo;
-  priority?: boolean;
-}
+function GalleryItem({ photo, priority }: { photo: Photo; priority: boolean }) {
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [frameRef, near] = useNearViewport<HTMLDivElement>();
+  const handleSettled = useCallback(() => setIsLoading(false), []);
 
-function GalleryItem({ photo, priority = false }: GalleryItemProps) {
-  const [isFlipped, setIsFlipped] = React.useState(false);
-  const [isPhotoLoading, setIsPhotoLoading] = React.useState(true);
-  
-  const width = React.useMemo(() => calculateImageWidth(photo), [photo]);
-  const aspectRatio = photo.width / photo.height;
-  const height = width / aspectRatio;
   const exif = formatExifData(photo);
   const descriptionText = getDescriptionText(photo);
-  
+
   return (
-    <div className="group select-none" style={{ width }}>
-      <div className="relative">
-        <div 
-          style={{ 
+    // Sized in CSS from the photo's proportions (see .gallery-item), so the
+    // layout is right in the server's HTML and stays right when the window
+    // is resized or the device is turned
+    <div
+      className="gallery-item group select-none"
+      data-orientation={orientationOf(photo)}
+      style={{ '--ratio': photo.width / photo.height } as CSSProperties}
+    >
+      <div
+        ref={frameRef}
+        className="gallery-item__frame relative"
+        style={{
+          backgroundImage: photo.lqip ? `url("${photo.lqip}")` : undefined
+        }}
+      >
+        <div
+          style={{
             transform: isFlipped ? 'scaleX(-1)' : 'scaleX(1)',
             transition: 'transform 0.3s ease'
           }}
         >
           <HDRImage
             photo={photo}
-            width={width}
-            height={height}
-            className="w-full h-auto block"
+            className="block h-auto w-full"
             priority={priority}
-            onLoadingChange={setIsPhotoLoading}
+            onSettled={handleSettled}
           />
         </div>
 
         {/* Sits outside the flip wrapper so a flipped photo doesn't mirror it */}
-        <LoadingOrb active={isPhotoLoading} className="absolute inset-0" />
+        <LoadingOrb active={isLoading && near} className="absolute inset-0" />
 
         <button
           onClick={() => setIsFlipped(!isFlipped)}
-          className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 backdrop-blur-xs"
+          className="absolute top-2 right-2 rounded-full bg-black/50 p-2 text-white opacity-0 backdrop-blur-xs transition-opacity duration-200 group-hover:opacity-100 hover:bg-black/70 focus-visible:opacity-100"
           aria-label="Flip image horizontally"
         >
           <FlipIcon />
         </button>
 
         {exif && (
-          <div className="pointer-events-none absolute inset-0 flex items-end justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <div className="bg-black/60 text-white text-[11px] px-3 py-1.5 rounded-full font-mono tracking-wide shadow-lg border border-white/10 backdrop-blur-xs">
+          <div className="pointer-events-none absolute inset-0 flex items-end justify-center pb-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            <div className="rounded-full border border-white/10 bg-black/60 px-3 py-1.5 text-[11px] text-white tabular-nums shadow-lg backdrop-blur-xs">
               {exif}
             </div>
           </div>
@@ -148,32 +151,32 @@ interface SingleColumnGalleryProps {
   className?: string;
 }
 
-export function SingleColumnGallery({ photos, className = '' }: SingleColumnGalleryProps) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  
-  // Setup iOS image memory cleanup
-  React.useEffect(() => {
-    // Small delay to ensure images are rendered
-    const timeoutId = setTimeout(() => {
-      const cleanup = setupImageCleanup(containerRef.current, {
-        rootMargin: '150% 0px', // Keep images loaded within 1.5 viewport heights
-      });
-      return cleanup;
-    }, 200);
-    
-    return () => clearTimeout(timeoutId);
+function SingleColumnGallery({
+  photos,
+  className = ''
+}: SingleColumnGalleryProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // iOS: release photos that are far off screen (see ios-image-cleanup.ts)
+  useEffect(() => {
+    return setupImageCleanup(containerRef.current, {
+      rootMargin: '150% 0px' // keep photos within 1.5 viewport heights
+    });
   }, [photos]);
-  
+
   if (photos.length === 0) return null;
-  
+
   return (
     <div
       ref={containerRef}
-      className={`fade-in-delayed flex flex-col items-center gap-8 ${className}`}
+      className={`flex w-full flex-col items-center gap-8 ${className}`}
     >
       {photos.map((photo, index) => (
-        // Fetch the first photos eagerly at high priority; lazy-load the rest
-        <GalleryItem key={photo.url || index} photo={photo} priority={index < 2} />
+        <GalleryItem
+          key={photo.url || index}
+          photo={photo}
+          priority={index < PRIORITY_COUNT}
+        />
       ))}
     </div>
   );

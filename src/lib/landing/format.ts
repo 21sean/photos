@@ -22,7 +22,9 @@ export function formatCoordinates({ lat, lng }: { lat: number; lng: number }): {
 }
 
 /** "7 photos", "1 photo", or "Soon" for an album with nothing in it yet. */
-export function photoTally({ photoCount }: Pick<Destination, 'photoCount'>): string {
+export function photoTally({
+  photoCount
+}: Pick<Destination, 'photoCount'>): string {
   if (photoCount === 0) return 'Soon';
   return `${photoCount} ${photoCount === 1 ? 'photo' : 'photos'}`;
 }

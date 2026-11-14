@@ -1,4 +1,5 @@
 import { albums } from './albums';
+import { gallerySizes } from './images/sizes';
 
 /**
  * What the landing page needs to know about an album: enough to list it,
@@ -20,7 +21,7 @@ export type Destination = {
   /** Other marked spots that belong to this album (side trips, districts). */
   spots: Array<{ lat: number; lng: number }>;
   /** First photo of the album, for warming up the gallery. */
-  lead?: { url: string; srcSet?: string };
+  lead?: { url: string; srcSet?: string; sizes: string };
   /** Small preview of the first photo. Needs published image variants. */
   preview?: { url: string; lqip?: string; width: number; height: number };
 };
@@ -43,7 +44,11 @@ export function getDestinations(): Destination[] {
         spots: album.locations
           .filter(spot => spot.lat !== album.lat || spot.lng !== album.lng)
           .map(({ lat, lng }) => ({ lat, lng })),
-        lead: first && { url: first.url, srcSet: first.srcSet },
+        lead: first && {
+          url: first.url,
+          srcSet: first.srcSet,
+          sizes: gallerySizes(first)
+        },
         preview: first?.thumbnailUrl
           ? {
               url: first.thumbnailUrl,

@@ -252,7 +252,14 @@ export function createActiveMarker(): SceneObject & { sprite: THREE.Sprite } {
   const context = canvas.getContext('2d');
   if (context) {
     const half = size / 2;
-    const gradient = context.createRadialGradient(half, half, 0, half, half, half);
+    const gradient = context.createRadialGradient(
+      half,
+      half,
+      0,
+      half,
+      half,
+      half
+    );
     gradient.addColorStop(0, 'rgba(255, 255, 246, 1)');
     gradient.addColorStop(0.18, 'rgba(255, 236, 160, 1)');
     gradient.addColorStop(0.42, 'rgba(255, 215, 106, 0.4)');

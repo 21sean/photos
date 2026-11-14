@@ -45,7 +45,9 @@ export function DestinationDeck({
   const settleTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const slideAt = useCallback((index: number) => {
-    return trackRef.current?.querySelectorAll<HTMLElement>('.deck__card')[index];
+    return trackRef.current?.querySelectorAll<HTMLElement>('.deck__card')[
+      index
+    ];
   }, []);
 
   const scrollToSlide = useCallback(
@@ -68,7 +70,9 @@ export function DestinationDeck({
     let nearest = 0;
     let nearestDistance = Infinity;
     track.querySelectorAll<HTMLElement>('.deck__card').forEach((slide, i) => {
-      const distance = Math.abs(slide.offsetLeft + slide.offsetWidth / 2 - centre);
+      const distance = Math.abs(
+        slide.offsetLeft + slide.offsetWidth / 2 - centre
+      );
       if (distance < nearestDistance) {
         nearest = i;
         nearestDistance = distance;
@@ -157,9 +161,7 @@ export function DestinationDeck({
           const body = (
             <>
               <span className="deck__eyebrow">
-                <span>
-                  {position(destination.index, destinations.length)}
-                </span>
+                <span>{position(destination.index, destinations.length)}</span>
                 {destination.year && <span>{destination.year}</span>}
               </span>
               <span className="deck__title">{destination.title}</span>
@@ -182,7 +184,11 @@ export function DestinationDeck({
           );
 
           return hasPhotos ? (
-            <Link key={destination.slug} href={albumHref(destination)} {...shared}>
+            <Link
+              key={destination.slug}
+              href={albumHref(destination)}
+              {...shared}
+            >
               {body}
             </Link>
           ) : (

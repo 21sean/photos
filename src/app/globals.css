@@ -1,7 +1,8 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme inline {
-  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ========================================
@@ -181,13 +182,21 @@ html:has(.album-page)::-webkit-scrollbar-track {
 }
 
 html:has(.album-page)::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(75, 85, 99, 0.8) 0%, rgba(107, 114, 128, 0.6) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(75, 85, 99, 0.8) 0%,
+    rgba(107, 114, 128, 0.6) 100%
+  );
   border-radius: 5px;
   border: 2px solid rgba(17, 24, 39, 0.8);
 }
 
 html:has(.album-page)::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(107, 114, 128, 0.9) 0%, rgba(156, 163, 175, 0.8) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(107, 114, 128, 0.9) 0%,
+    rgba(156, 163, 175, 0.8) 100%
+  );
 }
 
 /* Firefox scrollbar for album pages */
@@ -223,14 +232,22 @@ body:has(.album-page) {
   pointer-events: none;
 }
 
-/* Album page navigation container - transparent, sticky on scroll */
+/* Album page navigation column: sticky beside the photos. Only from the
+   width at which the nav is shown: below that the column is empty, and a
+   full-height empty column pushed the whole album one screen down on
+   Android phones. */
 .album-page > div:nth-child(2) {
   background-color: transparent !important;
-  min-height: 100vh;
-  position: sticky;
-  top: 0;
-  align-self: flex-start;
-  z-index: 10;
+}
+
+@media (min-width: 640px) {
+  .album-page > div:nth-child(2) {
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    z-index: 10;
+  }
 }
 
 /* Nav collapse animation on scroll */
@@ -252,17 +269,17 @@ body:has(.album-page) {
     margin-top: 0 !important;
     padding-top: 0 !important;
   }
-  
+
   .album-page > .album-content {
     margin-top: 0 !important;
     padding-top: 0 !important;
   }
-  
+
   /* Remove min-height that causes extra space on iOS */
   .album-page > div:nth-child(2) {
     min-height: auto !important;
   }
-  
+
   .album-page > .album-content {
     min-height: auto !important;
   }
@@ -355,14 +372,59 @@ body:has(.album-page) {
   }
 }
 
+/* The header and every photo are sized from the photo's proportions
+   (--ratio, set inline): as wide as the column allows, but never so tall
+   that it runs off the screen. Kept in step with lib/images/sizes.ts. */
+.album-title-box,
+.gallery-item {
+  --cap-width: 700px;
+  --cap-height: calc(100dvh - 190px);
+
+  width: min(100%, var(--cap-width), calc(var(--cap-height) * var(--ratio)));
+}
+
+.gallery-item[data-orientation='landscape'] {
+  --cap-width: 1100px;
+  --cap-height: 65dvh;
+}
+
+@media (max-width: 640px) {
+  .album-title-box,
+  .gallery-item {
+    width: calc(100vw - 16px);
+  }
+}
+
+/* The frame holds the photo's place (and its blurred preview, when the
+   manifest has one) until the real thing arrives */
+.gallery-item__frame {
+  aspect-ratio: var(--ratio);
+  background: rgb(255 255 255 / 0.04) center / cover no-repeat;
+}
+
+.album-empty {
+  padding: 3rem 1rem;
+  color: var(--ink-dim);
+}
+
+.album-empty a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 /* ========================================
    Photos
    ======================================== */
 
+/* Fade in over the placeholder once loaded */
+.hdr-image[data-settled='false'] {
+  opacity: 0;
+}
+
 /* HDR Image Support with Gain Maps */
 .hdr-image {
-  /* Smooth transitions for HDR adjustments */
-  transition: filter 0.3s ease, opacity 0.3s ease;
+  transition: opacity 0.4s ease;
   /* Preserve color profile and HDR metadata */
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
@@ -384,7 +446,7 @@ body:has(.album-page) {
     will-change: transform;
     transform: translateZ(0); /* Force GPU compositing */
   }
-  
+
   /* Enhanced HDR image handling with gain map support */
   .hdr-image {
     /* Allow full dynamic range utilization */
@@ -404,7 +466,7 @@ body:has(.album-page) {
   .hdr-enhanced {
     /* No filter needed - browser handles HDR natively */
   }
-  
+
   /* Enhanced gain map support for high-brightness displays */
   .hdr-image[data-gain-map] {
     /* Let the browser handle gain map processing */
@@ -419,12 +481,6 @@ body:has(.album-page) {
   }
 }
 
-/* Loading states for HDR images */
-.hdr-image[data-loading="true"] {
-  opacity: 0.7;
-  filter: blur(0px);
-}
-
 /* Modern HDR format support */
 .hdr-image {
   /* Support for JPEG XL and AVIF with gain maps */
@@ -433,7 +489,7 @@ body:has(.album-page) {
 
 /* HDR metadata tooltips */
 .hdr-image[data-max-luminance]:hover::after {
-  content: "HDR: " attr(data-max-luminance) " nits • ~3 stops";
+  content: 'HDR: ' attr(data-max-luminance) ' nits • ~3 stops';
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -456,18 +512,19 @@ body:has(.album-page) {
     /* Enable ISO 21496-1 gain map processing */
     image-orientation: from-image;
   }
-  
+
   /* iPhone 16 Pro HDR - let Safari handle native HDR rendering */
   .hdr-enhanced {
     /* No filter - Safari on iOS handles HDR/gain map images natively */
   }
-  
+
   /* Disable zoom on input fields to prevent Safari auto-zoom lag */
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     font-size: 16px !important;
     transform: translateZ(0); /* Hardware acceleration */
   }
-  
 }
 
 /* Target iPhone 16 Pro specifically */
@@ -505,7 +562,7 @@ body:has(.album-page) {
     /* Ensure content stays visible */
     content-visibility: visible !important;
   }
-  
+
   /* Prevent scroll container from triggering image reclamation */
   .album-page {
     -webkit-overflow-scrolling: touch;

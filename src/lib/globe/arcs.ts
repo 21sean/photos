@@ -15,10 +15,11 @@ type LatLng = { lat: number; lng: number };
 const MAX_ROUTES_PER_MARKER = 4;
 
 // ~11 m: enough to merge markers that are really the same spot
-const coordKey = ({ lat, lng }: LatLng) => `${lat.toFixed(4)},${lng.toFixed(4)}`;
+const coordKey = ({ lat, lng }: LatLng) =>
+  `${lat.toFixed(4)},${lng.toFixed(4)}`;
 
 /** Every distinct marked position: each destination plus its side spots. */
-export function uniqueSpots(destinations: Destination[]): LatLng[] {
+function uniqueSpots(destinations: Destination[]): LatLng[] {
   const seen = new Set<string>();
   const spots: LatLng[] = [];
   for (const destination of destinations) {

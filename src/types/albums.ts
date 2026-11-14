@@ -1,12 +1,7 @@
-export const types = {
-  LOCATION: 'location',
-  CUSTOM: 'custom'
-} as const;
-
 /** A string that is known to be an album title (see `albums.ts`). */
 export type AlbumTitle = string & { readonly __brand: 'AlbumTitle' };
 
-export type AlbumLocation = {
+type AlbumLocation = {
   description?: string;
   date?: string;
   lat: number;
@@ -27,7 +22,7 @@ export type Album = {
   /** `#rrggbb` */
   color: string;
   order: number;
-  type: (typeof types)[keyof typeof types];
+  type: 'location' | 'custom';
 };
 
 export type AlbumList = Album[];

@@ -49,7 +49,7 @@ const variantClasses: Record<Variant, string> = {
   primary: 'text-white',
 };
 
-export function ScrollReveal({
+function ScrollReveal({
   children,
   size = 'lg',
   align = 'left',

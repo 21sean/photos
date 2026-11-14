@@ -12,7 +12,6 @@ import {
   type MouseEvent
 } from 'react';
 import type { Destination } from '@/lib/destinations';
-import { GALLERY_SIZES } from '@/lib/images/sizes';
 import { DestinationCallout } from './destination-callout';
 import { DestinationDeck } from './destination-deck';
 import { DestinationIndex } from './destination-index';
@@ -52,7 +51,7 @@ function warmUp({ lead }: Destination) {
   image.decoding = 'async';
   image.fetchPriority = 'high';
   if (lead.srcSet) {
-    image.sizes = GALLERY_SIZES;
+    image.sizes = lead.sizes;
     image.srcset = lead.srcSet;
   }
   image.src = lead.url;

@@ -43,12 +43,10 @@ const GLOBE_CONFIG: COBEOptions = {
 function toMarkers(albums: Array<Album>): Array<Marker> {
   return albums.flatMap(album => [
     { location: [album.lat, album.lng], size: MARKER_SIZE },
-    ...album.locations.map(
-      (location): Marker => ({
-        location: [location.lat, location.lng],
-        size: MARKER_SIZE
-      })
-    )
+    ...album.locations.map((location): Marker => ({
+      location: [location.lat, location.lng],
+      size: MARKER_SIZE
+    }))
   ]);
 }
 

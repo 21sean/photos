@@ -77,7 +77,12 @@ function CalloutCard({
           }}
         >
           {/* Decorative: the album itself carries the described photos */}
-          <img src={destination.preview.url} alt="" loading="lazy" decoding="async" />
+          <img
+            src={destination.preview.url}
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
         </span>
       )}
       <span className="callout__eyebrow">

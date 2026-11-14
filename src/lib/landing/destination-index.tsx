@@ -50,7 +50,8 @@ export function DestinationIndex({
       onKeyDown={handleKeyDown}
       onMouseLeave={onPreviewEnd}
       onBlur={event => {
-        if (!event.currentTarget.contains(event.relatedTarget)) onPreviewEnd?.();
+        if (!event.currentTarget.contains(event.relatedTarget))
+          onPreviewEnd?.();
       }}
     >
       {destinations.map((destination, i) => {
