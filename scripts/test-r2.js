@@ -100,7 +100,7 @@ async function testR2Access() {
 
     console.log('✅ R2 access test completed successfully!');
     console.log('\nYour domain configuration:');
-    console.log('  Custom domain: images.sean.ventures');
+    console.log('  Custom domain: images.paganitech.com');
     console.log('  (Configure this in Cloudflare R2 bucket settings)');
 
   } catch (error) {

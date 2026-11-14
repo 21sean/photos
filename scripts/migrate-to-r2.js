@@ -257,7 +257,7 @@ async function migrate(dryRun = false) {
   if (!dryRun && uploaded > 0) {
     console.log('\n🎉 Migration complete!');
     console.log(`\nImages available at:`);
-    console.log(`   https://images.sean.ventures/<album>/<filename>`);
+    console.log(`   https://images.paganitech.com/<album>/<filename>`);
   }
 }
 
