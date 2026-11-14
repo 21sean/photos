@@ -7,7 +7,6 @@ import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Album, AlbumList } from '@/types/albums';
 import { Photo } from '@/types';
 import { titleToSlug } from '@/lib/slug';
-import Stack from '@mui/material/Stack';
 import WaveBackground from '@/lib/fx/wave-background';
 import ShaderBackground from '@/lib/fx/shader-background';
 import { isChrome, isIOSSafari } from '@/lib/browser-utils';
@@ -196,13 +195,13 @@ export default function AlbumPageClient({
       >
         {renderBackground()}
       </div>
-      <div className={`pt-3 sm:pt-6 sm:pl-10 sm:pr-8 lg:pl-16 lg:pr-12 space-y-1 flex-shrink-0 transition-all duration-500 ease-in-out ${
+      <div className={`pt-3 sm:pt-6 sm:pl-10 sm:pr-8 lg:pl-16 lg:pr-12 space-y-1 shrink-0 transition-all duration-500 ease-in-out ${
         isNavCollapsed ? 'nav-scroll-collapsed' : ''
       }`}>
         <Nav albums={albums} title={album.title} isCollapsed={isCollapsed} isScrollCollapsed={isNavCollapsed} />
       </div>
 
-      <Stack spacing={2} sx={{ flex: 1, minWidth: 0, alignItems: 'center' }}>
+      <div className="album-content flex min-w-0 flex-1 flex-col items-center gap-4">
         <div
           className="album-title-box rounded-lg px-5 py-4 relative"
           style={{ width: contentWidth ?? 'auto', maxWidth: '100%' }}
@@ -249,7 +248,7 @@ export default function AlbumPageClient({
               {/* Toggle arrow button */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="flex items-center justify-center w-6 h-10 bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-r-md transition-all duration-200 border border-l-0 border-white/10"
+                className="flex items-center justify-center w-6 h-10 bg-black/30 hover:bg-black/50 backdrop-blur-xs rounded-r-md transition-all duration-200 border border-l-0 border-white/10"
                 aria-label="Toggle background menu"
               >
                 <svg
@@ -292,14 +291,14 @@ export default function AlbumPageClient({
                       }`}
                     >
                       <span
-                        className="w-2 h-2 rounded-full border border-white/30 flex-shrink-0"
+                        className="w-2 h-2 rounded-full border border-white/30 shrink-0"
                         style={{
                           background: option.color || 'linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)',
                         }}
                       />
                       <span className="whitespace-nowrap">{option.label}</span>
                       {currentBackground === option.id && (
-                        <svg className="w-3 h-3 ml-auto flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-3 h-3 ml-auto shrink-0" fill="currentColor" viewBox="0 0 20 20">
                           <path
                             fillRule="evenodd"
                             d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -370,7 +369,7 @@ export default function AlbumPageClient({
           className="pb-8" 
           photos={photos}
         />
-      </Stack>
+      </div>
     </section>
   );
 }

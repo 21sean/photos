@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import GlobeGL from 'react-globe.gl';
 import type { GlobeProps, GlobeMethods } from 'react-globe.gl';
-import { GeoJsonGeometry } from 'three-geojson-geometry';
+import GeoJsonGeometry from 'three-geojson-geometry';
 import { geoGraticule10 } from 'd3-geo';
 import * as topojson from 'topojson-client';
 import { useWindowSize } from '@/hooks/use-window-size';
@@ -285,10 +285,9 @@ function useLandPolygons() {
         setLandPolygons(countriesGeoJson.features);
       } else {
         // Load TopoJSON with just land masses (no borders)
-        const landTopo = await import('../../data/land-110m.json');
-        const landPolygons = topojson.feature(
-          landTopo,
-          landTopo.objects.land
+        const landTopo = (await import('../../data/land-110m.json')) as any;
+        const landPolygons = (
+          topojson.feature(landTopo, landTopo.objects.land) as any
         ).features;
         setLandPolygons(landPolygons);
       }
@@ -350,7 +349,7 @@ function useAlbumInteraction(
   // Mobile focus hover: the RAF loop plus the timeout that starts it once
   // the zoom-in flight has landed
   const swayRafRef = useRef(0);
-  const swayStartTimeoutRef = useRef<NodeJS.Timeout>();
+  const swayStartTimeoutRef = useRef<NodeJS.Timeout>(undefined);
 
   const stopFocusSway = React.useCallback(() => {
     clearTimeout(swayStartTimeoutRef.current);
@@ -901,7 +900,7 @@ function Globe({ albums }: { albums: Array<Album> }) {
   
   
   // object config
-  const globeEl = useRef<Ref>();
+  const globeEl = useRef<Ref>(undefined);
   const globeElRef: Ref = globeEl.current;
 
   const { handleGlobeReady } = useGlobeReady(globeEl);

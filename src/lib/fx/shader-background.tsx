@@ -55,7 +55,7 @@ interface ShaderBackgroundProps {
 
 const blurClassMap: Record<BlurSize, string> = {
   none: "backdrop-blur-none",
-  sm: "backdrop-blur-sm",
+  sm: "backdrop-blur-xs",
   md: "backdrop-blur-md",
   lg: "backdrop-blur-lg",
   xl: "backdrop-blur-xl",
@@ -76,7 +76,7 @@ function ShaderBackground({
   backdropBlurAmount = "sm",
   color = "#07eae6",
   className = "",
-}: ShaderBackgroundProps): JSX.Element {
+}: ShaderBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   

@@ -1,6 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
 
 /* ========================================
    Custom Scrollbar Styling for Album Pages
@@ -465,7 +467,7 @@ body:has(.album-page) {
 }
 
 /* Album page photos container */
-.album-page > .MuiStack-root {
+.album-page > .album-content {
   background-color: transparent !important;
   min-height: 100vh;
   position: relative;
@@ -479,7 +481,7 @@ body:has(.album-page) {
     padding-top: 0 !important;
   }
   
-  .album-page > .MuiStack-root {
+  .album-page > .album-content {
     margin-top: 0 !important;
     padding-top: 0 !important;
   }
@@ -489,7 +491,7 @@ body:has(.album-page) {
     min-height: auto !important;
   }
   
-  .album-page > .MuiStack-root {
+  .album-page > .album-content {
     min-height: auto !important;
   }
 }
@@ -911,25 +913,6 @@ aside.absolute.z-50 *::selection {
       /* Preserve the fade-in animation on mobile - time increased 50% (1.65s -> 2.48s) */
       animation: fadeInCard 2.48s ease-out forwards !important;
     }
-  }
-}
-
-/* iOS Performance Optimizations for Dropdown */
-@supports (-webkit-touch-callout: none) {
-  /* Hardware acceleration for dropdown on iOS */
-  .sm\\:hidden.overflow-hidden.will-change-transform {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-perspective: 1000px;
-    perspective: 1000px;
-  }
-  
-  /* Optimize transforms for iOS */
-  .sm\\:hidden.overflow-hidden.will-change-transform * {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
   }
 }
 

@@ -35,9 +35,9 @@ export function AlbumCard({
         minHeight: '138px' /* Ensure minimum height to prevent clipping */
       }}
     >
-      <span className="blink rounded-lg flex-shrink-0 text-lg md:text-2xl">{album.title}</span>
-      <span className="text-sm md:text-base flex-shrink-0">{album.date}</span>
-      <div className="marquee py-4 pb-2 text-sm md:text-base flex-grow overflow-x-hidden">
+      <span className="blink rounded-lg shrink-0 text-lg md:text-2xl">{album.title}</span>
+      <span className="text-sm md:text-base shrink-0">{album.date}</span>
+      <div className="marquee py-4 pb-2 text-sm md:text-base grow overflow-x-hidden">
         <div className="marquee-content">
           {tags.map(tag => (
             <span key={`${tag}-1`}>{tag}</span>
@@ -51,7 +51,7 @@ export function AlbumCard({
       </div>
 
       <span 
-        className="flex-shrink-0 text-sm md:text-base py-1 px-2 rounded touch-manipulation select-none cursor-pointer hover:bg-gray-200 transition-colors duration-200"
+        className="shrink-0 text-sm md:text-base py-1 px-2 rounded touch-manipulation select-none cursor-pointer hover:bg-gray-200 transition-colors duration-200"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();

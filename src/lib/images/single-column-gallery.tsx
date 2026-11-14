@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import Stack from '@mui/material/Stack';
 import { Photo } from '@/types';
 import HDRImage from './hdr-image';
 import { FlipIcon } from '../icons';
@@ -108,7 +107,7 @@ function GalleryItem({ photo, priority = false }: GalleryItemProps) {
 
         <button
           onClick={() => setIsFlipped(!isFlipped)}
-          className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 backdrop-blur-sm"
+          className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 backdrop-blur-xs"
           aria-label="Flip image horizontally"
         >
           <FlipIcon />
@@ -116,7 +115,7 @@ function GalleryItem({ photo, priority = false }: GalleryItemProps) {
 
         {exif && (
           <div className="pointer-events-none absolute inset-0 flex items-end justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <div className="bg-black/60 text-white text-[11px] px-3 py-1.5 rounded-full font-mono tracking-wide shadow-lg border border-white/10 backdrop-blur-sm">
+            <div className="bg-black/60 text-white text-[11px] px-3 py-1.5 rounded-full font-mono tracking-wide shadow-lg border border-white/10 backdrop-blur-xs">
               {exif}
             </div>
           </div>
@@ -168,17 +167,15 @@ export function SingleColumnGallery({ photos, className = '' }: SingleColumnGall
   if (photos.length === 0) return null;
   
   return (
-    <Stack 
+    <div
       ref={containerRef}
-      spacing={4} 
-      className={`fade-in-delayed ${className}`}
-      sx={{ alignItems: 'center' }}
+      className={`fade-in-delayed flex flex-col items-center gap-8 ${className}`}
     >
       {photos.map((photo, index) => (
         // Fetch the first photos eagerly at high priority; lazy-load the rest
         <GalleryItem key={photo.url || index} photo={photo} priority={index < 2} />
       ))}
-    </Stack>
+    </div>
   );
 }
 

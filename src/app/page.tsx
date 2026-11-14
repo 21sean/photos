@@ -1,17 +1,13 @@
-import dynamic from 'next/dynamic';
 import './globals.css';
 import { getAlbums } from '@/lib/data';
-
-const Globe = dynamic(() => import('@/lib/globes/globe'), {
-  ssr: false
-});
+import { GlobeLoader } from '@/lib/globes/globe-loader';
 
 export default async function Page() {
   const albums = await getAlbums();
 
   return (
     <main role="main" className="fullpage">
-      <Globe albums={albums} />
+      <GlobeLoader albums={albums} />
     </main>
   );
 }

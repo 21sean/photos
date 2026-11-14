@@ -12,7 +12,8 @@ export async function generateStaticParams() {
   }));
 }
 
-async function AlbumPage({ params: { slug } }: { params: { slug: string } }) {
+async function AlbumPage({ params }: PageProps<'/[slug]'>) {
+  const { slug } = await params;
   // Guard against non-album routes like favicon.ico
   if (slug.includes('.') || slug.startsWith('_')) {
     notFound();

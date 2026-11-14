@@ -5,7 +5,7 @@ import './globals.css';
 const sansSerifFont = localFont({
   src: '../fonts/TASAOrbiterVF.woff2',
   display: 'swap',
-  variable: '--font-sans'
+  variable: '--font-body'
 });
 
 export const metadata: Metadata = {
