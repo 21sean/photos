@@ -1,5 +1,5 @@
 import { getAlbums } from '@/lib/data';
-import Globe from '@/lib/globes/mini-globe';
+import Globe from '@/lib/globe/mini-globe';
 import Nav from '@/lib/nav';
 import Noise from '@/lib/fx/noise';
 import { ExternalLink } from '@/lib/external-link';

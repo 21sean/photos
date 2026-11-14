@@ -1,13 +1,18 @@
-import './globals.css';
-import { getAlbums } from '@/lib/data';
-import { GlobeLoader } from '@/lib/globes/globe-loader';
+import { getDestinations } from '@/lib/destinations';
+import { Landing } from '@/lib/landing/landing';
 
-export default async function Page() {
-  const albums = await getAlbums();
+export default function Page() {
+  const destinations = getDestinations();
+  const photoCount = destinations.reduce(
+    (total, destination) => total + destination.photoCount,
+    0
+  );
 
   return (
-    <main role="main" className="fullpage">
-      <GlobeLoader albums={albums} />
-    </main>
+    <Landing
+      destinations={destinations}
+      photoCount={photoCount}
+      year={new Date().getFullYear()}
+    />
   );
 }

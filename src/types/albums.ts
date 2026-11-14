@@ -15,6 +15,8 @@ export type AlbumLocation = {
 
 export type Album = {
   title: AlbumTitle;
+  /** URL slug, and the album's folder name in the bucket. */
+  slug: string;
   description: string | null;
   date: string | null;
   lat: number;

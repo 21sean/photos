@@ -367,6 +367,7 @@ const albumsMeta: AlbumMeta[] = [
  */
 export const albums = albumsMeta.map(album => ({
   title: album.title as AlbumTitle,
+  slug: album.slug,
   color: album.color,
   type: album.type,
   description: album.description,
