@@ -14,7 +14,7 @@
  *   node scripts/enrich-photo-ai.js --album mexico --filename IMG_4648.jpeg --dry-run
  *
  * Optional (recommended if you have it):
- *   --image-url https://images.sean.ventures/mexico/IMG_4648.jpeg
+ *   --image-url https://images.paganitech.com/mexico/IMG_4648.jpeg
  */
 
 const fs = require('fs');

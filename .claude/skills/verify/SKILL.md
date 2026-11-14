@@ -34,8 +34,8 @@ const browser = await chromium.launch({
 
 Gotchas that cost time:
 
-- The image CDN (images.sean.ventures) is usually unreachable from a sandbox.
-  Stub it with `context.route('https://images.sean.ventures/**', ...)` and
+- The image CDN (images.paganitech.com) is usually unreachable from a sandbox.
+  Stub it with `context.route('https://images.paganitech.com/**', ...)` and
   fulfil with a generated image of the photo's aspect ratio (see
   src/lib/photos.json for dimensions). Playwright disables the HTTP cache
   while routing, so repeat requests for one URL are expected.

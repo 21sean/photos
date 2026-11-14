@@ -9,8 +9,13 @@
 
 import type { Photo } from '@/types';
 
-/** Origin of the R2 bucket, served through the custom domain. */
-export const IMAGE_ORIGIN = 'https://images.sean.ventures';
+/**
+ * Origin of the R2 bucket, served through its custom domain on the site's
+ * zone. Set NEXT_PUBLIC_IMAGE_ORIGIN at build time to point elsewhere.
+ */
+export const IMAGE_ORIGIN =
+  process.env.NEXT_PUBLIC_IMAGE_ORIGIN?.replace(/\/+$/, '') ||
+  'https://images.paganitech.com';
 
 /** One entry of the generated `photos.json` manifest. */
 export interface R2Photo {

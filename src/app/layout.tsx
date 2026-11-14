@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'sean.photo',
     description,
-    url: 'https://sean.ventures',
+    url: 'https://paganitech.com',
     siteName: 'sean.photo',
     locale: 'en_US',
     type: 'website'
