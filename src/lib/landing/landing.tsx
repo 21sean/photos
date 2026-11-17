@@ -187,7 +187,7 @@ export function Landing({ destinations, photoCount, year }: Props) {
   );
 
   const handleSettle = useCallback(
-    (destination: Destination | null) => select(destination, true),
+    (destination: Destination) => select(destination, true),
     [select]
   );
 
@@ -302,7 +302,6 @@ export function Landing({ destinations, photoCount, year }: Props) {
       <DestinationDeck
         destinations={destinations}
         activeSlug={active?.slug ?? null}
-        photoCount={photoCount}
         onSettle={handleSettle}
         onActivate={activate}
       />

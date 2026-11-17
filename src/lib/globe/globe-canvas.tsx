@@ -60,6 +60,16 @@ const SWAY_PERIOD_MS = 7000;
 /** Closest the visitor may zoom, in globe radii above the surface. */
 const MIN_ALTITUDE = 0.35;
 
+/**
+ * Camera near plane, in globe radii. globe.gl sets 0.05 units (1/2000 of a
+ * radius) so the camera can skim the surface, but depth precision falls off
+ * with the square of distance over the near plane. On a phone the camera
+ * rests ~5 radii out, where a 0.05 near plane leaves depth steps as thick as
+ * the gap between land and sea, and the two z-fight (flicker) as the globe
+ * turns. Nothing here comes closer than the dive, 0.16 radii up.
+ */
+const CAMERA_NEAR = 0.025;
+
 /** How close (px) a pointer must be to a marker to count as on it. */
 const PICK_RADIUS_MOUSE = 18;
 const PICK_RADIUS_TOUCH = 30;
@@ -67,6 +77,11 @@ const PICK_RADIUS_TOUCH = 30;
 const CLICK_SLOP_PX = 6;
 
 const TRANSPARENT = 'rgba(0, 0, 0, 0)';
+
+/** The atmosphere colour, dimmed (in linear light) to the glow's strength. */
+const ATMOSPHERE_COLOR = new THREE.Color(GLOBE_THEME.atmosphere)
+  .multiplyScalar(GLOBE_THEME.atmosphereStrength)
+  .getStyle();
 
 /** Glow diameter of a marker, in CSS pixels: an album, and a side spot. */
 const MARKER_SIZE = 30;
@@ -308,6 +323,10 @@ export default function GlobeCanvas({
     const pixelRatio = Math.min(window.devicePixelRatio, 2);
     renderer.setPixelRatio(pixelRatio);
 
+    const camera = globe.camera() as THREE.PerspectiveCamera;
+    camera.near = radius * CAMERA_NEAR;
+    camera.updateProjectionMatrix();
+
     controls.enablePan = false;
     controls.enableZoom = true;
     controls.enableRotate = true;
@@ -404,7 +423,7 @@ export default function GlobeCanvas({
 
     // Frame loop: everything that changes continuously lives here, so there
     // is exactly one requestAnimationFrame chain to start and stop
-    const cameraPosition = globe.camera().position;
+    const cameraPosition = camera.position;
     const startedAt = performance.now();
     let lastReadout = '';
     let anchorVisible: boolean | undefined;
@@ -719,7 +738,7 @@ export default function GlobeCanvas({
           backgroundImageUrl={null}
           globeMaterial={oceanMaterial}
           showAtmosphere
-          atmosphereColor={GLOBE_THEME.atmosphere}
+          atmosphereColor={ATMOSPHERE_COLOR}
           atmosphereAltitude={GLOBE_THEME.atmosphereAltitude}
           showGraticules={false}
           polygonsData={land}
