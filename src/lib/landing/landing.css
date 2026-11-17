@@ -99,40 +99,10 @@ body:has(.landing) {
 .wordmark,
 .index__item,
 .deck__title,
-.deck__headline,
 .callout__title {
   font-weight: 400;
   font-stretch: 96%;
   letter-spacing: -0.032em;
-}
-
-/* --------------------------------------------------------------------------
-   Controls: one filled button, one glass capsule
-   -------------------------------------------------------------------------- */
-
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5em;
-  min-height: 2.75rem;
-  padding: 0 1.1rem;
-  border-radius: var(--r-sm);
-  background: var(--ink);
-  color: #050a0c;
-  font-size: 0.875rem;
-  font-weight: 600;
-  transition:
-    translate 0.2s var(--ease-out),
-    scale 0.12s ease;
-}
-
-.button:hover {
-  translate: 0 -1px;
-}
-
-.button:active {
-  scale: 0.97;
 }
 
 /* --------------------------------------------------------------------------
@@ -187,7 +157,7 @@ body:has(.landing) {
   );
   box-shadow:
     0 0 0 1px rgb(127 223 233 / 0.14),
-    0 0 5rem 0.6rem rgb(60 190 205 / 0.2),
+    0 0 5rem 0.6rem rgb(60 190 205 / 0.16),
     inset -2rem -2.5rem 5rem rgb(0 0 0 / 0.55);
   opacity: 0.85;
   transition: opacity 1.2s ease;
@@ -527,17 +497,10 @@ body:has(.landing) {
   color: var(--ink-dim);
 }
 
-.deck__title,
-.deck__headline {
+.deck__title {
   margin: 0.3rem 0 0.25rem;
   font-size: 2.5rem;
   line-height: 1.05;
-}
-
-.deck__headline {
-  margin-top: 0;
-  font-size: 1.875rem;
-  line-height: 1.1;
 }
 
 .deck__card[data-current='true'] .deck__title {
@@ -577,21 +540,6 @@ body:has(.landing) {
   color: var(--ink-dim);
 }
 
-.deck__start {
-  align-self: flex-start;
-  margin-top: auto;
-}
-
-.deck__start svg {
-  animation: nudge 1.8s ease-in-out infinite;
-}
-
-@keyframes nudge {
-  50% {
-    translate: 0.25em 0;
-  }
-}
-
 /* A ruler with one tick per place */
 .deck__ruler {
   display: flex;
@@ -617,10 +565,6 @@ body:has(.landing) {
     background-color 0.3s ease;
 }
 
-.deck__tick--intro::before {
-  height: 0.75rem;
-}
-
 .deck__tick[data-current='true']::before {
   width: 2px;
   height: 1.1rem;
@@ -639,10 +583,6 @@ body:has(.landing) {
 
   .deck__text {
     display: none;
-  }
-
-  .deck__headline {
-    font-size: 1.375rem;
   }
 }
 
@@ -1132,15 +1072,13 @@ body:has(.landing) {
   .hud,
   .callout,
   .sheet[open],
-  .globe-frame__orb,
-  .deck__start svg {
+  .globe-frame__orb {
     animation: none;
   }
 
   .index__item,
   .index__name,
-  .deck__card,
-  .button {
+  .deck__card {
     transition: none;
   }
 

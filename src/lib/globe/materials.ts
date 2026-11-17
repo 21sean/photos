@@ -114,10 +114,9 @@ const LAND_FRAGMENT_SHADER = /* glsl */ `
     vec3 n = normalize(vNormal);
     vec3 viewDir = normalize(vViewPosition);
 
-    // Infrared film records how much is growing, so the pink is not flat:
-    // deepest in the tropics, dusty across the desert belts, pale at the
-    // poles. Bands by latitude, broken up by a slow wobble so they never
-    // read as stripes. A stylisation, not data.
+    // The green is not flat: deepest in the tropics, olive across the
+    // desert belts, frosted at the poles. Bands by latitude, broken up by a
+    // slow wobble so they never read as stripes. A stylisation, not data.
     float lat = degrees(asin(clamp(vUnit.y, -1.0, 1.0)));
     float lng = atan(vUnit.z, vUnit.x);
     float wobble = 7.0 * sin(lng * 3.0 + vUnit.y * 5.0) + 4.0 * sin(lng * 7.0 - vUnit.y * 9.0);
@@ -159,10 +158,14 @@ export function createOceanMaterial(): THREE.ShaderMaterial {
   });
 }
 
-/** Infrared-pink land that brightens towards the key light. */
+/** Green land that brightens towards the key light. */
 export function createLandMaterial(): THREE.ShaderMaterial {
   const { land } = GLOBE_THEME;
   return new THREE.ShaderMaterial({
+    // Nudged back in the depth buffer by a couple of steps, so the coastline
+    // and border lines drawn just above it always win instead of shimmering
+    polygonOffset: true,
+    polygonOffsetUnits: 2,
     uniforms: {
       uShade: color(land.shade),
       uLit: color(land.lit),

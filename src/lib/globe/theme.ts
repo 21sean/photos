@@ -1,9 +1,8 @@
 /**
  * Colours of the landing-page globe.
  *
- * The look borrows from Aerochrome, the infrared film that turns foliage
- * pink and water nearly black: land glows in magentas over a deep petrol
- * sea. To restyle the globe, this file is the only one to touch.
+ * Deep forest-green land over a dark petrol sea, lit like a night-side
+ * photograph. To restyle the globe, this file is the only one to touch.
  */
 export const GLOBE_THEME = {
   /** Renderer clear colour. Must match `--bg` in globals.css. */
@@ -21,29 +20,32 @@ export const GLOBE_THEME = {
 
   /**
    * Land. `shade` to `lit` is the unlit side to the side facing the key
-   * light; `lush`, `arid` and `ice` vary the pink by latitude, the way the
-   * film's colour follows how much is growing.
+   * light; `lush`, `arid` and `ice` vary the green by latitude, the way
+   * vegetation does: densest in the tropics, olive across the desert belts,
+   * frosted at the poles.
    */
   land: {
-    shade: '#6a0f38',
-    lit: '#ff5c93',
-    lush: '#e8185f',
-    arid: '#f3a8a0',
-    ice: '#ffe9ef',
-    glint: '#ffc9dc',
-    rim: '#ffd9e6'
+    shade: '#03140b',
+    lit: '#1f5236',
+    lush: '#123f26',
+    arid: '#4a5a34',
+    ice: '#8eaa98',
+    glint: '#5f9c76',
+    rim: '#7fc79a'
   },
   /** Land sits slightly above the sea so the two never z-fight. */
   landAltitude: 0.004,
-  coastline: 'rgba(255, 214, 228, 0.5)',
+  coastline: 'rgba(150, 222, 178, 0.45)',
 
-  /** Country boundaries, drawn dark over the bright land. */
-  borders: '#4a0a26',
-  bordersOpacity: 0.55,
+  /** Country boundaries, drawn faint and light over the dark land. */
+  borders: '#8fd6aa',
+  bordersOpacity: 0.22,
   bordersAltitude: 0.005,
 
   atmosphere: '#7fdfe9',
   atmosphereAltitude: 0.17,
+  /** How bright the atmosphere's glow is, as a fraction of `atmosphere`. */
+  atmosphereStrength: 0.8,
 
   /** The faint celestial grid behind the globe. */
   graticule: '#1f3a40',
